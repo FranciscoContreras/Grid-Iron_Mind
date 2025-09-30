@@ -271,8 +271,85 @@ async function viewPlayerDetails(playerId) {
         const modal = document.getElementById('playerModal');
         document.getElementById('modalPlayerName').textContent = player.name;
 
+        // Load career stats
+        let careerHTML = '';
+        try {
+            const careerResult = await apiCall(`/api/v1/players/${playerId}/career`);
+            const careerData = careerResult.data.data;
+
+            if (careerData.career_stats && careerData.career_stats.length > 0) {
+                const currentYear = new Date().getFullYear();
+                const stats = careerData.career_stats;
+
+                // Sort by season descending (most recent first)
+                stats.sort((a, b) => b.season - a.season);
+
+                careerHTML = `
+                    <h3 style="margin-top: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                        📊 Career Statistics
+                    </h3>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table class="data-table" style="font-size: 14px;">
+                            <thead>
+                                <tr>
+                                    <th>Season</th>
+                                    <th>GP</th>
+                                    <th>Pass Yds</th>
+                                    <th>Pass TD</th>
+                                    <th>INT</th>
+                                    <th>Rush Yds</th>
+                                    <th>Rush TD</th>
+                                    <th>Rec</th>
+                                    <th>Rec Yds</th>
+                                    <th>Rec TD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${stats.map(s => `
+                                    <tr style="${s.season === currentYear ? 'background-color: rgba(76, 175, 80, 0.1); font-weight: bold;' : ''}">
+                                        <td>${s.season}${s.season === currentYear ? ' ⭐' : ''}</td>
+                                        <td>${s.games_played || 0}</td>
+                                        <td>${s.passing_yards || 0}</td>
+                                        <td>${s.passing_tds || 0}</td>
+                                        <td>${s.passing_ints || 0}</td>
+                                        <td>${s.rushing_yards || 0}</td>
+                                        <td>${s.rushing_tds || 0}</td>
+                                        <td>${s.receptions || 0}</td>
+                                        <td>${s.receiving_yards || 0}</td>
+                                        <td>${s.receiving_tds || 0}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else {
+                careerHTML = `
+                    <h3 style="margin-top: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                        📊 Career Statistics
+                    </h3>
+                    <p style="padding: 20px; text-align: center; color: #666;">
+                        No career statistics available yet. Stats will be synced from ESPN.
+                    </p>
+                `;
+            }
+        } catch (error) {
+            console.error('Failed to load career stats:', error);
+            careerHTML = `
+                <h3 style="margin-top: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                    📊 Career Statistics
+                </h3>
+                <p style="padding: 20px; text-align: center; color: #666;">
+                    Unable to load career statistics.
+                </p>
+            `;
+        }
+
         const details = `
             <div style="line-height: 2;">
+                <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
+                    ℹ️ Player Information
+                </h3>
                 <p><strong>Position:</strong> ${player.position}</p>
                 <p><strong>Jersey:</strong> ${player.jersey_number || 'N/A'}</p>
                 <p><strong>Status:</strong> <span class="badge badge-${player.status}">${player.status}</span></p>
@@ -281,6 +358,7 @@ async function viewPlayerDetails(playerId) {
                 <p><strong>College:</strong> ${player.college || 'N/A'}</p>
                 <p><strong>Draft:</strong> ${player.draft_year ? `${player.draft_year} - Round ${player.draft_round}, Pick ${player.draft_pick}` : 'N/A'}</p>
             </div>
+            ${careerHTML}
         `;
 
         document.getElementById('modalPlayerDetails').innerHTML = details;
