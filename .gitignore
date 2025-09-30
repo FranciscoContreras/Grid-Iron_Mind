@@ -1,4 +1,4 @@
-# Binaries
+# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
@@ -7,29 +7,37 @@
 bin/
 dist/
 
-# Test binary
+# Test binary, built with `go test -c`
 *.test
 
 # Output of the go coverage tool
 *.out
 
-# Dependency directories
-vendor/
-
 # Go workspace file
 go.work
+
+# Dependency directories
+vendor/
 
 # Environment files
 .env
 .env.local
+.env.*.local
 
-# IDE
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
+
+# Build artifacts
+tmp/
+temp/
+
+# Vercel
+.vercel
