@@ -462,6 +462,145 @@ function initDarkMode() {
 }
 
 // Initialize
+// Games Functions
+async function loadGames() {
+    showLoading('gamesLoading');
+    hideError('gamesError');
+
+    const season = document.getElementById('seasonFilter').value;
+    const week = document.getElementById('weekFilter').value;
+    const status = document.getElementById('gameStatusFilter').value;
+
+    const params = {};
+    if (season) params.season = season;
+    if (week) params.week = week;
+    if (status) params.status = status;
+
+    try {
+        const result = await apiCall('/api/v1/games', params);
+        const games = result.data.data || [];
+        renderGames(games);
+    } catch (error) {
+        showError('gamesError', `Failed to load games: ${error.message}`);
+    } finally {
+        hideLoading('gamesLoading');
+    }
+}
+
+function renderGames(games) {
+    const tbody = document.getElementById('gamesTableBody');
+
+    if (games.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No games found</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = games.map(game => `
+        <tr>
+            <td>${game.game_date ? new Date(game.game_date).toLocaleDateString() : 'TBD'}</td>
+            <td>${game.away_team || 'N/A'}</td>
+            <td style="text-align: center; font-weight: bold;">
+                ${game.away_score !== null ? game.away_score : '-'} - ${game.home_score !== null ? game.home_score : '-'}
+            </td>
+            <td>${game.home_team || 'N/A'}</td>
+            <td><span class="badge badge-${game.status}">${game.status || 'scheduled'}</span></td>
+            <td>${game.weather_temp ? `${game.weather_temp}°F ${game.weather_condition || ''}` : 'N/A'}</td>
+            <td>${game.venue_name || 'N/A'}${game.venue_city ? `, ${game.venue_city}` : ''}</td>
+        </tr>
+    `).join('');
+}
+
+// Career Stats Functions
+async function loadCareerStats() {
+    const playerId = document.getElementById('careerPlayerId').value.trim();
+
+    if (!playerId) {
+        showError('careerError', 'Please enter a player ID');
+        return;
+    }
+
+    showLoading('careerLoading');
+    hideError('careerError');
+    document.getElementById('careerStatsContainer').style.display = 'none';
+
+    try {
+        const result = await apiCall(`/api/v1/players/${playerId}/career`);
+        const data = result.data.data;
+        renderCareerStats(data);
+    } catch (error) {
+        showError('careerError', `Failed to load career stats: ${error.message}`);
+    } finally {
+        hideLoading('careerLoading');
+    }
+}
+
+function renderCareerStats(data) {
+    document.getElementById('careerStatsContainer').style.display = 'block';
+    document.getElementById('careerPlayerName').textContent = `Player ID: ${data.player_id}`;
+    document.getElementById('careerSummary').textContent =
+        `Total Seasons: ${data.total_seasons || 0} | Teams: ${data.team_history?.length || 0}`;
+
+    // Render team history
+    const teamHistoryBody = document.getElementById('teamHistoryBody');
+    if (data.team_history && data.team_history.length > 0) {
+        teamHistoryBody.innerHTML = data.team_history.map(history => `
+            <tr>
+                <td>${history.team_name || 'N/A'}</td>
+                <td>${history.position}</td>
+                <td>${history.season_start} - ${history.season_end || 'Present'}</td>
+                <td>${history.is_current ? '✓' : ''}</td>
+            </tr>
+        `).join('');
+    } else {
+        teamHistoryBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No team history available</td></tr>';
+    }
+
+    // Render career stats
+    const careerStatsBody = document.getElementById('careerStatsBody');
+    if (data.career_stats && data.career_stats.length > 0) {
+        careerStatsBody.innerHTML = data.career_stats.map(stat => `
+            <tr>
+                <td><strong>${stat.season}</strong></td>
+                <td>${stat.team_name || 'N/A'}</td>
+                <td>${stat.games_played || 0}</td>
+                <td>${stat.passing_yards || 0}</td>
+                <td>${stat.passing_tds || 0}</td>
+                <td>${stat.rushing_yards || 0}</td>
+                <td>${stat.rushing_tds || 0}</td>
+                <td>${stat.receptions || 0}</td>
+                <td>${stat.receiving_yards || 0}</td>
+                <td>${stat.receiving_tds || 0}</td>
+            </tr>
+        `).join('');
+    } else {
+        careerStatsBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No career stats available</td></tr>';
+    }
+}
+
+// Admin Sync Functions
+async function syncData(endpoint, body = {}) {
+    const statusDiv = document.getElementById('syncStatus');
+    statusDiv.innerHTML = '<p class="loading">Syncing...</p>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/admin/sync/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            statusDiv.innerHTML = `<p class="success">✓ ${result.data.message}</p>`;
+        } else {
+            statusDiv.innerHTML = `<p class="error">✗ Sync failed: ${result.error?.message || 'Unknown error'}</p>`;
+        }
+    } catch (error) {
+        statusDiv.innerHTML = `<p class="error">✗ Sync failed: ${error.message}</p>`;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initPlayerFilters();
@@ -473,10 +612,50 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPlayers();
     loadTeams();
 
-    // Refresh teams button
+    // Refresh buttons
     document.getElementById('refreshTeams').addEventListener('click', () => {
         localStorage.clear();
         loadTeams();
+    });
+
+    document.getElementById('refreshGames').addEventListener('click', loadGames);
+
+    // Career stats
+    document.getElementById('loadCareerStats').addEventListener('click', loadCareerStats);
+
+    // Admin sync buttons - ESPN
+    document.getElementById('syncTeams').addEventListener('click', () => syncData('teams'));
+    document.getElementById('syncRosters').addEventListener('click', () => syncData('rosters'));
+    document.getElementById('syncGames').addEventListener('click', () => syncData('games'));
+    document.getElementById('syncFull').addEventListener('click', () => syncData('full'));
+
+    // Admin sync buttons - Historical
+    document.getElementById('syncHistoricalSeason').addEventListener('click', () => {
+        const year = parseInt(document.getElementById('historicalYear').value);
+        syncData('historical/season', { year });
+    });
+
+    document.getElementById('syncMultipleSeasons').addEventListener('click', () => {
+        const start_year = parseInt(document.getElementById('multiSeasonStart').value);
+        const end_year = parseInt(document.getElementById('multiSeasonEnd').value);
+        syncData('historical/seasons', { start_year, end_year });
+    });
+
+    // Admin sync buttons - NFLverse
+    document.getElementById('syncNFLverseStats').addEventListener('click', () => {
+        const season = parseInt(document.getElementById('nflverseStatsSeason').value);
+        syncData('nflverse/stats', { season });
+    });
+
+    document.getElementById('syncNFLverseSchedule').addEventListener('click', () => {
+        const season = parseInt(document.getElementById('nflverseScheduleSeason').value);
+        syncData('nflverse/schedule', { season });
+    });
+
+    document.getElementById('syncNFLverseNextGen').addEventListener('click', () => {
+        const season = parseInt(document.getElementById('nflverseNextGenSeason').value);
+        const stat_type = document.getElementById('nflverseStatType').value;
+        syncData('nflverse/nextgen', { season, stat_type });
     });
 });
 

@@ -533,3 +533,96 @@ body.dark-mode .error {
         padding: 8px;
     }
 }
+
+/* Admin Section Styles */
+.admin-section {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.admin-section h3 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-actions .btn {
+    flex: 1;
+    min-width: 150px;
+}
+
+.sync-status {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    padding: 15px;
+    min-height: 60px;
+}
+
+.sync-status p {
+    margin: 0;
+}
+
+.sync-status .loading {
+    color: var(--primary);
+}
+
+.sync-status .success {
+    color: var(--success);
+}
+
+.sync-status .error {
+    color: var(--danger);
+}
+
+/* Career Stats Styles */
+.stats-summary {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.stats-summary h3 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.stats-summary p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Badge Styles */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-scheduled {
+    background: var(--warning);
+    color: #000;
+}
+
+.badge-in_progress {
+    background: var(--primary);
+    color: #fff;
+}
+
+.badge-final {
+    background: var(--success);
+    color: #fff;
+}

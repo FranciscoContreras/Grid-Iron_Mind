@@ -27,7 +27,9 @@
         <nav class="tabs">
             <button class="tab active" data-tab="players">Players</button>
             <button class="tab" data-tab="teams">Teams</button>
-            <button class="tab" data-tab="stats">Stats</button>
+            <button class="tab" data-tab="games">Games</button>
+            <button class="tab" data-tab="career">Career Stats</button>
+            <button class="tab" data-tab="admin">Admin Sync</button>
             <button class="tab" data-tab="api-test">API Testing</button>
         </nav>
 
@@ -108,37 +110,170 @@
                 </div>
             </section>
 
-            <!-- Stats Tab -->
-            <section id="stats-tab" class="tab-content">
+            <!-- Games Tab -->
+            <section id="games-tab" class="tab-content">
                 <div class="section-header">
-                    <h2>Stat Leaders</h2>
-                    <button class="btn-refresh" id="refreshStats">↻ Refresh</button>
+                    <h2>Games & Schedule</h2>
+                    <button class="btn-refresh" id="refreshGames">↻ Refresh</button>
                 </div>
 
                 <div class="filters">
-                    <select id="statTypeFilter" class="select">
-                        <option value="passing_yards">Passing Yards</option>
-                        <option value="rushing_yards">Rushing Yards</option>
-                        <option value="receiving_yards">Receiving Yards</option>
-                        <option value="touchdowns">Touchdowns</option>
-                        <option value="interceptions">Interceptions</option>
-                    </select>
-                    <select id="statPositionFilter" class="select">
-                        <option value="">All Positions</option>
-                        <option value="QB">QB</option>
-                        <option value="RB">RB</option>
-                        <option value="WR">WR</option>
-                        <option value="TE">TE</option>
-                    </select>
-                    <select id="limitFilter" class="select">
-                        <option value="10">Top 10</option>
-                        <option value="25">Top 25</option>
-                        <option value="50">Top 50</option>
+                    <input type="number" id="seasonFilter" placeholder="Season (e.g., 2024)" class="input" value="2024">
+                    <input type="number" id="weekFilter" placeholder="Week (1-18)" class="input" min="1" max="18">
+                    <select id="gameStatusFilter" class="select">
+                        <option value="">All Status</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="final">Final</option>
                     </select>
                 </div>
 
-                <div class="stats-placeholder">
-                    <p>📊 Stat leaders will be available after implementing game stats endpoints (Phase 4)</p>
+                <div class="loading" id="gamesLoading" style="display: none;">Loading...</div>
+                <div class="error" id="gamesError" style="display: none;"></div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Away Team</th>
+                                <th>Score</th>
+                                <th>Home Team</th>
+                                <th>Status</th>
+                                <th>Weather</th>
+                                <th>Venue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gamesTableBody">
+                            <tr><td colspan="7" style="text-align: center; padding: 20px;">Select filters and click Refresh</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Career Stats Tab -->
+            <section id="career-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>Player Career Statistics</h2>
+                </div>
+
+                <div class="form-group">
+                    <label>Player ID (UUID)</label>
+                    <input type="text" id="careerPlayerId" class="input" placeholder="Enter player UUID">
+                    <button class="btn btn-primary" id="loadCareerStats">Load Career Stats</button>
+                </div>
+
+                <div class="loading" id="careerLoading" style="display: none;">Loading...</div>
+                <div class="error" id="careerError" style="display: none;"></div>
+
+                <div id="careerStatsContainer" style="display: none;">
+                    <div class="stats-summary">
+                        <h3 id="careerPlayerName"></h3>
+                        <p id="careerSummary"></p>
+                    </div>
+
+                    <h4>Team History</h4>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Team</th>
+                                    <th>Position</th>
+                                    <th>Seasons</th>
+                                    <th>Current</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teamHistoryBody"></tbody>
+                        </table>
+                    </div>
+
+                    <h4>Season-by-Season Stats</h4>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Season</th>
+                                    <th>Team</th>
+                                    <th>GP</th>
+                                    <th>Pass Yds</th>
+                                    <th>Pass TD</th>
+                                    <th>Rush Yds</th>
+                                    <th>Rush TD</th>
+                                    <th>Rec</th>
+                                    <th>Rec Yds</th>
+                                    <th>Rec TD</th>
+                                </tr>
+                            </thead>
+                            <tbody id="careerStatsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Sync Tab -->
+            <section id="admin-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>Admin Data Synchronization</h2>
+                </div>
+
+                <div class="admin-section">
+                    <h3>ESPN Data Sync</h3>
+                    <div class="admin-actions">
+                        <button class="btn" id="syncTeams">Sync Teams</button>
+                        <button class="btn" id="syncRosters">Sync Rosters</button>
+                        <button class="btn" id="syncGames">Sync Current Games</button>
+                        <button class="btn btn-primary" id="syncFull">Full Sync</button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Historical Data Sync</h3>
+                    <div class="form-group">
+                        <label>Season Year</label>
+                        <input type="number" id="historicalYear" class="input" placeholder="e.g., 2023" value="2023">
+                        <button class="btn" id="syncHistoricalSeason">Sync Season</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Season Range</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="multiSeasonStart" class="input" placeholder="Start year" value="2020">
+                            <input type="number" id="multiSeasonEnd" class="input" placeholder="End year" value="2023">
+                            <button class="btn" id="syncMultipleSeasons">Sync Range</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>NFLverse Data Enrichment</h3>
+                    <div class="form-group">
+                        <label>Season for Stats Sync</label>
+                        <input type="number" id="nflverseStatsSeason" class="input" placeholder="e.g., 2024" value="2024">
+                        <button class="btn" id="syncNFLverseStats">Sync Player Stats</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Season for Schedule Sync (Weather & Venue)</label>
+                        <input type="number" id="nflverseScheduleSeason" class="input" placeholder="e.g., 2024" value="2024">
+                        <button class="btn" id="syncNFLverseSchedule">Sync Schedule</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Next Gen Stats</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="nflverseNextGenSeason" class="input" placeholder="Season" value="2024">
+                            <select id="nflverseStatType" class="select">
+                                <option value="passing">Passing</option>
+                                <option value="rushing">Rushing</option>
+                                <option value="receiving">Receiving</option>
+                            </select>
+                            <button class="btn" id="syncNFLverseNextGen">Sync Next Gen</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Sync Status</h3>
+                    <div id="syncStatus" class="sync-status">
+                        <p>Ready to sync data</p>
+                    </div>
                 </div>
             </section>
 
@@ -152,11 +287,24 @@
                     <div class="form-group">
                         <label>Endpoint</label>
                         <select id="apiEndpoint" class="select">
-                            <option value="/api/v1/players">GET /api/v1/players</option>
-                            <option value="/api/v1/players/:id">GET /api/v1/players/:id</option>
-                            <option value="/api/v1/teams">GET /api/v1/teams</option>
-                            <option value="/api/v1/teams/:id">GET /api/v1/teams/:id</option>
-                            <option value="/api/v1/teams/:id/players">GET /api/v1/teams/:id/players</option>
+                            <optgroup label="Players">
+                                <option value="/api/v1/players">GET /api/v1/players</option>
+                                <option value="/api/v1/players/:id">GET /api/v1/players/:id</option>
+                                <option value="/api/v1/players/:id/career">GET /api/v1/players/:id/career</option>
+                                <option value="/api/v1/players/:id/history">GET /api/v1/players/:id/history</option>
+                            </optgroup>
+                            <optgroup label="Teams">
+                                <option value="/api/v1/teams">GET /api/v1/teams</option>
+                                <option value="/api/v1/teams/:id">GET /api/v1/teams/:id</option>
+                                <option value="/api/v1/teams/:id/players">GET /api/v1/teams/:id/players</option>
+                            </optgroup>
+                            <optgroup label="Games">
+                                <option value="/api/v1/games">GET /api/v1/games</option>
+                                <option value="/api/v1/games/:id">GET /api/v1/games/:id</option>
+                            </optgroup>
+                            <optgroup label="Stats">
+                                <option value="/api/v1/stats/leaders">GET /api/v1/stats/leaders</option>
+                            </optgroup>
                         </select>
                     </div>
 
