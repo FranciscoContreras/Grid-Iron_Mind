@@ -36,13 +36,21 @@ func (ft *FlexibleTime) UnmarshalJSON(data []byte) error {
 	return lastErr
 }
 
+// SeasonType represents ESPN season type information
+type SeasonType struct {
+	ID           string `json:"id"`
+	Type         int    `json:"type"`
+	Name         string `json:"name"`
+	Abbreviation string `json:"abbreviation"`
+}
+
 // ScoreboardResponse represents the ESPN scoreboard API response
 type ScoreboardResponse struct {
 	Leagues []struct {
 		Season struct {
-			Year int    `json:"year"`
-			Type int    `json:"type"`
-			Slug string `json:"slug"`
+			Year int        `json:"year"`
+			Type SeasonType `json:"type"`
+			Slug string     `json:"slug"`
 		} `json:"season"`
 	} `json:"leagues"`
 	Events []Event `json:"events"`
@@ -63,9 +71,9 @@ type Event struct {
 
 // Season represents season information
 type Season struct {
-	Year int    `json:"year"`
-	Type int    `json:"type"`
-	Slug string `json:"slug"`
+	Year int        `json:"year"`
+	Type SeasonType `json:"type"`
+	Slug string     `json:"slug"`
 }
 
 // Week represents week information
