@@ -1,14 +1,21 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/francisco/gridironmind/internal/cache"
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/pkg/response"
 	"github.com/google/uuid"
 )
+
+func getCurrentTimestamp() string {
+	return time.Now().UTC().Format(time.RFC3339)
+}
 
 type TeamsHandler struct {
 	queries *db.TeamQueries
@@ -47,6 +54,16 @@ func (h *TeamsHandler) HandleTeams(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TeamsHandler) listTeams(w http.ResponseWriter, r *http.Request) {
+	cacheKey := cache.TeamsCacheKey()
+
+	// Try cache first
+	if cached, err := cache.Get(r.Context(), cacheKey); err == nil && cached != "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("X-Cache", "HIT")
+		w.Write([]byte(cached))
+		return
+	}
+
 	// Query database
 	teams, err := h.queries.ListTeams(r.Context())
 	if err != nil {
@@ -55,8 +72,25 @@ func (h *TeamsHandler) listTeams(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Build response
+	respData := struct {
+		Data interface{} `json:"data"`
+		Meta struct {
+			Timestamp string `json:"timestamp"`
+		} `json:"meta"`
+	}{
+		Data: teams,
+	}
+	respData.Meta.Timestamp = getCurrentTimestamp()
+
+	// Marshal and cache
+	respJSON, _ := json.Marshal(respData)
+	cache.Set(r.Context(), cacheKey, string(respJSON), cache.TTLTeams)
+
 	// Return response
-	response.Success(w, teams)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("X-Cache", "MISS")
+	w.Write(respJSON)
 }
 
 func (h *TeamsHandler) getTeam(w http.ResponseWriter, r *http.Request, idStr string) {

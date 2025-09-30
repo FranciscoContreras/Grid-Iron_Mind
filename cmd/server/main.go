@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/francisco/gridironmind/internal/cache"
 	"github.com/francisco/gridironmind/internal/config"
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/internal/handlers"
@@ -38,6 +39,20 @@ func main() {
 	defer db.Close()
 
 	log.Println("Database connection established")
+
+	// Connect to Redis (optional - continue if not available)
+	if cfg.RedisURL != "" {
+		cacheConfig := cache.Config{
+			RedisURL: cfg.RedisURL,
+		}
+		if err := cache.Connect(cacheConfig); err != nil {
+			log.Printf("Warning: Failed to connect to Redis: %v (caching disabled)", err)
+		} else {
+			defer cache.Close()
+		}
+	} else {
+		log.Println("Redis URL not configured (caching disabled)")
+	}
 
 	// Initialize handlers
 	playersHandler := handlers.NewPlayersHandler()
