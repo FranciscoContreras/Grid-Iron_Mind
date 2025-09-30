@@ -189,7 +189,13 @@ function renderPlayers() {
 
     filteredPlayers.forEach(player => {
         const row = document.createElement('tr');
-        const headshotUrl = player.headshot_url || `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.espn_athlete_id || 'default'}.png&w=350&h=254`;
+        // Use headshot if available, otherwise use NFL ID for ESPN URL, or use placeholder
+        let headshotUrl = 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50';
+        if (player.headshot_url) {
+            headshotUrl = player.headshot_url;
+        } else if (player.nfl_id) {
+            headshotUrl = `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.nfl_id}.png&w=350&h=254`;
+        }
         const yearsPro = player.years_pro ? `${player.years_pro} yrs` : 'Rookie';
 
         row.innerHTML = `
@@ -456,7 +462,13 @@ function renderTeamRoster(players) {
             </thead>
             <tbody>
                 ${players.map(player => {
-                    const headshotUrl = player.headshot_url || `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.espn_athlete_id || 'default'}.png&w=350&h=254`;
+                    // Use headshot if available, otherwise use NFL ID for ESPN URL, or use placeholder
+                    let headshotUrl = 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50';
+                    if (player.headshot_url) {
+                        headshotUrl = player.headshot_url;
+                    } else if (player.nfl_id) {
+                        headshotUrl = `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.nfl_id}.png&w=350&h=254`;
+                    }
                     return `
                         <tr>
                             <td><img src="${headshotUrl}" alt="${player.name}" class="player-headshot" onerror="this.src='https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50'"></td>
