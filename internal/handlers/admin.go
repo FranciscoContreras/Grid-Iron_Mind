@@ -409,8 +409,9 @@ func (h *AdminHandler) HandleSyncTeamStats(w http.ResponseWriter, r *http.Reques
 	}
 
 	var reqBody struct {
-		Season int `json:"season"`
-		Week   int `json:"week"`
+		Season int  `json:"season"`
+		Week   int  `json:"week"`
+		Debug  bool `json:"debug"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
@@ -426,12 +427,12 @@ func (h *AdminHandler) HandleSyncTeamStats(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	log.Printf("Admin endpoint: Team stats sync requested for season %d, week %d", reqBody.Season, reqBody.Week)
+	log.Printf("Admin endpoint: Team stats sync requested for season %d, week %d (debug=%v)", reqBody.Season, reqBody.Week, reqBody.Debug)
 
 	ctx := r.Context()
 	if err := h.ingestionService.SyncGameTeamStats(ctx, reqBody.Season, reqBody.Week); err != nil {
 		log.Printf("Team stats sync failed: %v", err)
-		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", "Failed to sync team stats")
+		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", fmt.Sprintf("Failed to sync team stats: %v", err))
 		return
 	}
 

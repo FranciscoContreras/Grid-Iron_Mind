@@ -840,7 +840,8 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 			statsDisplay := make(map[string]string)
 			for _, stat := range teamStats.Statistics {
 				statsDisplay[stat.Name] = stat.DisplayValue
-				// Handle the value field which can be float64 or string "-"
+
+				// Special handling for X-Y format stats
 				if stat.Name == "thirdDownEff" || stat.Name == "fourthDownEff" ||
 					stat.Name == "redZoneAttempts" || stat.Name == "completionAttempts" ||
 					stat.Name == "sacksYardsLost" || stat.Name == "totalPenaltiesYards" {
@@ -852,10 +853,14 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 						stats[stat.Name+"_made"] = made
 						stats[stat.Name+"_att"] = att
 					}
-				} else {
-					// For regular numeric stats, try to parse the display value
-					if val, err := strconv.ParseFloat(stat.DisplayValue, 64); err == nil {
-						stats[stat.Name] = val
+				} else if stat.Value != nil {
+					// Use the Value field if available (it's already a number)
+					switch v := stat.Value.(type) {
+					case float64:
+						stats[stat.Name] = v
+					case string:
+						// Skip string values like "-"
+						continue
 					}
 				}
 			}

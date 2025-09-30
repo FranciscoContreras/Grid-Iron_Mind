@@ -315,9 +315,11 @@ type GameDetailResponse struct {
 		Teams []struct {
 			Team       TeamInfo `json:"team"`
 			Statistics []struct {
-				Name             string `json:"name"`
-				DisplayValue     string `json:"displayValue"`
-				Abbreviation     string `json:"abbreviation"`
+				Name             string      `json:"name"`
+				DisplayValue     string      `json:"displayValue"`
+				Value            interface{} `json:"value"` // can be float64 or string "-"
+				Label            string      `json:"label"`
+				Abbreviation     string      `json:"abbreviation"`
 			} `json:"statistics"`
 		} `json:"teams"`
 		Players []struct {
