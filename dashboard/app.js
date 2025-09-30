@@ -189,17 +189,25 @@ function renderPlayers() {
 
     filteredPlayers.forEach(player => {
         const row = document.createElement('tr');
-        // Use headshot if available, otherwise use NFL ID for ESPN URL, or use placeholder
-        let headshotUrl = 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50';
-        if (player.headshot_url) {
+        // Use placeholder by default - images will attempt to load ESPN headshots via onerror chain
+        const placeholderUrl = 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50';
+        let headshotUrl = placeholderUrl;
+
+        // Try headshot_url first, then ESPN with nfl_id
+        if (player.headshot_url && player.headshot_url.trim() !== '') {
             headshotUrl = player.headshot_url;
         } else if (player.nfl_id) {
             headshotUrl = `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.nfl_id}.png&w=350&h=254`;
         }
+
         const yearsPro = player.years_pro ? `${player.years_pro} yrs` : 'Rookie';
 
         row.innerHTML = `
-            <td><img src="${headshotUrl}" alt="${player.name}" class="player-headshot" onerror="this.src='https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50'"></td>
+            <td><img src="${headshotUrl}"
+                     alt="${player.name}"
+                     class="player-headshot"
+                     style="max-width: 50px; max-height: 50px; object-fit: contain;"
+                     onerror="this.onerror=null; this.src='${placeholderUrl}';"></td>
             <td><strong>${player.name}</strong></td>
             <td><span class="position-badge">${player.position}</span></td>
             <td>--</td>
@@ -463,8 +471,18 @@ async function viewTeamDetail(teamId, teamName, teamData) {
     // Show back button
     document.getElementById('backToTeams').style.display = 'inline-block';
 
-    // Set team name
-    document.getElementById('teamDetailName').textContent = teamName;
+    // Set team name with logo
+    const teamLogo = teamData.abbreviation ?
+        `https://a.espncdn.com/i/teamlogos/nfl/500/${teamData.abbreviation.toLowerCase()}.png` :
+        'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=100&w=100';
+
+    document.getElementById('teamDetailName').innerHTML = `
+        <img src="${teamLogo}"
+             alt="${teamName}"
+             style="height: 60px; width: 60px; vertical-align: middle; margin-right: 15px; object-fit: contain;"
+             onerror="this.src='https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=100&w=100'">
+        ${teamName}
+    `;
 
     // Load games history and roster
     try {
@@ -540,16 +558,24 @@ function renderTeamRoster(players) {
             </thead>
             <tbody>
                 ${players.map(player => {
-                    // Use headshot if available, otherwise use NFL ID for ESPN URL, or use placeholder
-                    let headshotUrl = 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50';
-                    if (player.headshot_url) {
+                    // Use placeholder by default - images will attempt to load ESPN headshots via onerror chain
+                    const placeholderUrl = 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50';
+                    let headshotUrl = placeholderUrl;
+
+                    // Try headshot_url first, then ESPN with nfl_id
+                    if (player.headshot_url && player.headshot_url.trim() !== '') {
                         headshotUrl = player.headshot_url;
                     } else if (player.nfl_id) {
                         headshotUrl = `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.nfl_id}.png&w=350&h=254`;
                     }
+
                     return `
                         <tr>
-                            <td><img src="${headshotUrl}" alt="${player.name}" class="player-headshot" onerror="this.src='https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50'"></td>
+                            <td><img src="${headshotUrl}"
+                                     alt="${player.name}"
+                                     class="player-headshot"
+                                     style="max-width: 50px; max-height: 50px; object-fit: contain;"
+                                     onerror="this.onerror=null; this.src='${placeholderUrl}';"></td>
                             <td><strong>${player.name}</strong></td>
                             <td><span class="position-badge">${player.position}</span></td>
                             <td>#${player.jersey_number || '--'}</td>
