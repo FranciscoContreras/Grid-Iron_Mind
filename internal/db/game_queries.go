@@ -23,7 +23,7 @@ func (q *GameQueries) ListGames(ctx context.Context, filters models.GameFilters)
 	argPos := 1
 
 	if filters.Season > 0 {
-		whereClause += fmt.Sprintf(" AND season_year = $%d", argPos)
+		whereClause += fmt.Sprintf(" AND season = $%d", argPos)
 		args = append(args, filters.Season)
 		argPos++
 	}
@@ -55,7 +55,7 @@ func (q *GameQueries) ListGames(ctx context.Context, filters models.GameFilters)
 
 	// Fetch games
 	query := fmt.Sprintf(`
-		SELECT id, espn_game_id, season_year, season_type, week, game_date,
+		SELECT id, espn_game_id, season, season_type, week, game_date,
 		       home_team_id, away_team_id, home_score, away_score, status,
 		       created_at, updated_at
 		FROM games
@@ -96,7 +96,7 @@ func (q *GameQueries) GetGameByID(ctx context.Context, id uuid.UUID) (*models.Ga
 	}
 
 	query := `
-		SELECT id, espn_game_id, season_year, season_type, week, game_date,
+		SELECT id, espn_game_id, season, season_type, week, game_date,
 		       home_team_id, away_team_id, home_score, away_score, status,
 		       created_at, updated_at
 		FROM games
@@ -126,7 +126,7 @@ func (q *StatsQueries) GetGameStats(ctx context.Context, gameID uuid.UUID) ([]mo
 	}
 
 	query := `
-		SELECT id, player_id, game_id, team_id, season_year, week,
+		SELECT id, player_id, game_id, team_id, season, week,
 		       passing_yards, passing_touchdowns, passing_interceptions, passing_completions, passing_attempts,
 		       rushing_yards, rushing_touchdowns, rushing_attempts,
 		       receiving_yards, receiving_touchdowns, receiving_receptions, receiving_targets,
@@ -173,7 +173,7 @@ func (q *StatsQueries) GetPlayerStats(ctx context.Context, playerID uuid.UUID, f
 	argPos := 2
 
 	if filters.Season > 0 {
-		whereClause += fmt.Sprintf(" AND season_year = $%d", argPos)
+		whereClause += fmt.Sprintf(" AND season = $%d", argPos)
 		args = append(args, filters.Season)
 		argPos++
 	}
@@ -185,14 +185,14 @@ func (q *StatsQueries) GetPlayerStats(ctx context.Context, playerID uuid.UUID, f
 	}
 
 	query := fmt.Sprintf(`
-		SELECT id, player_id, game_id, team_id, season_year, week,
+		SELECT id, player_id, game_id, team_id, season, week,
 		       passing_yards, passing_touchdowns, passing_interceptions, passing_completions, passing_attempts,
 		       rushing_yards, rushing_touchdowns, rushing_attempts,
 		       receiving_yards, receiving_touchdowns, receiving_receptions, receiving_targets,
 		       created_at, updated_at
 		FROM game_stats
 		%s
-		ORDER BY season_year DESC, week DESC
+		ORDER BY season DESC, week DESC
 		LIMIT $%d OFFSET $%d
 	`, whereClause, argPos, argPos+1)
 
@@ -262,7 +262,7 @@ func (q *StatsQueries) GetStatsLeaders(ctx context.Context, category string, sea
 		FROM game_stats gs
 		JOIN players p ON gs.player_id = p.id
 		JOIN teams t ON gs.team_id = t.id
-		WHERE gs.season_year = $1
+		WHERE gs.season = $1
 		GROUP BY gs.player_id, p.name, p.position, p.jersey_number, gs.team_id, t.abbreviation
 		ORDER BY total_stat DESC
 		LIMIT $2
