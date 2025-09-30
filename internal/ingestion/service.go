@@ -299,10 +299,33 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 	awayScore, _ := strconv.Atoi(awayTeam.Score)
 
 	status := "scheduled"
+	statusDetail := event.Status.Type.Description
 	if event.Status.Type.Completed {
 		status = "completed"
 	} else if event.Status.Type.State == "in" {
 		status = "in_progress"
+	}
+
+	// Extract venue information
+	venueID := competition.Venue.ID
+	venueName := competition.Venue.FullName
+	var venueCity, venueState string
+	if competition.Venue.Address.City != "" {
+		venueCity = competition.Venue.Address.City
+	}
+	if competition.Venue.Address.State != "" {
+		venueState = competition.Venue.Address.State
+	}
+	attendance := competition.Attendance
+
+	// Extract status details
+	var currentPeriod int
+	var gameClock string
+	if event.Status.Period > 0 {
+		currentPeriod = event.Status.Period
+	}
+	if event.Status.DisplayClock != "" {
+		gameClock = event.Status.DisplayClock
 	}
 
 	// Check if game exists
@@ -313,30 +336,36 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 	).Scan(&existingID)
 
 	if err != nil {
-		// Game doesn't exist, insert
+		// Game doesn't exist, insert with comprehensive data
 		id := uuid.New()
 		_, err = s.dbPool.Exec(ctx,
-			`INSERT INTO games (id, nfl_game_id, home_team_id, away_team_id, game_date, season, week, home_score, away_score, status)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+			`INSERT INTO games (
+				id, nfl_game_id, home_team_id, away_team_id, game_date, season, week,
+				home_score, away_score, status, status_detail, current_period, game_clock,
+				venue_id, venue_name, venue_city, venue_state, attendance
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
 			id, event.ID, homeTeamID, awayTeamID, event.Date.Time, event.Season.Year, event.Week.Number,
-			homeScore, awayScore, status,
+			homeScore, awayScore, status, statusDetail, currentPeriod, gameClock,
+			venueID, venueName, venueCity, venueState, attendance,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to insert game: %w", err)
 		}
-		log.Printf("Inserted game: %s", event.Name)
+		log.Printf("Inserted game: %s at %s", event.Name, venueName)
 	} else {
-		// Game exists, update scores and status
+		// Game exists, update scores, status, and details
 		_, err = s.dbPool.Exec(ctx,
 			`UPDATE games
-			SET home_score = $1, away_score = $2, status = $3
-			WHERE id = $4`,
-			homeScore, awayScore, status, existingID,
+			SET home_score = $1, away_score = $2, status = $3, status_detail = $4,
+			    current_period = $5, game_clock = $6, attendance = $7
+			WHERE id = $8`,
+			homeScore, awayScore, status, statusDetail,
+			currentPeriod, gameClock, attendance, existingID,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to update game: %w", err)
 		}
-		log.Printf("Updated game: %s (%d-%d)", event.Name, homeScore, awayScore)
+		log.Printf("Updated game: %s (%d-%d) - %s", event.Name, homeScore, awayScore, statusDetail)
 	}
 
 	return nil
@@ -676,14 +705,24 @@ func (s *Service) EnrichGamesWithWeather(ctx context.Context, season int) error 
 			continue
 		}
 
-		// Update game with weather data
+		// Determine if day game (kickoff before 5pm local time)
+		isDayGame := gameDate.Hour() < 17
+
+		// Update game with comprehensive weather data
 		updateQuery := `
 			UPDATE games
 			SET weather_temp = $1,
 			    weather_condition = $2,
 			    weather_wind_speed = $3,
-			    weather_humidity = $4
-			WHERE id = $5
+			    weather_humidity = $4,
+			    weather_wind_dir = $5,
+			    weather_pressure = $6,
+			    weather_visibility = $7,
+			    weather_feels_like = $8,
+			    weather_precipitation = $9,
+			    weather_cloud_cover = $10,
+			    is_day_game = $11
+			WHERE id = $12
 		`
 
 		_, err = s.dbPool.Exec(ctx, updateQuery,
@@ -691,6 +730,13 @@ func (s *Service) EnrichGamesWithWeather(ctx context.Context, season int) error 
 			weatherData.Day.Condition.Text,
 			int(weatherData.Day.MaxWindMPH),
 			int(weatherData.Day.AvgHumidity),
+			"", // Wind direction not available in historical day data
+			int(weatherData.Day.AvgPressureMb),
+			int(weatherData.Day.AvgVisMiles),
+			int(weatherData.Day.AvgTempF), // Use avg temp as feels-like for historical
+			weatherData.Day.TotalPrecipIn,
+			int(weatherData.Day.AvgCloud),
+			isDayGame,
 			gameID,
 		)
 
@@ -700,9 +746,10 @@ func (s *Service) EnrichGamesWithWeather(ctx context.Context, season int) error 
 		}
 
 		count++
-		log.Printf("Enriched game %s (%s, %s %s) with weather: %s, %.0f°F",
+		log.Printf("Enriched game %s (%s, %s %s) with weather: %s, %.0f°F, %dmph wind, %d%% humidity",
 			gameID, dateStr, city, state,
-			weatherData.Day.Condition.Text, weatherData.Day.AvgTempF)
+			weatherData.Day.Condition.Text, weatherData.Day.AvgTempF,
+			int(weatherData.Day.MaxWindMPH), int(weatherData.Day.AvgHumidity))
 
 		// Rate limiting - WeatherAPI free tier allows 1M calls/month
 		// Sleep for 500ms between requests to be respectful

@@ -58,6 +58,8 @@ type Day struct {
 	AvgVisKM          float64   `json:"avgvis_km"`
 	AvgVisMiles       float64   `json:"avgvis_miles"`
 	AvgHumidity       float64   `json:"avghumidity"`
+	AvgPressureMb     float64   `json:"avgpressure_mb"`
+	AvgCloud          float64   `json:"avgcloud"`
 	DailyChanceOfRain int       `json:"daily_chance_of_rain"`
 	DailyChanceOfSnow int       `json:"daily_chance_of_snow"`
 	Condition         Condition `json:"condition"`
