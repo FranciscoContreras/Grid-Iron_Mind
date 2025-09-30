@@ -43,6 +43,10 @@ func (h *PlayersHandler) HandlePlayers(w http.ResponseWriter, r *http.Request) {
 		// Get player team history
 		careerHandler := NewCareerHandler()
 		careerHandler.HandlePlayerTeamHistory(w, r)
+	} else if strings.HasSuffix(path, "/injuries") {
+		// Get player injuries
+		injuryHandler := NewInjuryHandler()
+		injuryHandler.HandlePlayerInjuries(w, r)
 	} else {
 		// Get single player by ID
 		h.getPlayer(w, r, path)

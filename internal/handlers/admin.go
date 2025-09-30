@@ -455,3 +455,28 @@ func (h *AdminHandler) HandleSyncTeamStats(w http.ResponseWriter, r *http.Reques
 		"status":  "success",
 	})
 }
+
+// HandleSyncInjuries triggers injury reports sync for all teams
+func (h *AdminHandler) HandleSyncInjuries(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	log.Println("Admin endpoint: Injuries sync requested")
+
+	// Run sync in background for long operations
+	go func() {
+		ctx := context.Background()
+		if err := h.ingestionService.SyncAllTeamInjuries(ctx); err != nil {
+			log.Printf("Injuries sync failed: %v", err)
+		} else {
+			log.Println("Injuries sync completed successfully")
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message": "Injury reports sync started (running in background)",
+		"status":  "success",
+	})
+}

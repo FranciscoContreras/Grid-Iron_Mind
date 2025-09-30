@@ -1000,3 +1000,116 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 
 	return nil
 }
+
+// SyncTeamInjuries fetches and updates injury reports for a team
+func (s *Service) SyncTeamInjuries(ctx context.Context, espnTeamID string) error {
+	log.Printf("Syncing injuries for team %s...", espnTeamID)
+
+	// Fetch injury report from ESPN
+	injuryReport, err := s.espnClient.FetchTeamInjuries(ctx, espnTeamID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch team injuries: %w", err)
+	}
+
+	// Get our internal team ID
+	nflID, _ := strconv.Atoi(espnTeamID)
+	var teamID uuid.UUID
+	err = s.dbPool.QueryRow(ctx, "SELECT id FROM teams WHERE nfl_id = $1", nflID).Scan(&teamID)
+	if err != nil {
+		return fmt.Errorf("team not found in database: %w", err)
+	}
+
+	injuryQueries := db.InjuryQueries{}
+	inserted := 0
+	failed := 0
+
+	for _, injury := range injuryReport.Injuries {
+		// Get player ID from ESPN athlete ID
+		espnAthleteID, _ := strconv.Atoi(injury.Athlete.ID)
+		var playerID uuid.UUID
+		err = s.dbPool.QueryRow(ctx,
+			"SELECT id FROM players WHERE nfl_id = $1",
+			espnAthleteID,
+		).Scan(&playerID)
+
+		if err != nil {
+			log.Printf("Player %s not found, skipping injury", injury.Athlete.DisplayName)
+			failed++
+			continue
+		}
+
+		// Parse dates
+		var injuryDate *time.Time
+		if injury.Date != "" {
+			if parsed, err := time.Parse(time.RFC3339, injury.Date); err == nil {
+				injuryDate = &parsed
+			}
+		}
+
+		var returnDate *time.Time
+		if injury.Details.ReturnDate != "" {
+			if parsed, err := time.Parse("2006-01-02", injury.Details.ReturnDate); err == nil {
+				returnDate = &parsed
+			}
+		}
+
+		// Create injury model
+		playerInjury := &models.PlayerInjury{
+			PlayerID:           playerID,
+			TeamID:             &teamID,
+			Status:             injury.Status,
+			StatusAbbreviation: injury.Type.Abbreviation,
+			InjuryType:         injury.Details.Type,
+			BodyLocation:       injury.Details.Location,
+			Detail:             injury.Details.Detail,
+			Side:               injury.Details.Side,
+			InjuryDate:         injuryDate,
+			ReturnDate:         returnDate,
+		}
+
+		// Upsert to database
+		if err := injuryQueries.UpsertPlayerInjury(ctx, playerInjury); err != nil {
+			log.Printf("Failed to upsert injury for %s: %v", injury.Athlete.DisplayName, err)
+			failed++
+		} else {
+			inserted++
+		}
+	}
+
+	log.Printf("Injury sync completed for team %s: %d inserted/updated, %d failed", espnTeamID, inserted, failed)
+	return nil
+}
+
+// SyncAllTeamInjuries syncs injury reports for all teams
+func (s *Service) SyncAllTeamInjuries(ctx context.Context) error {
+	log.Println("Starting all team injuries sync...")
+
+	// Get all teams
+	rows, err := s.dbPool.Query(ctx, "SELECT nfl_id FROM teams")
+	if err != nil {
+		return fmt.Errorf("failed to fetch teams: %w", err)
+	}
+	defer rows.Close()
+
+	var teamIDs []int
+	for rows.Next() {
+		var nflID int
+		if err := rows.Scan(&nflID); err != nil {
+			log.Printf("Failed to scan team ID: %v", err)
+			continue
+		}
+		teamIDs = append(teamIDs, nflID)
+	}
+
+	// Sync each team's injuries with a delay to avoid rate limiting
+	for _, nflID := range teamIDs {
+		if err := s.SyncTeamInjuries(ctx, strconv.Itoa(nflID)); err != nil {
+			log.Printf("Failed to sync injuries for team %d: %v", nflID, err)
+		}
+		// Add delay between requests to avoid rate limiting
+		time.Sleep(1 * time.Second)
+	}
+
+	log.Println("All team injuries sync completed")
+	return nil
+}

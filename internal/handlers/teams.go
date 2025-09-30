@@ -42,10 +42,13 @@ func (h *TeamsHandler) HandleTeams(w http.ResponseWriter, r *http.Request) {
 		// List all teams
 		h.listTeams(w, r)
 	} else {
-		// Check if requesting team players
+		// Check if requesting team players or injuries
 		parts := strings.Split(path, "/")
 		if len(parts) == 2 && parts[1] == "players" {
 			h.getTeamPlayers(w, r, parts[0])
+		} else if len(parts) == 2 && parts[1] == "injuries" {
+			injuryHandler := NewInjuryHandler()
+			injuryHandler.HandleTeamInjuries(w, r)
 		} else {
 			// Get single team by ID
 			h.getTeam(w, r, path)

@@ -102,6 +102,9 @@ func main() {
 	// Team stats sync endpoint
 	mux.HandleFunc("/api/v1/admin/sync/team-stats", applyMiddleware(adminHandler.HandleSyncTeamStats))
 
+	// Injury sync endpoint
+	mux.HandleFunc("/api/v1/admin/sync/injuries", applyMiddleware(adminHandler.HandleSyncInjuries))
+
 	// Weather API endpoints
 	mux.HandleFunc("/api/v1/weather/current", applyMiddleware(weatherHandler.HandleCurrentWeather))
 	mux.HandleFunc("/api/v1/weather/historical", applyMiddleware(weatherHandler.HandleHistoricalWeather))
