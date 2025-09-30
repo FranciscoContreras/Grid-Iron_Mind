@@ -465,10 +465,56 @@
                 </div>
 
                 <div class="admin-section">
-                    <h3>Sync Status</h3>
-                    <div id="syncStatus" class="sync-status">
-                        <p>Ready to sync data</p>
+                    <h3>Weather Data Enrichment</h3>
+                    <div class="form-group">
+                        <label>Season for Weather Enrichment</label>
+                        <input type="number" id="weatherSyncSeason" class="input" placeholder="e.g., 2024" value="2024">
+                        <button class="btn" id="syncWeather">Enrich with Weather Data</button>
                     </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>📊 Database Status</h3>
+                    <div id="dbStatus" class="sync-status" style="background: var(--bg-primary); padding: 20px; border-radius: 8px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">TEAMS</div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbTeamsCount">--</div>
+                            </div>
+                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">PLAYERS</div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbPlayersCount">--</div>
+                            </div>
+                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">GAMES</div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbGamesCount">--</div>
+                            </div>
+                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">WEATHER DATA</div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbWeatherCount">--</div>
+                            </div>
+                        </div>
+                        <button class="btn" id="refreshDbStatus" style="width: 100%;">↻ Refresh Database Status</button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>🔄 Sync Status & Log</h3>
+                    <div id="syncStatus" class="sync-status" style="min-height: 150px; max-height: 400px; overflow-y: auto;">
+                        <p style="color: var(--text-secondary);">Ready to sync data. Click any sync button above to start.</p>
+                    </div>
+                    <button class="btn" id="clearSyncLog" style="margin-top: 10px;">Clear Log</button>
+                </div>
+
+                <div class="admin-section">
+                    <h3>⚡ Quick Actions</h3>
+                    <div class="admin-actions">
+                        <button class="btn btn-primary" id="quickSyncAll">🚀 Sync Everything (2020-2024)</button>
+                        <button class="btn" id="syncCurrent2024">📅 Sync 2024 Season Only</button>
+                    </div>
+                    <p style="margin-top: 10px; color: var(--text-secondary); font-size: 14px;">
+                        Quick sync runs: Teams → Rosters → Historical Games (2020-2024) → NFLverse Stats → Weather Data
+                    </p>
                 </div>
             </section>
 

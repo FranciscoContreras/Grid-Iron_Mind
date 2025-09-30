@@ -1187,9 +1187,74 @@ function calculateFantasyPoints(player, scoringType) {
 }
 
 // Admin Sync Functions
-async function syncData(endpoint, body = {}) {
+let syncLog = [];
+
+function addToSyncLog(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = { timestamp, message, type };
+    syncLog.unshift(logEntry);
+
+    // Keep only last 50 entries
+    if (syncLog.length > 50) {
+        syncLog = syncLog.slice(0, 50);
+    }
+
+    // Save to localStorage
+    localStorage.setItem('syncLog', JSON.stringify(syncLog));
+
+    updateSyncDisplay();
+}
+
+function updateSyncDisplay() {
     const statusDiv = document.getElementById('syncStatus');
-    statusDiv.innerHTML = '<p class="loading">Syncing...</p>';
+
+    if (syncLog.length === 0) {
+        statusDiv.innerHTML = '<p style="color: var(--text-secondary);">Ready to sync data. Click any sync button above to start.</p>';
+        return;
+    }
+
+    let html = '';
+    syncLog.forEach(entry => {
+        let color = 'var(--text-primary)';
+        let icon = 'ℹ️';
+
+        if (entry.type === 'success') {
+            color = 'var(--success)';
+            icon = '✓';
+        } else if (entry.type === 'error') {
+            color = 'var(--danger)';
+            icon = '✗';
+        } else if (entry.type === 'loading') {
+            color = 'var(--primary)';
+            icon = '⟳';
+        }
+
+        html += `<div style="padding: 8px; border-bottom: 1px solid var(--border); color: ${color};">
+            <span style="color: var(--text-secondary); font-size: 11px;">${entry.timestamp}</span>
+            <span style="margin-left: 10px;">${icon} ${entry.message}</span>
+        </div>`;
+    });
+
+    statusDiv.innerHTML = html;
+}
+
+function clearSyncLog() {
+    syncLog = [];
+    localStorage.removeItem('syncLog');
+    updateSyncDisplay();
+}
+
+// Load sync log from localStorage on page load
+function loadSyncLog() {
+    const stored = localStorage.getItem('syncLog');
+    if (stored) {
+        syncLog = JSON.parse(stored);
+        updateSyncDisplay();
+    }
+}
+
+async function syncData(endpoint, body = {}) {
+    addToSyncLog(`Starting ${endpoint} sync...`, 'loading');
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/v1/admin/sync/${endpoint}`, {
@@ -1201,13 +1266,98 @@ async function syncData(endpoint, body = {}) {
         const result = await response.json();
 
         if (response.ok) {
-            statusDiv.innerHTML = `<p class="success">✓ ${result.data.message}</p>`;
+            addToSyncLog(`${result.data.message}`, 'success');
+
+            // Refresh database status after sync
+            setTimeout(refreshDatabaseStatus, 2000);
         } else {
-            statusDiv.innerHTML = `<p class="error">✗ Sync failed: ${result.error?.message || 'Unknown error'}</p>`;
+            addToSyncLog(`Sync failed: ${result.error?.message || 'Unknown error'}`, 'error');
         }
     } catch (error) {
-        statusDiv.innerHTML = `<p class="error">✗ Sync failed: ${error.message}</p>`;
+        addToSyncLog(`Sync failed: ${error.message}`, 'error');
     }
+}
+
+// Database Status Functions
+async function refreshDatabaseStatus() {
+    try {
+        // Get teams count
+        const teamsResult = await apiCall('/api/v1/teams');
+        const teamsCount = teamsResult.data.data?.length || 0;
+        document.getElementById('dbTeamsCount').textContent = teamsCount;
+
+        // Get players count
+        const playersResult = await apiCall('/api/v1/players', { limit: 1 });
+        const playersCount = playersResult.data.meta?.total || 0;
+        document.getElementById('dbPlayersCount').textContent = playersCount;
+
+        // Get games count
+        const gamesResult = await apiCall('/api/v1/games', { limit: 1, season: 2024 });
+        const gamesCount = gamesResult.data.meta?.total || 0;
+        document.getElementById('dbGamesCount').textContent = gamesCount;
+
+        // Get weather data count (games with weather)
+        const weatherResult = await apiCall('/api/v1/games', { limit: 1000, season: 2024 });
+        const weatherCount = (weatherResult.data.data || []).filter(g => g.weather_temp).length;
+        document.getElementById('dbWeatherCount').textContent = weatherCount;
+
+        addToSyncLog('Database status refreshed', 'success');
+    } catch (error) {
+        addToSyncLog(`Failed to refresh database status: ${error.message}`, 'error');
+    }
+}
+
+// Quick sync functions
+async function quickSyncAll() {
+    addToSyncLog('🚀 Starting comprehensive sync (this may take several minutes)...', 'loading');
+
+    // Step 1: Sync teams
+    await syncData('teams');
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    // Step 2: Sync rosters
+    await syncData('rosters');
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    // Step 3: Sync historical games 2020-2024
+    await syncData('historical/seasons', { start_year: 2020, end_year: 2024 });
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    // Step 4: Sync NFLverse stats for recent seasons
+    for (let year = 2022; year <= 2024; year++) {
+        await syncData('nflverse/stats', { season: year });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+
+    // Step 5: Enrich with weather data
+    for (let year = 2022; year <= 2024; year++) {
+        await syncData('weather', { season: year });
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+
+    addToSyncLog('🎉 Comprehensive sync completed!', 'success');
+    refreshDatabaseStatus();
+}
+
+async function syncCurrent2024() {
+    addToSyncLog('📅 Starting 2024 season sync...', 'loading');
+
+    await syncData('teams');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await syncData('rosters');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await syncData('games');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await syncData('nflverse/stats', { season: 2024 });
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await syncData('weather', { season: 2024 });
+
+    addToSyncLog('✅ 2024 season sync completed!', 'success');
+    refreshDatabaseStatus();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1217,9 +1367,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initModal();
     initDarkMode();
 
+    // Load sync log from localStorage
+    loadSyncLog();
+
     // Load initial data
     loadPlayers();
     loadTeams();
+
+    // Refresh database status on load
+    refreshDatabaseStatus();
 
     // Refresh buttons
     document.getElementById('refreshTeams').addEventListener('click', () => {
@@ -1275,6 +1431,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const stat_type = document.getElementById('nflverseStatType').value;
         syncData('nflverse/nextgen', { season, stat_type });
     });
+
+    // Weather sync button
+    document.getElementById('syncWeather').addEventListener('click', () => {
+        const season = parseInt(document.getElementById('weatherSyncSeason').value);
+        syncData('weather', { season });
+    });
+
+    // Database status
+    document.getElementById('refreshDbStatus').addEventListener('click', refreshDatabaseStatus);
+    document.getElementById('clearSyncLog').addEventListener('click', clearSyncLog);
+
+    // Quick action buttons
+    document.getElementById('quickSyncAll').addEventListener('click', quickSyncAll);
+    document.getElementById('syncCurrent2024').addEventListener('click', syncCurrent2024);
 });
 
 // Make functions available globally
