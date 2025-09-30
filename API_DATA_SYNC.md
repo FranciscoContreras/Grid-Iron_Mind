@@ -4,7 +4,7 @@ This document explains how to populate the database with NFL data using the robu
 
 ## Base URL
 
-Production: `http://nfl.wearemachina.com`
+Production: `https://nfl.wearemachina.com`
 Heroku: `https://grid-iron-mind-71cc9734eaf4.herokuapp.com`
 
 ## Admin Endpoints Overview
@@ -15,7 +15,7 @@ All admin endpoints require POST requests and run asynchronously in the backgrou
 Fetches all 32 NFL teams from ESPN API.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/teams
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/teams
 ```
 
 **Response:**
@@ -32,7 +32,7 @@ curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/teams
 Fetches all players for all teams from ESPN API.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/rosters
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/rosters
 ```
 
 **Response:**
@@ -54,14 +54,14 @@ heroku logs --tail -a grid-iron-mind
 Fetches current week's games from ESPN scoreboard.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/games
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/games
 ```
 
 ### 4. Sync Historical Games (Single Season)
 Fetches all games for a specific season.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/historical/season \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/historical/season \
   -H "Content-Type: application/json" \
   -d '{"season": 2024}'
 ```
@@ -70,7 +70,7 @@ curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/historical/season \
 Fetches games for multiple seasons at once.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/historical/seasons \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/historical/seasons \
   -H "Content-Type: application/json" \
   -d '{"start_season": 2020, "end_season": 2024}'
 ```
@@ -79,7 +79,7 @@ curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/historical/seasons \
 Fetches detailed player statistics from NFLverse (nflverse.com) data source.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
   -H "Content-Type: application/json" \
   -d '{"season": 2024}'
 ```
@@ -92,7 +92,7 @@ curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
 Enhanced schedule data from NFLverse with additional metadata.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/schedule \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/schedule \
   -H "Content-Type: application/json" \
   -d '{"season": 2024}'
 ```
@@ -101,7 +101,7 @@ curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/schedule \
 Advanced analytics and next-gen statistics.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/nextgen \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/nextgen \
   -H "Content-Type: application/json" \
   -d '{"season": 2024, "stat_type": "passing"}'
 ```
@@ -112,14 +112,14 @@ curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/nextgen \
 Fetches team-level statistics for completed games.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/team-stats
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/team-stats
 ```
 
 ### 10. Enrich Weather Data
 Adds weather information to games based on location and date.
 
 ```bash
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/weather
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/weather
 ```
 
 **Note:** Requires `WEATHER_API_KEY` environment variable set.
@@ -130,30 +130,30 @@ To fully populate the database, run these commands in order:
 
 ```bash
 # 1. Sync teams (required first)
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/teams
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/teams
 
 # 2. Sync all player rosters (takes ~5 minutes)
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/rosters
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/rosters
 
 # 3. Sync historical games for recent seasons
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/historical/seasons \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/historical/seasons \
   -H "Content-Type: application/json" \
   -d '{"start_season": 2023, "end_season": 2024}'
 
 # 4. Sync player statistics from NFLverse (CRITICAL for career stats)
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
   -H "Content-Type: application/json" \
   -d '{"season": 2024}'
 
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
   -H "Content-Type: application/json" \
   -d '{"season": 2023}'
 
 # 5. Sync team stats
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/team-stats
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/team-stats
 
 # 6. Optional: Enrich with weather data
-curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/weather
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/weather
 ```
 
 ## Query Endpoints
@@ -162,27 +162,27 @@ curl -X POST http://nfl.wearemachina.com/api/v1/admin/sync/weather
 
 **List all players:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/players?limit=50&offset=0
+curl https://nfl.wearemachina.com/api/v1/players?limit=50&offset=0
 ```
 
 **Filter by position:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/players?position=QB
+curl https://nfl.wearemachina.com/api/v1/players?position=QB
 ```
 
 **Filter by team:**
 ```bash
-curl "http://nfl.wearemachina.com/api/v1/players?team=TEAM_UUID"
+curl "https://nfl.wearemachina.com/api/v1/players?team=TEAM_UUID"
 ```
 
 **Get single player:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/players/PLAYER_UUID
+curl https://nfl.wearemachina.com/api/v1/players/PLAYER_UUID
 ```
 
 **Get player career stats:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/players/PLAYER_UUID/career
+curl https://nfl.wearemachina.com/api/v1/players/PLAYER_UUID/career
 ```
 
 **Response example:**
@@ -217,51 +217,51 @@ curl http://nfl.wearemachina.com/api/v1/players/PLAYER_UUID/career
 
 **Get player team history:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/players/PLAYER_UUID/history
+curl https://nfl.wearemachina.com/api/v1/players/PLAYER_UUID/history
 ```
 
 ### Teams
 
 **List all teams:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/teams
+curl https://nfl.wearemachina.com/api/v1/teams
 ```
 
 **Get single team:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/teams/TEAM_UUID
+curl https://nfl.wearemachina.com/api/v1/teams/TEAM_UUID
 ```
 
 **Get team roster:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/teams/TEAM_UUID/players
+curl https://nfl.wearemachina.com/api/v1/teams/TEAM_UUID/players
 ```
 
 ### Games
 
 **List games:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/games?limit=20&offset=0
+curl https://nfl.wearemachina.com/api/v1/games?limit=20&offset=0
 ```
 
 **Filter by team:**
 ```bash
-curl "http://nfl.wearemachina.com/api/v1/games?team=TEAM_UUID"
+curl "https://nfl.wearemachina.com/api/v1/games?team=TEAM_UUID"
 ```
 
 **Filter by season and week:**
 ```bash
-curl "http://nfl.wearemachina.com/api/v1/games?season=2024&week=10"
+curl "https://nfl.wearemachina.com/api/v1/games?season=2024&week=10"
 ```
 
 **Get single game:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/games/GAME_UUID
+curl https://nfl.wearemachina.com/api/v1/games/GAME_UUID
 ```
 
 **Get player stats for a game:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/stats/game/GAME_UUID
+curl https://nfl.wearemachina.com/api/v1/stats/game/GAME_UUID
 ```
 
 **Response example:**
@@ -299,14 +299,14 @@ curl http://nfl.wearemachina.com/api/v1/stats/game/GAME_UUID
 
 **Get team stats for a game:**
 ```bash
-curl http://nfl.wearemachina.com/api/v1/games/GAME_UUID/stats
+curl https://nfl.wearemachina.com/api/v1/games/GAME_UUID/stats
 ```
 
 ### Stats Leaders
 
 **Get passing yards leaders:**
 ```bash
-curl "http://nfl.wearemachina.com/api/v1/stats/leaders?category=passing_yards&season=2024&limit=10"
+curl "https://nfl.wearemachina.com/api/v1/stats/leaders?category=passing_yards&season=2024&limit=10"
 ```
 
 **Categories:**
