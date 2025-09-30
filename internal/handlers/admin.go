@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -60,13 +61,14 @@ func (h *AdminHandler) HandleSyncRosters(w http.ResponseWriter, r *http.Request)
 
 	log.Println("Admin endpoint: Rosters sync requested")
 
-	ctx := r.Context()
-
 	// Run sync in background for long operations
 	go func() {
+		// Use background context to prevent cancellation
+		ctx := context.Background()
 		if err := h.ingestionService.SyncAllRosters(ctx); err != nil {
 			log.Printf("Rosters sync failed: %v", err)
 		} else {
+			log.Println("Rosters sync completed successfully")
 			// Invalidate players cache on success
 			if err := cache.DeletePattern(ctx, cache.InvalidatePlayersCache()); err != nil {
 				log.Printf("Failed to invalidate players cache: %v", err)
