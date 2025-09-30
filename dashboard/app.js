@@ -315,7 +315,7 @@ function renderTeams() {
     state.teams.forEach(team => {
         const card = document.createElement('div');
         card.className = 'team-card';
-        card.onclick = () => viewTeamRoster(team.id, team.name);
+        card.onclick = () => viewTeamDetail(team.id, team.name, team);
 
         card.innerHTML = `
             <div class="team-abbr">${team.abbreviation}</div>
@@ -343,36 +343,481 @@ function populateTeamFilter() {
     });
 }
 
-async function viewTeamRoster(teamId, teamName) {
+// Navigation State
+let navigationState = {
+    level: 'teams',
+    currentTeam: null,
+    currentGame: null,
+    currentPlayer: null
+};
+
+// Level 1 → Level 2: Team Detail View
+async function viewTeamDetail(teamId, teamName, teamData) {
+    navigationState = {
+        level: 'teamDetail',
+        currentTeam: { id: teamId, name: teamName, data: teamData },
+        currentGame: null,
+        currentPlayer: null
+    };
+
+    // Hide teams grid
+    document.getElementById('teamsGrid').style.display = 'none';
+
+    // Show team detail view
+    const teamDetailView = document.getElementById('teamDetailView');
+    teamDetailView.style.display = 'block';
+
+    // Update breadcrumb
+    const breadcrumb = document.getElementById('teamBreadcrumb');
+    breadcrumb.style.display = 'block';
+    breadcrumb.innerHTML = `
+        <span class="breadcrumb-item" onclick="navigateToTeams()">Teams</span>
+        <span class="breadcrumb-separator"> > </span>
+        <span class="breadcrumb-item active">${teamName}</span>
+    `;
+
+    // Show back button
+    document.getElementById('backToTeams').style.display = 'inline-block';
+
+    // Set team name
+    document.getElementById('teamDetailName').textContent = teamName;
+
+    // Load games history and roster
     try {
-        const result = await apiCall(`/api/v1/teams/${teamId}/players`);
-        const players = result.data.data;
+        // Load games
+        const gamesResult = await apiCall('/api/v1/games', { team: teamId, limit: 100 });
+        const games = gamesResult.data.data || [];
+        renderTeamGames(games);
 
-        const modal = document.getElementById('playerModal');
-        document.getElementById('modalPlayerName').textContent = `${teamName} Roster`;
-
-        let roster = '<div style="max-height: 400px; overflow-y: auto;">';
-        roster += '<table class="data-table" style="margin: 0;">';
-        roster += '<thead><tr><th>Name</th><th>Position</th><th>Jersey</th><th>Status</th></tr></thead>';
-        roster += '<tbody>';
-
-        players.forEach(player => {
-            roster += `
-                <tr>
-                    <td>${player.name}</td>
-                    <td>${player.position}</td>
-                    <td>${player.jersey_number || '--'}</td>
-                    <td><span class="badge badge-${player.status}">${player.status}</span></td>
-                </tr>
-            `;
-        });
-
-        roster += '</tbody></table></div>';
-
-        document.getElementById('modalPlayerDetails').innerHTML = roster;
-        modal.classList.add('active');
+        // Load roster
+        const rosterResult = await apiCall(`/api/v1/teams/${teamId}/players`);
+        const players = rosterResult.data.data || [];
+        renderTeamRoster(players);
     } catch (error) {
-        alert('Failed to load team roster: ' + error.message);
+        alert('Failed to load team details: ' + error.message);
+    }
+}
+
+function renderTeamGames(games) {
+    const container = document.getElementById('teamGamesList');
+
+    if (games.length === 0) {
+        container.innerHTML = '<p style="padding: 20px; text-align: center;">No games found</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Matchup</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${games.map(game => `
+                    <tr>
+                        <td>${game.game_date ? new Date(game.game_date).toLocaleDateString() : 'TBD'}</td>
+                        <td>${game.away_team || 'N/A'} @ ${game.home_team || 'N/A'}</td>
+                        <td style="font-weight: bold;">
+                            ${game.away_score !== null ? `${game.away_score} - ${game.home_score}` : 'N/A'}
+                        </td>
+                        <td><span class="badge badge-${game.status}">${game.status || 'scheduled'}</span></td>
+                        <td><button class="btn" onclick="viewGameDetail('${game.id}', '${game.away_team} @ ${game.home_team}', ${JSON.stringify(game).replace(/'/g, "&apos;")})">View Game</button></td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function renderTeamRoster(players) {
+    const container = document.getElementById('teamRosterList');
+
+    if (players.length === 0) {
+        container.innerHTML = '<p style="padding: 20px; text-align: center;">No roster data available</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Jersey</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${players.map(player => {
+                    const headshotUrl = player.headshot_url || `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.espn_athlete_id || 'default'}.png&w=350&h=254`;
+                    return `
+                        <tr>
+                            <td><img src="${headshotUrl}" alt="${player.name}" class="player-headshot" onerror="this.src='https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50'"></td>
+                            <td><strong>${player.name}</strong></td>
+                            <td><span class="position-badge">${player.position}</span></td>
+                            <td>#${player.jersey_number || '--'}</td>
+                            <td><span class="badge badge-${player.status}">${player.status}</span></td>
+                            <td><button class="btn" onclick="viewPlayerHistorical('${player.id}', '${player.name}')">View History</button></td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+// Level 2 → Level 3: Game Detail View
+async function viewGameDetail(gameId, gameTitle, gameData) {
+    navigationState.level = 'gameDetail';
+    navigationState.currentGame = { id: gameId, title: gameTitle, data: gameData };
+
+    // Hide team detail view
+    document.getElementById('teamDetailView').style.display = 'none';
+
+    // Show game detail view
+    const gameDetailView = document.getElementById('gameDetailView');
+    gameDetailView.style.display = 'block';
+
+    // Update breadcrumb
+    const breadcrumb = document.getElementById('teamBreadcrumb');
+    breadcrumb.innerHTML = `
+        <span class="breadcrumb-item" onclick="navigateToTeams()">Teams</span>
+        <span class="breadcrumb-separator"> > </span>
+        <span class="breadcrumb-item" onclick="navigateToTeamDetail()">${navigationState.currentTeam.name}</span>
+        <span class="breadcrumb-separator"> > </span>
+        <span class="breadcrumb-item active">${gameTitle}</span>
+    `;
+
+    // Set game title
+    document.getElementById('gameDetailTitle').textContent = gameTitle;
+
+    // Render weather/game conditions
+    renderGameConditions(gameData);
+
+    // Load player stats for this game
+    try {
+        const statsResult = await apiCall(`/api/v1/games/${gameId}/stats`);
+        const stats = statsResult.data.data || [];
+        renderGamePlayerStats(stats);
+    } catch (error) {
+        // If endpoint doesn't exist yet, show placeholder
+        document.getElementById('gamePlayersList').innerHTML =
+            '<p style="padding: 20px; text-align: center;">Player stats endpoint not yet available</p>';
+    }
+}
+
+function renderGameConditions(game) {
+    const container = document.getElementById('gameWeatherDetails');
+
+    container.innerHTML = `
+        <div class="weather-grid">
+            <div class="weather-card">
+                <h4>🌡️ Temperature</h4>
+                <p style="font-size: 24px; font-weight: bold;">${game.weather_temp ? `${game.weather_temp}°F` : 'N/A'}</p>
+                <p>${game.weather_condition || ''}</p>
+            </div>
+            <div class="weather-card">
+                <h4>💨 Wind</h4>
+                <p style="font-size: 24px; font-weight: bold;">${game.weather_wind_speed ? `${game.weather_wind_speed} mph` : 'N/A'}</p>
+            </div>
+            <div class="weather-card">
+                <h4>🏟️ Venue</h4>
+                <p style="font-size: 18px; font-weight: bold;">${game.venue_name || 'N/A'}</p>
+                <p>${game.venue_city ? game.venue_city : ''}</p>
+                <p>${game.venue_type ? `Type: ${game.venue_type}` : ''}</p>
+            </div>
+            <div class="weather-card">
+                <h4>📅 Game Info</h4>
+                <p><strong>Date:</strong> ${game.game_date ? new Date(game.game_date).toLocaleDateString() : 'TBD'}</p>
+                <p><strong>Week:</strong> ${game.week || 'N/A'}</p>
+                <p><strong>Season:</strong> ${game.season || 'N/A'}</p>
+            </div>
+        </div>
+    `;
+}
+
+function renderGamePlayerStats(stats) {
+    const container = document.getElementById('gamePlayersList');
+
+    if (stats.length === 0) {
+        container.innerHTML = '<p style="padding: 20px; text-align: center;">No player stats available for this game</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Position</th>
+                    <th>Pass Yds</th>
+                    <th>Pass TD</th>
+                    <th>Rush Yds</th>
+                    <th>Rush TD</th>
+                    <th>Rec Yds</th>
+                    <th>Rec TD</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${stats.map(stat => `
+                    <tr>
+                        <td><strong>${stat.player_name || 'Unknown'}</strong></td>
+                        <td><span class="position-badge">${stat.position || 'N/A'}</span></td>
+                        <td>${stat.passing_yards || 0}</td>
+                        <td>${stat.passing_touchdowns || 0}</td>
+                        <td>${stat.rushing_yards || 0}</td>
+                        <td>${stat.rushing_touchdowns || 0}</td>
+                        <td>${stat.receiving_yards || 0}</td>
+                        <td>${stat.receiving_touchdowns || 0}</td>
+                        <td><button class="btn" onclick="viewPlayerHistorical('${stat.player_id}', '${stat.player_name}')">View History</button></td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+// Level 3/2 → Level 4: Player Historical View
+async function viewPlayerHistorical(playerId, playerName) {
+    navigationState.level = 'playerHistorical';
+    navigationState.currentPlayer = { id: playerId, name: playerName };
+
+    // Hide previous views
+    document.getElementById('teamDetailView').style.display = 'none';
+    document.getElementById('gameDetailView').style.display = 'none';
+
+    // Show player historical view
+    const playerHistoricalView = document.getElementById('playerHistoricalView');
+    playerHistoricalView.style.display = 'block';
+
+    // Update breadcrumb
+    const breadcrumb = document.getElementById('teamBreadcrumb');
+    let breadcrumbHTML = `<span class="breadcrumb-item" onclick="navigateToTeams()">Teams</span>`;
+
+    if (navigationState.currentTeam) {
+        breadcrumbHTML += `
+            <span class="breadcrumb-separator"> > </span>
+            <span class="breadcrumb-item" onclick="navigateToTeamDetail()">${navigationState.currentTeam.name}</span>
+        `;
+    }
+
+    if (navigationState.currentGame) {
+        breadcrumbHTML += `
+            <span class="breadcrumb-separator"> > </span>
+            <span class="breadcrumb-item" onclick="navigateToGameDetail()">${navigationState.currentGame.title}</span>
+        `;
+    }
+
+    breadcrumbHTML += `
+        <span class="breadcrumb-separator"> > </span>
+        <span class="breadcrumb-item active">${playerName}</span>
+    `;
+
+    breadcrumb.innerHTML = breadcrumbHTML;
+
+    // Set player name
+    document.getElementById('playerHistoricalName').textContent = `${playerName} - Career History`;
+
+    // Load player career data
+    try {
+        const careerResult = await apiCall(`/api/v1/players/${playerId}/career`);
+        const careerData = careerResult.data.data;
+        renderPlayerHistoricalData(careerData);
+    } catch (error) {
+        document.getElementById('playerHistoricalData').innerHTML =
+            `<p style="padding: 20px; text-align: center; color: var(--danger);">Failed to load career data: ${error.message}</p>`;
+    }
+}
+
+function renderPlayerHistoricalData(data) {
+    const container = document.getElementById('playerHistoricalData');
+
+    let html = '<div style="margin-bottom: 30px;">';
+
+    // Summary
+    html += `
+        <div class="stats-summary">
+            <h3>Career Summary</h3>
+            <p><strong>Total Seasons:</strong> ${data.total_seasons || 0}</p>
+            <p><strong>Teams Played For:</strong> ${data.team_history?.length || 0}</p>
+        </div>
+    `;
+
+    // Team History
+    if (data.team_history && data.team_history.length > 0) {
+        html += `
+            <div style="margin-bottom: 30px;">
+                <h3>Team History</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>Position</th>
+                            <th>Years</th>
+                            <th>Current</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.team_history.map(history => `
+                            <tr>
+                                <td><strong>${history.team_name || 'N/A'}</strong></td>
+                                <td>${history.position}</td>
+                                <td>${history.season_start} - ${history.season_end || 'Present'}</td>
+                                <td>${history.is_current ? '✓ Current' : ''}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // Season-by-Season Stats
+    if (data.career_stats && data.career_stats.length > 0) {
+        html += `
+            <div>
+                <h3>Season-by-Season Statistics</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Season</th>
+                            <th>Team</th>
+                            <th>GP</th>
+                            <th>Pass Yds</th>
+                            <th>Pass TD</th>
+                            <th>Rush Yds</th>
+                            <th>Rush TD</th>
+                            <th>Rec</th>
+                            <th>Rec Yds</th>
+                            <th>Rec TD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.career_stats.map(stat => `
+                            <tr>
+                                <td><strong>${stat.season}</strong></td>
+                                <td>${stat.team_name || 'N/A'}</td>
+                                <td>${stat.games_played || 0}</td>
+                                <td>${stat.passing_yards || 0}</td>
+                                <td>${stat.passing_tds || 0}</td>
+                                <td>${stat.rushing_yards || 0}</td>
+                                <td>${stat.rushing_tds || 0}</td>
+                                <td>${stat.receptions || 0}</td>
+                                <td>${stat.receiving_yards || 0}</td>
+                                <td>${stat.receiving_tds || 0}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    html += '</div>';
+
+    if (!data.team_history && !data.career_stats) {
+        html = '<p style="padding: 20px; text-align: center;">No career data available for this player</p>';
+    }
+
+    container.innerHTML = html;
+}
+
+// Navigation Functions
+function navigateToTeams() {
+    navigationState = {
+        level: 'teams',
+        currentTeam: null,
+        currentGame: null,
+        currentPlayer: null
+    };
+
+    // Show teams grid
+    document.getElementById('teamsGrid').style.display = 'grid';
+
+    // Hide all other views
+    document.getElementById('teamDetailView').style.display = 'none';
+    document.getElementById('gameDetailView').style.display = 'none';
+    document.getElementById('playerHistoricalView').style.display = 'none';
+
+    // Hide breadcrumb and back button
+    document.getElementById('teamBreadcrumb').style.display = 'none';
+    document.getElementById('backToTeams').style.display = 'none';
+}
+
+function navigateToTeamDetail() {
+    if (!navigationState.currentTeam) return;
+
+    // Hide other views
+    document.getElementById('gameDetailView').style.display = 'none';
+    document.getElementById('playerHistoricalView').style.display = 'none';
+
+    // Show team detail view
+    document.getElementById('teamDetailView').style.display = 'block';
+
+    // Update breadcrumb
+    const breadcrumb = document.getElementById('teamBreadcrumb');
+    breadcrumb.innerHTML = `
+        <span class="breadcrumb-item" onclick="navigateToTeams()">Teams</span>
+        <span class="breadcrumb-separator"> > </span>
+        <span class="breadcrumb-item active">${navigationState.currentTeam.name}</span>
+    `;
+
+    navigationState.level = 'teamDetail';
+    navigationState.currentGame = null;
+    navigationState.currentPlayer = null;
+}
+
+function navigateToGameDetail() {
+    if (!navigationState.currentGame) return;
+
+    // Hide other views
+    document.getElementById('teamDetailView').style.display = 'none';
+    document.getElementById('playerHistoricalView').style.display = 'none';
+
+    // Show game detail view
+    document.getElementById('gameDetailView').style.display = 'block';
+
+    // Update breadcrumb
+    const breadcrumb = document.getElementById('teamBreadcrumb');
+    breadcrumb.innerHTML = `
+        <span class="breadcrumb-item" onclick="navigateToTeams()">Teams</span>
+        <span class="breadcrumb-separator"> > </span>
+        <span class="breadcrumb-item" onclick="navigateToTeamDetail()">${navigationState.currentTeam.name}</span>
+        <span class="breadcrumb-separator"> > </span>
+        <span class="breadcrumb-item active">${navigationState.currentGame.title}</span>
+    `;
+
+    navigationState.level = 'gameDetail';
+    navigationState.currentPlayer = null;
+}
+
+function navigateBack() {
+    switch (navigationState.level) {
+        case 'playerHistorical':
+            if (navigationState.currentGame) {
+                navigateToGameDetail();
+            } else if (navigationState.currentTeam) {
+                navigateToTeamDetail();
+            } else {
+                navigateToTeams();
+            }
+            break;
+        case 'gameDetail':
+            navigateToTeamDetail();
+            break;
+        case 'teamDetail':
+            navigateToTeams();
+            break;
+        default:
+            navigateToTeams();
     }
 }
 
@@ -782,6 +1227,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTeams();
     });
 
+    // Back button
+    document.getElementById('backToTeams').addEventListener('click', navigateBack);
+
     document.getElementById('refreshGames').addEventListener('click', loadGames);
 
     // Career stats
@@ -829,5 +1277,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Make viewPlayerDetails available globally
+// Make functions available globally
 window.viewPlayerDetails = viewPlayerDetails;
+window.viewTeamDetail = viewTeamDetail;
+window.viewGameDetail = viewGameDetail;
+window.viewPlayerHistorical = viewPlayerHistorical;
+window.navigateToTeams = navigateToTeams;
+window.navigateToTeamDetail = navigateToTeamDetail;
+window.navigateToGameDetail = navigateToGameDetail;
+window.navigateBack = navigateBack;
