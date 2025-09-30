@@ -974,6 +974,13 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 		time.Sleep(500 * time.Millisecond)
 	}
 
-	log.Printf("Team stats sync completed: %d team stats records created/updated", count)
+	log.Printf("========================================")
+	log.Printf("Team stats sync completed: %d team stats records created/updated out of %d games", count, len(games))
+	log.Printf("========================================")
+
+	if count == 0 {
+		return fmt.Errorf("no team stats were synced - processed %d games but inserted 0 records", len(games))
+	}
+
 	return nil
 }
