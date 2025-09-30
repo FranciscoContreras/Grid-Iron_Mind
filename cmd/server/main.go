@@ -104,6 +104,11 @@ func main() {
 	mux.HandleFunc("/health", applyMiddleware(healthCheck))
 	mux.HandleFunc("/api/v1/health", applyMiddleware(healthCheck))
 
+	// API Documentation endpoint
+	mux.HandleFunc("/api-docs.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./dashboard/api-docs.html")
+	})
+
 	// Serve dashboard static files
 	fs := http.FileServer(http.Dir("./dashboard"))
 	mux.Handle("/", fs)

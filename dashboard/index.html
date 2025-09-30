@@ -33,6 +33,7 @@
             <button class="tab" data-tab="fantasy">Fantasy Stats</button>
             <button class="tab" data-tab="admin">Admin Sync</button>
             <button class="tab" data-tab="api-test">API Testing</button>
+            <a href="/api-docs.html" class="tab" style="text-decoration: none; display: flex; align-items: center; justify-content: center;" target="_blank">📚 API Docs</a>
         </nav>
 
         <!-- Tab Content -->
@@ -106,12 +107,72 @@
                 <div class="section-header">
                     <h2>Teams</h2>
                     <button class="btn-refresh" id="refreshTeams">↻ Refresh</button>
+                    <button class="btn" id="backToTeams" style="display: none;">← Back to Teams</button>
+                </div>
+
+                <!-- Breadcrumb Navigation -->
+                <div class="breadcrumb" id="teamBreadcrumb" style="display: none;">
+                    <span class="breadcrumb-item" data-level="teams">Teams</span>
                 </div>
 
                 <div class="loading" id="teamsLoading">Loading...</div>
                 <div class="error" id="teamsError" style="display: none;"></div>
 
-                <div class="teams-grid" id="teamsGrid">
+                <!-- Teams Grid (Level 1) -->
+                <div class="teams-grid" id="teamsGrid"></div>
+
+                <!-- Team Detail View (Level 2) -->
+                <div id="teamDetailView" style="display: none;">
+                    <div class="team-header">
+                        <h2 id="teamDetailName"></h2>
+                        <p id="teamDetailInfo"></p>
+                    </div>
+
+                    <div class="team-section">
+                        <h3>📅 Games History</h3>
+                        <div class="filters">
+                            <input type="number" id="teamGamesSeason" placeholder="Season" class="input" value="2024">
+                            <button class="btn" id="loadTeamGames">Load Games</button>
+                        </div>
+                        <div class="loading" id="teamGamesLoading" style="display: none;">Loading...</div>
+                        <div id="teamGamesList"></div>
+                    </div>
+
+                    <div class="team-section">
+                        <h3>👥 Current Roster</h3>
+                        <div class="loading" id="teamRosterLoading" style="display: none;">Loading...</div>
+                        <div id="teamRosterList"></div>
+                    </div>
+                </div>
+
+                <!-- Game Detail View (Level 3) -->
+                <div id="gameDetailView" style="display: none;">
+                    <div class="game-header">
+                        <h2 id="gameDetailTitle"></h2>
+                        <p id="gameDetailInfo"></p>
+                    </div>
+
+                    <div class="game-weather-info">
+                        <h3>🌡️ Game Conditions</h3>
+                        <div id="gameWeatherDetails"></div>
+                    </div>
+
+                    <div class="game-section">
+                        <h3>📊 Player Performance</h3>
+                        <div class="loading" id="gamePlayersLoading" style="display: none;">Loading...</div>
+                        <div id="gamePlayersList"></div>
+                    </div>
+                </div>
+
+                <!-- Player Historical View (Level 4) -->
+                <div id="playerHistoricalView" style="display: none;">
+                    <div class="player-header">
+                        <h2 id="playerHistoricalName"></h2>
+                        <p id="playerHistoricalInfo"></p>
+                    </div>
+
+                    <div class="loading" id="playerHistoricalLoading" style="display: none;">Loading...</div>
+                    <div id="playerHistoricalData"></div>
                 </div>
             </section>
 
