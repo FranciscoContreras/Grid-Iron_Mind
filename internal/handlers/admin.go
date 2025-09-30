@@ -61,20 +61,22 @@ func (h *AdminHandler) HandleSyncRosters(w http.ResponseWriter, r *http.Request)
 	log.Println("Admin endpoint: Rosters sync requested")
 
 	ctx := r.Context()
-	if err := h.ingestionService.SyncAllRosters(ctx); err != nil {
-		log.Printf("Rosters sync failed: %v", err)
-		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", "Failed to sync rosters")
-		return
-	}
 
-	// Invalidate players cache
-	if err := cache.DeletePattern(ctx, cache.InvalidatePlayersCache()); err != nil {
-		log.Printf("Failed to invalidate players cache: %v", err)
-	}
+	// Run sync in background for long operations
+	go func() {
+		if err := h.ingestionService.SyncAllRosters(ctx); err != nil {
+			log.Printf("Rosters sync failed: %v", err)
+		} else {
+			// Invalidate players cache on success
+			if err := cache.DeletePattern(ctx, cache.InvalidatePlayersCache()); err != nil {
+				log.Printf("Failed to invalidate players cache: %v", err)
+			}
+		}
+	}()
 
 	response.Success(w, map[string]interface{}{
-		"message": "Rosters sync completed successfully",
-		"status":  "success",
+		"message": "Rosters sync started in background",
+		"status":  "processing",
 	})
 }
 
