@@ -830,8 +830,9 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 			var dbTeamID uuid.UUID
 			teamQuery := `SELECT id FROM teams WHERE nfl_id::text = $1`
 			if err := s.dbPool.QueryRow(ctx, teamQuery, espnTeamID).Scan(&dbTeamID); err != nil {
-				log.Printf("Could not find team with ESPN ID %s: %v", espnTeamID, err)
-				continue
+				log.Printf("ERROR: Could not find team with ESPN ID %s: %v", espnTeamID, err)
+				log.Printf("ERROR: This is blocking all team stats sync! Check teams table.")
+				return fmt.Errorf("team lookup failed for ESPN ID %s: %w", espnTeamID, err)
 			}
 			teamID = dbTeamID
 
