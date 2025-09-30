@@ -55,9 +55,9 @@ func (q *GameQueries) ListGames(ctx context.Context, filters models.GameFilters)
 
 	// Fetch games
 	query := fmt.Sprintf(`
-		SELECT id, espn_game_id, season, season_type, week, game_date,
+		SELECT id, nfl_game_id, season, week, game_date,
 		       home_team_id, away_team_id, home_score, away_score, status,
-		       created_at, updated_at
+		       created_at
 		FROM games
 		%s
 		ORDER BY game_date DESC, id
@@ -76,9 +76,9 @@ func (q *GameQueries) ListGames(ctx context.Context, filters models.GameFilters)
 	for rows.Next() {
 		var g models.Game
 		if err := rows.Scan(
-			&g.ID, &g.EspnGameID, &g.SeasonYear, &g.SeasonType, &g.Week,
+			&g.ID, &g.EspnGameID, &g.SeasonYear, &g.Week,
 			&g.GameDate, &g.HomeTeamID, &g.AwayTeamID, &g.HomeScore,
-			&g.AwayScore, &g.Status, &g.CreatedAt, &g.UpdatedAt,
+			&g.AwayScore, &g.Status, &g.CreatedAt,
 		); err != nil {
 			return nil, 0, fmt.Errorf("failed to scan game: %w", err)
 		}
@@ -96,18 +96,18 @@ func (q *GameQueries) GetGameByID(ctx context.Context, id uuid.UUID) (*models.Ga
 	}
 
 	query := `
-		SELECT id, espn_game_id, season, season_type, week, game_date,
+		SELECT id, nfl_game_id, season, week, game_date,
 		       home_team_id, away_team_id, home_score, away_score, status,
-		       created_at, updated_at
+		       created_at
 		FROM games
 		WHERE id = $1
 	`
 
 	var g models.Game
 	err := pool.QueryRow(ctx, query, id).Scan(
-		&g.ID, &g.EspnGameID, &g.SeasonYear, &g.SeasonType, &g.Week,
+		&g.ID, &g.EspnGameID, &g.SeasonYear, &g.Week,
 		&g.GameDate, &g.HomeTeamID, &g.AwayTeamID, &g.HomeScore,
-		&g.AwayScore, &g.Status, &g.CreatedAt, &g.UpdatedAt,
+		&g.AwayScore, &g.Status, &g.CreatedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get game: %w", err)
