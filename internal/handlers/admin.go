@@ -1,12 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/francisco/gridironmind/internal/ingestion"
-	"github.com/francisco/gridironmind/internal/models"
+	"github.com/francisco/gridironmind/pkg/response"
 )
 
 type AdminHandler struct {
@@ -31,22 +30,14 @@ func (h *AdminHandler) HandleSyncTeams(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if err := h.ingestionService.SyncTeams(ctx); err != nil {
 		log.Printf("Teams sync failed: %v", err)
-		sendErrorResponse(w, "Failed to sync teams", http.StatusInternalServerError)
+		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", "Failed to sync teams")
 		return
 	}
 
-	response := models.SingleResponse{
-		Data: map[string]interface{}{
-			"message": "Teams sync completed successfully",
-			"status":  "success",
-		},
-		Meta: models.Meta{
-			Timestamp: getCurrentTimestamp(),
-		},
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	response.Success(w, map[string]interface{}{
+		"message": "Teams sync completed successfully",
+		"status":  "success",
+	})
 }
 
 // HandleSyncRosters triggers a full roster sync for all teams
@@ -61,22 +52,14 @@ func (h *AdminHandler) HandleSyncRosters(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 	if err := h.ingestionService.SyncAllRosters(ctx); err != nil {
 		log.Printf("Rosters sync failed: %v", err)
-		sendErrorResponse(w, "Failed to sync rosters", http.StatusInternalServerError)
+		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", "Failed to sync rosters")
 		return
 	}
 
-	response := models.SingleResponse{
-		Data: map[string]interface{}{
-			"message": "Rosters sync completed successfully",
-			"status":  "success",
-		},
-		Meta: models.Meta{
-			Timestamp: getCurrentTimestamp(),
-		},
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	response.Success(w, map[string]interface{}{
+		"message": "Rosters sync completed successfully",
+		"status":  "success",
+	})
 }
 
 // HandleSyncGames triggers a games/scoreboard sync
@@ -91,22 +74,14 @@ func (h *AdminHandler) HandleSyncGames(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if err := h.ingestionService.SyncGames(ctx); err != nil {
 		log.Printf("Games sync failed: %v", err)
-		sendErrorResponse(w, "Failed to sync games", http.StatusInternalServerError)
+		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", "Failed to sync games")
 		return
 	}
 
-	response := models.SingleResponse{
-		Data: map[string]interface{}{
-			"message": "Games sync completed successfully",
-			"status":  "success",
-		},
-		Meta: models.Meta{
-			Timestamp: getCurrentTimestamp(),
-		},
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	response.Success(w, map[string]interface{}{
+		"message": "Games sync completed successfully",
+		"status":  "success",
+	})
 }
 
 // HandleFullSync triggers a complete data sync (teams -> rosters -> games)
@@ -127,16 +102,8 @@ func (h *AdminHandler) HandleFullSync(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	response := models.SingleResponse{
-		Data: map[string]interface{}{
-			"message": "Full sync started in background",
-			"status":  "processing",
-		},
-		Meta: models.Meta{
-			Timestamp: getCurrentTimestamp(),
-		},
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	response.Success(w, map[string]interface{}{
+		"message": "Full sync started in background",
+		"status":  "processing",
+	})
 }
