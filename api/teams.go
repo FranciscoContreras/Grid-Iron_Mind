@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/francisco/gridironmind/internal/config"
-	"github.com/francisco/gridironmind/internal/db"
-	"github.com/francisco/gridironmind/internal/handlers"
-	"github.com/francisco/gridironmind/internal/middleware"
+	"github.com/francisco/gridironmind/pkg/config"
+	"github.com/francisco/gridironmind/pkg/database"
+	"github.com/francisco/gridironmind/pkg/handlers"
+	"github.com/francisco/gridironmind/pkg/middleware"
 	"github.com/francisco/gridironmind/pkg/response"
 )
 
@@ -46,11 +46,11 @@ func initTeamsDB() error {
 		return err
 	}
 
-	dbConfig := db.Config{
+	dbConfig := database.Config{
 		DatabaseURL: cfg.DatabaseURL,
 		MaxConns:    cfg.DBMaxConns,
 		MinConns:    cfg.DBMinConns,
 	}
 
-	return db.Connect(context.Background(), dbConfig)
+	return database.Connect(context.Background(), dbConfig)
 }
