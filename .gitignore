@@ -39,5 +39,9 @@ Thumbs.db
 tmp/
 temp/
 
-# Vercel
-.vercel
+# Build output
+bin/
+server
+
+# Heroku
+.heroku/

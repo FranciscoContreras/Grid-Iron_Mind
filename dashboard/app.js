@@ -1,7 +1,5 @@
 // Configuration
-const API_BASE_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:3000'
-    : ''; // Use relative URLs in production
+const API_BASE_URL = ''; // Use relative URLs - works for both local and production
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // State

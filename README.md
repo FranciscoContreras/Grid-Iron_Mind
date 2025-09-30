@@ -220,17 +220,39 @@ See [dashboard/README.md](dashboard/README.md) for detailed instructions.
 
 4. Create `.env` file with required variables
 
-5. Test locally or deploy to Vercel:
+5. Run the server:
    ```bash
-   vercel deploy
+   go run cmd/server/main.go
+   # Server runs on http://localhost:8080
    ```
 
-6. Open the dashboard:
-   ```bash
-   cd dashboard
-   python -m http.server 8000
-   # Open http://localhost:8000 in browser
-   ```
+6. Open the dashboard at `http://localhost:8080`
+
+## Deployment
+
+### Heroku (Recommended)
+
+```bash
+# Create Heroku app
+heroku create gridironmind
+
+# Add addons
+heroku addons:create heroku-postgresql:essential-0
+heroku addons:create heroku-redis:mini
+
+# Set environment variables
+heroku config:set ENVIRONMENT=production
+heroku config:set API_KEY=your-key
+heroku config:set CLAUDE_API_KEY=your-key
+
+# Deploy
+git push heroku main
+
+# Setup database
+heroku pg:psql < schema.sql
+```
+
+See [HEROKU_DEPLOY.md](HEROKU_DEPLOY.md) for complete deployment guide.
 
 ## Database Schema
 
