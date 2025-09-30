@@ -295,7 +295,6 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 		return fmt.Errorf("away team not found: %w", err)
 	}
 
-	espnGameID, _ := strconv.Atoi(event.ID)
 	homeScore, _ := strconv.Atoi(homeTeam.Score)
 	awayScore, _ := strconv.Atoi(awayTeam.Score)
 
@@ -310,7 +309,7 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 	var existingID uuid.UUID
 	err = s.dbPool.QueryRow(ctx,
 		"SELECT id FROM games WHERE nfl_game_id = $1",
-		espnGameID,
+		event.ID,
 	).Scan(&existingID)
 
 	if err != nil {
@@ -319,7 +318,7 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 		_, err = s.dbPool.Exec(ctx,
 			`INSERT INTO games (id, nfl_game_id, home_team_id, away_team_id, game_date, season, week, home_score, away_score, status)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-			id, espnGameID, homeTeamID, awayTeamID, event.Date.Time, event.Season.Year, event.Week.Number,
+			id, event.ID, homeTeamID, awayTeamID, event.Date.Time, event.Season.Year, event.Week.Number,
 			homeScore, awayScore, status,
 		)
 		if err != nil {
