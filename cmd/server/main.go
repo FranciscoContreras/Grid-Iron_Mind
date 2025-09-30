@@ -14,6 +14,7 @@ import (
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/internal/handlers"
 	"github.com/francisco/gridironmind/internal/middleware"
+	"github.com/francisco/gridironmind/internal/weather"
 	"github.com/francisco/gridironmind/pkg/response"
 )
 
@@ -61,7 +62,8 @@ func main() {
 	statsHandler := handlers.NewStatsHandler()
 	careerHandler := handlers.NewCareerHandler()
 	aiHandler := handlers.NewAIHandler(cfg)
-	adminHandler := handlers.NewAdminHandler()
+	adminHandler := handlers.NewAdminHandler(cfg.WeatherAPIKey)
+	weatherHandler := handlers.NewWeatherHandler(weather.NewClient(cfg.WeatherAPIKey))
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -97,6 +99,14 @@ func main() {
 	mux.HandleFunc("/api/v1/admin/sync/nflverse/stats", applyMiddleware(adminHandler.HandleSyncNFLverseStats))
 	mux.HandleFunc("/api/v1/admin/sync/nflverse/schedule", applyMiddleware(adminHandler.HandleSyncNFLverseSchedule))
 	mux.HandleFunc("/api/v1/admin/sync/nflverse/nextgen", applyMiddleware(adminHandler.HandleSyncNFLverseNextGen))
+
+	// Weather enrichment endpoint
+	mux.HandleFunc("/api/v1/admin/sync/weather", applyMiddleware(adminHandler.HandleEnrichWeather))
+
+	// Weather API endpoints
+	mux.HandleFunc("/api/v1/weather/current", applyMiddleware(weatherHandler.HandleCurrentWeather))
+	mux.HandleFunc("/api/v1/weather/historical", applyMiddleware(weatherHandler.HandleHistoricalWeather))
+	mux.HandleFunc("/api/v1/weather/forecast", applyMiddleware(weatherHandler.HandleForecastWeather))
 
 	mux.HandleFunc("/api/v1/admin/keys/generate", applyMiddleware(adminHandler.HandleGenerateAPIKey))
 

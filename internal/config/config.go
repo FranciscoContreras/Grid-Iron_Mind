@@ -16,6 +16,7 @@ type Config struct {
 	APIKey             string
 	UnlimitedAPIKey    string
 	ClaudeAPIKey       string
+	WeatherAPIKey      string
 	DBMaxConns         int32
 	DBMinConns         int32
 }
@@ -32,6 +33,7 @@ func Load() (*Config, error) {
 		APIKey:          getEnv("API_KEY", ""),
 		UnlimitedAPIKey: getEnv("UNLIMITED_API_KEY", ""),
 		ClaudeAPIKey:    getEnv("CLAUDE_API_KEY", ""),
+		WeatherAPIKey:   getEnv("WEATHER_API_KEY", ""),
 		DBMaxConns:      int32(getEnvInt("DB_MAX_CONNS", 25)),
 		DBMinConns:      int32(getEnvInt("DB_MIN_CONNS", 5)),
 	}

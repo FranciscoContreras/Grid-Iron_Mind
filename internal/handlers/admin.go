@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/francisco/gridironmind/internal/cache"
 	"github.com/francisco/gridironmind/internal/ingestion"
@@ -17,9 +18,9 @@ type AdminHandler struct {
 	ingestionService *ingestion.Service
 }
 
-func NewAdminHandler() *AdminHandler {
+func NewAdminHandler(weatherAPIKey string) *AdminHandler {
 	return &AdminHandler{
-		ingestionService: ingestion.NewService(),
+		ingestionService: ingestion.NewService(weatherAPIKey),
 	}
 }
 
@@ -359,5 +360,43 @@ func (h *AdminHandler) HandleSyncNFLverseNextGen(w http.ResponseWriter, r *http.
 		"season":    reqBody.Season,
 		"stat_type": reqBody.StatType,
 		"status":    "processing",
+	})
+}
+
+// HandleEnrichWeather handles POST /admin/sync/weather
+func (h *AdminHandler) HandleEnrichWeather(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season int `json:"season"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	if reqBody.Season == 0 {
+		reqBody.Season = time.Now().Year()
+	}
+
+	log.Printf("Admin endpoint: Weather enrichment requested for season %d", reqBody.Season)
+
+	ctx := r.Context()
+
+	// Run enrichment in background
+	go func() {
+		if err := h.ingestionService.EnrichGamesWithWeather(ctx, reqBody.Season); err != nil {
+			log.Printf("Weather enrichment failed: %v", err)
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("Weather enrichment started for season %d", reqBody.Season),
+		"season":  reqBody.Season,
+		"status":  "processing",
 	})
 }

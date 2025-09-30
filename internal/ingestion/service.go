@@ -12,22 +12,30 @@ import (
 	"github.com/francisco/gridironmind/internal/espn"
 	"github.com/francisco/gridironmind/internal/models"
 	"github.com/francisco/gridironmind/internal/nflverse"
+	"github.com/francisco/gridironmind/internal/weather"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Service handles data ingestion from ESPN and nflverse APIs
+// Service handles data ingestion from ESPN, nflverse, and weather APIs
 type Service struct {
 	espnClient     *espn.Client
 	nflverseClient *nflverse.Client
+	weatherClient  *weather.Client
 	dbPool         *pgxpool.Pool
 }
 
 // NewService creates a new ingestion service
-func NewService() *Service {
+func NewService(weatherAPIKey string) *Service {
+	var weatherClient *weather.Client
+	if weatherAPIKey != "" {
+		weatherClient = weather.NewClient(weatherAPIKey)
+	}
+
 	return &Service{
 		espnClient:     espn.NewClient(),
 		nflverseClient: nflverse.NewClient(),
+		weatherClient:  weatherClient,
 		dbPool:         db.GetPool(),
 	}
 }
@@ -619,4 +627,90 @@ func (s *Service) findPlayerByExternalID(ctx context.Context, externalID string)
 		return uuid.Nil, fmt.Errorf("player not found: %w", err)
 	}
 	return playerID, nil
+}
+
+// EnrichGamesWithWeather enriches games with weather data from WeatherAPI.com
+func (s *Service) EnrichGamesWithWeather(ctx context.Context, season int) error {
+	if s.weatherClient == nil {
+		return fmt.Errorf("weather client not initialized (API key missing)")
+	}
+
+	log.Printf("Starting weather enrichment for season %d...", season)
+
+	// Get all games for the season that have venue coordinates
+	query := `
+		SELECT g.id, g.game_date, t.stadium_latitude, t.stadium_longitude, t.city, t.state
+		FROM games g
+		JOIN teams t ON g.home_team_id = t.id
+		WHERE g.season = $1
+		AND t.stadium_latitude IS NOT NULL
+		AND t.stadium_longitude IS NOT NULL
+		AND g.weather_temp IS NULL
+		ORDER BY g.game_date
+	`
+
+	rows, err := s.dbPool.Query(ctx, query, season)
+	if err != nil {
+		return fmt.Errorf("failed to query games: %w", err)
+	}
+	defer rows.Close()
+
+	count := 0
+	for rows.Next() {
+		var gameID uuid.UUID
+		var gameDate time.Time
+		var lat, lon float64
+		var city, state string
+
+		if err := rows.Scan(&gameID, &gameDate, &lat, &lon, &city, &state); err != nil {
+			log.Printf("Failed to scan game row: %v", err)
+			continue
+		}
+
+		// Format date for WeatherAPI (YYYY-MM-DD)
+		dateStr := gameDate.Format("2006-01-02")
+
+		// Get historical weather data
+		weatherData, err := s.weatherClient.GetHistoricalWeatherByCoordinates(ctx, lat, lon, dateStr)
+		if err != nil {
+			log.Printf("Failed to fetch weather for game %s on %s: %v", gameID, dateStr, err)
+			time.Sleep(1 * time.Second) // Rate limiting
+			continue
+		}
+
+		// Update game with weather data
+		updateQuery := `
+			UPDATE games
+			SET weather_temp = $1,
+			    weather_condition = $2,
+			    weather_wind_speed = $3,
+			    weather_humidity = $4
+			WHERE id = $5
+		`
+
+		_, err = s.dbPool.Exec(ctx, updateQuery,
+			int(weatherData.Day.AvgTempF),
+			weatherData.Day.Condition.Text,
+			int(weatherData.Day.MaxWindMPH),
+			int(weatherData.Day.AvgHumidity),
+			gameID,
+		)
+
+		if err != nil {
+			log.Printf("Failed to update game %s with weather: %v", gameID, err)
+			continue
+		}
+
+		count++
+		log.Printf("Enriched game %s (%s, %s %s) with weather: %s, %.0f°F",
+			gameID, dateStr, city, state,
+			weatherData.Day.Condition.Text, weatherData.Day.AvgTempF)
+
+		// Rate limiting - WeatherAPI free tier allows 1M calls/month
+		// Sleep for 500ms between requests to be respectful
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	log.Printf("Weather enrichment completed: %d games updated", count)
+	return nil
 }
