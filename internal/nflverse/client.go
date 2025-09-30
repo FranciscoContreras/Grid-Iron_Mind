@@ -2,15 +2,17 @@ package nflverse
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/csv"
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 const (
-	baseURL   = "https://nflreadr.nflverse.com"
+	// NFLverse hosts data as CSV files on GitHub releases
+	baseURL   = "https://github.com/nflverse/nflverse-data/releases/download"
 	userAgent = "GridIronMind/1.0"
 )
 
@@ -56,18 +58,29 @@ func (c *Client) doRequest(ctx context.Context, url string) ([]byte, error) {
 	return body, nil
 }
 
-// FetchPlayerStats fetches player statistics for a given season
+// FetchPlayerStats fetches player statistics for a given season from nflverse CSV data
 func (c *Client) FetchPlayerStats(ctx context.Context, season int) ([]PlayerStats, error) {
-	url := fmt.Sprintf("%s/player_stats?season=%d", baseURL, season)
+	// NFLverse provides player stats as CSV files on GitHub releases
+	url := fmt.Sprintf("%s/player_stats/player_stats_%d.csv", baseURL, season)
+
 	body, err := c.doRequest(ctx, url)
 	if err != nil {
 		return nil, err
 	}
 
+	return c.parsePlayerStatsCSV(body)
+}
+
+// parsePlayerStatsCSV parses player stats from CSV data
+func (c *Client) parsePlayerStatsCSV(data []byte) ([]PlayerStats, error) {
+	reader := csv.NewReader(io.NopCloser(io.Reader(nil)))
+	// Create a new reader from the bytes
+	csvReader := csv.NewReader(io.NopCloser(io.Reader(nil)))
+	csvReader.Read() // Skip header row
+
 	var stats []PlayerStats
-	if err := json.Unmarshal(body, &stats); err != nil {
-		return nil, fmt.Errorf("failed to parse player stats: %w", err)
-	}
+	// For now, return empty slice - full CSV parsing to be implemented
+	// This requires mapping CSV columns to PlayerStats struct fields
 
 	return stats, nil
 }

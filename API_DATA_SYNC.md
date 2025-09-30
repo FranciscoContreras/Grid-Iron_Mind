@@ -76,37 +76,15 @@ curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/historical/seasons \
 ```
 
 ### 6. Sync NFLverse Player Stats
-Fetches detailed player statistics from NFLverse (nflverse.com) data source.
+**⚠️ Currently unavailable** - NFLverse integration requires CSV/Parquet parsing which is being implemented.
 
-```bash
-curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
-  -H "Content-Type: application/json" \
-  -d '{"season": 2024}'
-```
-
-**What it populates:**
-- `game_stats` table - Individual player game statistics
-- `player_career_stats` table - Aggregated career statistics by season
+For now, use ESPN data sources which provide comprehensive player and team statistics.
 
 ### 7. Sync NFLverse Schedule
-Enhanced schedule data from NFLverse with additional metadata.
-
-```bash
-curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/schedule \
-  -H "Content-Type: application/json" \
-  -d '{"season": 2024}'
-```
+**⚠️ Currently unavailable** - NFLverse integration requires CSV/Parquet parsing.
 
 ### 8. Sync NFLverse Next Gen Stats
-Advanced analytics and next-gen statistics.
-
-```bash
-curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/nextgen \
-  -H "Content-Type: application/json" \
-  -d '{"season": 2024, "stat_type": "passing"}'
-```
-
-**Stat types:** `passing`, `rushing`, `receiving`
+**⚠️ Currently unavailable** - NFLverse integration requires CSV/Parquet parsing.
 
 ### 9. Sync Team Stats
 Fetches team-level statistics for completed games.
@@ -140,20 +118,18 @@ curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/historical/seasons \
   -H "Content-Type: application/json" \
   -d '{"start_season": 2023, "end_season": 2024}'
 
-# 4. Sync player statistics from NFLverse (CRITICAL for career stats)
-curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
+# 4. Sync team stats for completed games (week by week)
+# Example for 2024 season, week 1:
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/team-stats \
+  -H "Content-Type: application/json" \
+  -d '{"season": 2024, "week": 1}'
+
+# Repeat for all completed weeks...
+
+# 5. Optional: Enrich with weather data
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/weather \
   -H "Content-Type: application/json" \
   -d '{"season": 2024}'
-
-curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/nflverse/stats \
-  -H "Content-Type: application/json" \
-  -d '{"season": 2023}'
-
-# 5. Sync team stats
-curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/team-stats
-
-# 6. Optional: Enrich with weather data
-curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/weather
 ```
 
 ## Query Endpoints
@@ -357,7 +333,7 @@ heroku pg:psql -a grid-iron-mind -c "SELECT COUNT(*) FROM player_career_stats;"
 
 1. **Order matters**: Always sync teams first, then rosters, then games, then stats.
 
-2. **NFLverse stats are crucial**: The `/admin/sync/nflverse/stats` endpoint populates both `game_stats` and `player_career_stats` tables, which power the career statistics feature.
+2. **NFLverse integration is in development**: NFLverse endpoints currently require CSV/Parquet parsing implementation. Career stats can be populated via ESPN API for individual players.
 
 3. **All sync operations are asynchronous**: Check Heroku logs to monitor progress.
 
