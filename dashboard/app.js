@@ -547,41 +547,70 @@ function renderGamePlayerStats(stats) {
     const container = document.getElementById('gamePlayersList');
 
     if (stats.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center;">No player stats available for this game</p>';
+        container.innerHTML = '<p style="padding: 20px; text-align: center;">No team stats available for this game</p>';
         return;
     }
 
+    // Render team stats in a side-by-side comparison
     container.innerHTML = `
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Position</th>
-                    <th>Pass Yds</th>
-                    <th>Pass TD</th>
-                    <th>Rush Yds</th>
-                    <th>Rush TD</th>
-                    <th>Rec Yds</th>
-                    <th>Rec TD</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${stats.map(stat => `
-                    <tr>
-                        <td><strong>${stat.player_name || 'Unknown'}</strong></td>
-                        <td><span class="position-badge">${stat.position || 'N/A'}</span></td>
-                        <td>${stat.passing_yards || 0}</td>
-                        <td>${stat.passing_touchdowns || 0}</td>
-                        <td>${stat.rushing_yards || 0}</td>
-                        <td>${stat.rushing_touchdowns || 0}</td>
-                        <td>${stat.receiving_yards || 0}</td>
-                        <td>${stat.receiving_touchdowns || 0}</td>
-                        <td><button class="btn" onclick="viewPlayerHistorical('${stat.player_id}', '${stat.player_name}')">View History</button></td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            ${stats.map(teamStat => `
+                <div class="stats-card">
+                    <h3 style="text-align: center; margin-bottom: 20px; color: var(--primary);">${teamStat.team_name} (${teamStat.team_abbr})</h3>
+
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Yards</span>
+                            <span class="stat-value">${teamStat.total_yards}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">First Downs</span>
+                            <span class="stat-value">${teamStat.first_downs}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Passing Yards</span>
+                            <span class="stat-value">${teamStat.passing_yards}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Rushing Yards</span>
+                            <span class="stat-value">${teamStat.rushing_yards}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Yards/Play</span>
+                            <span class="stat-value">${teamStat.yards_per_play.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Offensive Plays</span>
+                            <span class="stat-value">${teamStat.offensive_plays}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">3rd Down Conv</span>
+                            <span class="stat-value">${teamStat.third_down_conversions}/${teamStat.third_down_attempts} (${teamStat.third_down_pct.toFixed(1)}%)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">4th Down Conv</span>
+                            <span class="stat-value">${teamStat.fourth_down_conversions}/${teamStat.fourth_down_attempts} (${teamStat.fourth_down_pct.toFixed(1)}%)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Red Zone</span>
+                            <span class="stat-value">${teamStat.red_zone_scores}/${teamStat.red_zone_attempts}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Turnovers</span>
+                            <span class="stat-value">${teamStat.turnovers}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Penalties</span>
+                            <span class="stat-value">${teamStat.penalties} for ${teamStat.penalty_yards} yds</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Time of Possession</span>
+                            <span class="stat-value">${teamStat.possession_time}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
     `;
 }
 
