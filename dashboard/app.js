@@ -1,5 +1,7 @@
 // Configuration
-const API_BASE_URL = 'http://localhost:3000'; // Change to your Vercel URL when deployed
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : ''; // Use relative URLs in production
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // State

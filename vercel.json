@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/v1/players/:path*",
-      "destination": "/api/v1/players.go"
+      "destination": "/api/players"
     },
     {
       "source": "/api/v1/teams/:path*",
-      "destination": "/api/v1/teams.go"
+      "destination": "/api/teams"
     }
   ]
 }
