@@ -619,13 +619,13 @@ async function viewGameDetail(gameId, gameTitle, gameData) {
 
     // Load player stats for this game
     try {
-        const statsResult = await apiCall(`/api/v1/games/${gameId}/stats`);
+        const statsResult = await apiCall(`/api/v1/stats/game/${gameId}`);
         const stats = statsResult.data.data || [];
         renderGamePlayerStats(stats);
     } catch (error) {
-        // If endpoint doesn't exist yet, show placeholder
+        console.error('Failed to load player stats:', error);
         document.getElementById('gamePlayersList').innerHTML =
-            '<p style="padding: 20px; text-align: center;">Player stats endpoint not yet available</p>';
+            '<p style="padding: 20px; text-align: center;">No player stats available for this game</p>';
     }
 }
 
@@ -663,71 +663,131 @@ function renderGamePlayerStats(stats) {
     const container = document.getElementById('gamePlayersList');
 
     if (stats.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center;">No team stats available for this game</p>';
+        container.innerHTML = '<p style="padding: 20px; text-align: center;">No player stats available for this game</p>';
         return;
     }
 
-    // Render team stats in a side-by-side comparison
-    container.innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            ${stats.map(teamStat => `
-                <div class="stats-card">
-                    <h3 style="text-align: center; margin-bottom: 20px; color: var(--primary);">${teamStat.team_name} (${teamStat.team_abbr})</h3>
+    // Separate by position type for better organization
+    const passers = stats.filter(s => s.passing_attempts > 0);
+    const rushers = stats.filter(s => s.rushing_attempts > 0);
+    const receivers = stats.filter(s => s.receiving_receptions > 0);
 
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-label">Total Yards</span>
-                            <span class="stat-value">${teamStat.total_yards}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">First Downs</span>
-                            <span class="stat-value">${teamStat.first_downs}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Passing Yards</span>
-                            <span class="stat-value">${teamStat.passing_yards}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Rushing Yards</span>
-                            <span class="stat-value">${teamStat.rushing_yards}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Yards/Play</span>
-                            <span class="stat-value">${teamStat.yards_per_play.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Offensive Plays</span>
-                            <span class="stat-value">${teamStat.offensive_plays}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">3rd Down Conv</span>
-                            <span class="stat-value">${teamStat.third_down_conversions}/${teamStat.third_down_attempts} (${teamStat.third_down_pct.toFixed(1)}%)</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">4th Down Conv</span>
-                            <span class="stat-value">${teamStat.fourth_down_conversions}/${teamStat.fourth_down_attempts} (${teamStat.fourth_down_pct.toFixed(1)}%)</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Red Zone</span>
-                            <span class="stat-value">${teamStat.red_zone_scores}/${teamStat.red_zone_attempts}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Turnovers</span>
-                            <span class="stat-value">${teamStat.turnovers}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Penalties</span>
-                            <span class="stat-value">${teamStat.penalties} for ${teamStat.penalty_yards} yds</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Time of Possession</span>
-                            <span class="stat-value">${teamStat.possession_time}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
+    let html = '';
+
+    // Passing stats
+    if (passers.length > 0) {
+        html += `
+            <h3 style="margin-top: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                🏈 Passing Stats
+            </h3>
+            <table class="data-table" style="font-size: 14px;">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>C/ATT</th>
+                        <th>Yards</th>
+                        <th>TD</th>
+                        <th>INT</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${passers.map(p => {
+                        const rating = p.passing_attempts > 0 ?
+                            ((p.passing_completions / p.passing_attempts) * 100).toFixed(1) : '0.0';
+                        return `
+                            <tr>
+                                <td><strong>${p.player?.name || 'Unknown'}</strong></td>
+                                <td>${p.passing_completions}/${p.passing_attempts}</td>
+                                <td>${p.passing_yards}</td>
+                                <td>${p.passing_touchdowns}</td>
+                                <td>${p.passing_interceptions}</td>
+                                <td>${rating}%</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    // Rushing stats
+    if (rushers.length > 0) {
+        html += `
+            <h3 style="margin-top: 30px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                🏃 Rushing Stats
+            </h3>
+            <table class="data-table" style="font-size: 14px;">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Attempts</th>
+                        <th>Yards</th>
+                        <th>Avg</th>
+                        <th>TD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rushers.map(p => {
+                        const avg = p.rushing_attempts > 0 ?
+                            (p.rushing_yards / p.rushing_attempts).toFixed(1) : '0.0';
+                        return `
+                            <tr>
+                                <td><strong>${p.player?.name || 'Unknown'}</strong></td>
+                                <td>${p.rushing_attempts}</td>
+                                <td>${p.rushing_yards}</td>
+                                <td>${avg}</td>
+                                <td>${p.rushing_touchdowns}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    // Receiving stats
+    if (receivers.length > 0) {
+        html += `
+            <h3 style="margin-top: 30px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                🎯 Receiving Stats
+            </h3>
+            <table class="data-table" style="font-size: 14px;">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Receptions</th>
+                        <th>Targets</th>
+                        <th>Yards</th>
+                        <th>Avg</th>
+                        <th>TD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${receivers.map(p => {
+                        const avg = p.receiving_receptions > 0 ?
+                            (p.receiving_yards / p.receiving_receptions).toFixed(1) : '0.0';
+                        return `
+                            <tr>
+                                <td><strong>${p.player?.name || 'Unknown'}</strong></td>
+                                <td>${p.receiving_receptions}</td>
+                                <td>${p.receiving_targets}</td>
+                                <td>${p.receiving_yards}</td>
+                                <td>${avg}</td>
+                                <td>${p.receiving_touchdowns}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    if (html === '') {
+        container.innerHTML = '<p style="padding: 20px; text-align: center;">No player performance data available for this game</p>';
+    } else {
+        container.innerHTML = html;
+    }
 }
 
 // Level 3/2 → Level 4: Player Historical View

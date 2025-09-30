@@ -23,28 +23,24 @@ func NewStatsHandler() *StatsHandler {
 	}
 }
 
-// HandleGameStats handles GET /games/:gameID/stats
+// HandleGameStats handles GET /stats/game/:gameID - returns player stats for a game
 func (h *StatsHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
 		return
 	}
 
-	// Extract game ID from path: /api/v1/games/{id}/stats
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/games/")
-	parts := strings.Split(path, "/")
-	if len(parts) < 2 {
-		response.Error(w, http.StatusBadRequest, "INVALID_PATH", "Invalid game stats path")
-		return
-	}
+	// Extract game ID from path: /api/v1/stats/game/{id}
+	path := strings.TrimPrefix(r.URL.Path, "/api/v1/stats/game/")
+	path = strings.TrimSuffix(path, "/")
 
-	gameID, err := uuid.Parse(parts[0])
+	gameID, err := uuid.Parse(path)
 	if err != nil {
 		response.Error(w, http.StatusBadRequest, "INVALID_GAME_ID", "Game ID must be a valid UUID")
 		return
 	}
 
-	log.Printf("%s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
+	log.Printf("%s %s from %s - Getting player stats for game %s", r.Method, r.URL.Path, r.RemoteAddr, gameID)
 
 	stats, err := h.queries.GetGameStats(r.Context(), gameID)
 	if err != nil {

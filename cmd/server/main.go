@@ -75,6 +75,7 @@ func main() {
 	mux.HandleFunc("/api/v1/games", applyMiddleware(gamesHandler.HandleGames))
 	mux.HandleFunc("/api/v1/games/", applyMiddleware(gamesHandler.HandleGames))
 	mux.HandleFunc("/api/v1/stats/leaders", applyMiddleware(statsHandler.HandleStatsLeaders))
+	mux.HandleFunc("/api/v1/stats/game/", applyMiddleware(statsHandler.HandleGameStats))
 
 	// AI endpoints (require API key and stricter rate limiting)
 	mux.HandleFunc("/api/v1/ai/predict/game/", applyAIMiddleware(aiHandler.HandlePredictGame))
