@@ -4,9 +4,9 @@ High-performance NFL data lake with AI-enriched insights via REST API.
 
 ## API Base URL
 
-```
-https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1
-```
+**Production:** `http://nfl.wearemachina.com/api/v1`
+
+**Heroku:** `https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1`
 
 ## Available Endpoints
 
@@ -26,7 +26,7 @@ GET /api/v1/players
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/players?position=QB&limit=10"
+curl "http://nfl.wearemachina.com/api/v1/players?position=QB&limit=10"
 ```
 
 **Response:**
@@ -63,7 +63,7 @@ GET /api/v1/players/:id
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/players/uuid"
+curl "http://nfl.wearemachina.com/api/v1/players/uuid"
 ```
 
 **Response:**
@@ -90,7 +90,7 @@ GET /api/v1/teams
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/teams"
+curl "http://nfl.wearemachina.com/api/v1/teams"
 ```
 
 **Response:**
@@ -123,7 +123,7 @@ GET /api/v1/teams/:id
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/teams/uuid"
+curl "http://nfl.wearemachina.com/api/v1/teams/uuid"
 ```
 
 #### Get Team Roster
@@ -133,7 +133,7 @@ GET /api/v1/teams/:id/players
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/teams/uuid/players"
+curl "http://nfl.wearemachina.com/api/v1/teams/uuid/players"
 ```
 
 **Response:**
@@ -171,7 +171,7 @@ GET /api/v1/games
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/games?season=2024&week=1"
+curl "http://nfl.wearemachina.com/api/v1/games?season=2024&week=1"
 ```
 
 **Response:**
@@ -206,7 +206,7 @@ GET /api/v1/games/:id
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/games/uuid"
+curl "http://nfl.wearemachina.com/api/v1/games/uuid"
 ```
 
 ### Statistics
@@ -218,7 +218,7 @@ GET /api/v1/games/:gameID/stats
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/games/uuid/stats"
+curl "http://nfl.wearemachina.com/api/v1/games/uuid/stats"
 ```
 
 **Response:**
@@ -256,7 +256,7 @@ GET /api/v1/players/:playerID/stats
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/players/uuid/stats?season=2024"
+curl "http://nfl.wearemachina.com/api/v1/players/uuid/stats?season=2024"
 ```
 
 #### Get Stats Leaders
@@ -271,7 +271,7 @@ GET /api/v1/stats/leaders
 
 **Example:**
 ```bash
-curl "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/stats/leaders?category=passing_yards&season=2024&limit=10"
+curl "http://nfl.wearemachina.com/api/v1/stats/leaders?category=passing_yards&season=2024&limit=10"
 ```
 
 **Response:**
@@ -306,7 +306,7 @@ POST /api/v1/ai/predict/game/:gameID
 
 **Example:**
 ```bash
-curl -X POST "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/ai/predict/game/uuid" \
+curl -X POST "http://nfl.wearemachina.com/api/v1/ai/predict/game/uuid" \
   -H "X-API-Key: your-api-key"
 ```
 
@@ -336,7 +336,7 @@ POST /api/v1/ai/predict/player/:playerID
 
 **Example:**
 ```bash
-curl -X POST "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/ai/predict/player/uuid" \
+curl -X POST "http://nfl.wearemachina.com/api/v1/ai/predict/player/uuid" \
   -H "X-API-Key: your-api-key"
 ```
 
@@ -347,7 +347,7 @@ POST /api/v1/ai/insights/player/:playerID
 
 **Example:**
 ```bash
-curl -X POST "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/ai/insights/player/uuid" \
+curl -X POST "http://nfl.wearemachina.com/api/v1/ai/insights/player/uuid" \
   -H "X-API-Key: your-api-key"
 ```
 
@@ -358,7 +358,7 @@ POST /api/v1/ai/query
 
 **Example:**
 ```bash
-curl -X POST "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/ai/query" \
+curl -X POST "http://nfl.wearemachina.com/api/v1/ai/query" \
   -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{"query": "Who are the top 5 quarterbacks this season?"}'
@@ -394,12 +394,12 @@ API keys are required for AI endpoints. Include your API key in requests using e
 
 **X-API-Key Header:**
 ```bash
-curl -H "X-API-Key: your-api-key" https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/ai/query
+curl -H "X-API-Key: your-api-key" http://nfl.wearemachina.com/api/v1/ai/query
 ```
 
 **Authorization Bearer Token:**
 ```bash
-curl -H "Authorization: Bearer your-api-key" https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/ai/query
+curl -H "Authorization: Bearer your-api-key" http://nfl.wearemachina.com/api/v1/ai/query
 ```
 
 ### Rate Limits
@@ -425,12 +425,12 @@ Admin endpoint to generate API keys:
 
 ```bash
 # Generate standard API key
-curl -X POST "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/admin/keys/generate" \
+curl -X POST "http://nfl.wearemachina.com/api/v1/admin/keys/generate" \
   -H "Content-Type: application/json" \
   -d '{"unlimited": false, "label": "production-key"}'
 
 # Generate unlimited API key
-curl -X POST "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/api/v1/admin/keys/generate" \
+curl -X POST "http://nfl.wearemachina.com/api/v1/admin/keys/generate" \
   -H "Content-Type: application/json" \
   -d '{"unlimited": true, "label": "internal-unlimited"}'
 ```
@@ -651,7 +651,7 @@ This creates:
 - Redis caching enabled
 - Environment variables configured
 - Database migrations automated
-- API fully operational at https://grid-iron-mind-71cc9734eaf4.herokuapp.com/
+- API fully operational at http://nfl.wearemachina.com/
 
 ## License
 
