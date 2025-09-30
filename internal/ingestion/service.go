@@ -822,9 +822,9 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 			espnTeamID := teamStats.Team.ID
 			var teamID uuid.UUID
 
-			// Match ESPN team ID to our team ID
+			// Match ESPN team ID to our team ID (convert string to int)
 			var dbTeamID uuid.UUID
-			teamQuery := `SELECT id FROM teams WHERE espn_team_id = $1`
+			teamQuery := `SELECT id FROM teams WHERE nfl_id::text = $1`
 			if err := s.dbPool.QueryRow(ctx, teamQuery, espnTeamID).Scan(&dbTeamID); err != nil {
 				log.Printf("Could not find team with ESPN ID %s: %v", espnTeamID, err)
 				continue
