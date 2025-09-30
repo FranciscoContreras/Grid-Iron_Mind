@@ -44,7 +44,8 @@ func (q *CareerQueries) GetPlayerCareerStats(ctx context.Context, playerID uuid.
 	var stats []models.PlayerCareerStats
 	for rows.Next() {
 		var s models.PlayerCareerStats
-		var team models.Team
+		var teamID *uuid.UUID
+		var teamName, teamAbbr, teamCity *string
 
 		err := rows.Scan(
 			&s.ID, &s.PlayerID, &s.Season, &s.TeamID,
@@ -59,14 +60,20 @@ func (q *CareerQueries) GetPlayerCareerStats(ctx context.Context, playerID uuid.
 			&s.FieldGoalsMade, &s.FieldGoalsAttempted,
 			&s.ExtraPointsMade, &s.ExtraPointsAttempted,
 			&s.CreatedAt, &s.UpdatedAt,
-			&team.ID, &team.Name, &team.Abbreviation, &team.City,
+			&teamID, &teamName, &teamAbbr, &teamCity,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan career stats: %w", err)
 		}
 
-		if s.TeamID != nil {
-			s.Team = &team
+		// Only populate team if we have team data from JOIN
+		if teamID != nil && teamName != nil {
+			s.Team = &models.Team{
+				ID:           *teamID,
+				Name:         *teamName,
+				Abbreviation: *teamAbbr,
+				City:         *teamCity,
+			}
 		}
 
 		stats = append(stats, s)
@@ -136,8 +143,9 @@ func (q *CareerQueries) UpsertPlayerCareerStats(ctx context.Context, stats *mode
 			$21, $22, $23, $24, $25, $26,
 			$27, $28, $29, $30
 		)
-		ON CONFLICT (player_id, season, team_id)
+		ON CONFLICT (player_id, season)
 		DO UPDATE SET
+			team_id = EXCLUDED.team_id,
 			games_played = EXCLUDED.games_played,
 			games_started = EXCLUDED.games_started,
 			passing_yards = EXCLUDED.passing_yards,

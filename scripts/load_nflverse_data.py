@@ -204,8 +204,14 @@ def main():
     player_mapping = get_player_mapping(conn)
     print(f"  Found {len(team_mapping)} teams, {len(player_mapping)} players\n")
 
-    # Process each season
-    seasons = [2023, 2024]
+    # Process each season - load comprehensive historical data
+    # NFLverse has data from 1999 onwards, but focus on modern era (2010+)
+    # Include 2025 for current season
+    current_year = 2025
+    seasons = list(range(2010, current_year + 1))  # 2010-2025
+
+    print(f"Will process {len(seasons)} seasons: {seasons[0]}-{seasons[-1]}\n")
+
     for season in seasons:
         print(f"\n{'='*50}")
         print(f"Processing {season} Season")
