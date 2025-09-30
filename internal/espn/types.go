@@ -191,10 +191,10 @@ type Logo struct {
 
 // TeamResponse represents a single team with roster
 type TeamResponse struct {
-	Team   TeamDetail `json:"team"`
-	Roster struct {
+	Team struct {
+		TeamDetail
 		Athletes []Athlete `json:"athletes"`
-	} `json:"roster"`
+	} `json:"team"`
 }
 
 // PlayersResponse represents the active players API response

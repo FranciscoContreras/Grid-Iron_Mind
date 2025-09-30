@@ -128,13 +128,16 @@ func (s *Service) SyncTeamRoster(ctx context.Context, espnTeamID string) error {
 	}
 
 	// Process each player in the roster
-	for _, athlete := range teamResp.Roster.Athletes {
+	playerCount := 0
+	for _, athlete := range teamResp.Team.Athletes {
 		if err := s.upsertPlayer(ctx, athlete, teamID); err != nil {
 			log.Printf("Failed to upsert player %s: %v", athlete.DisplayName, err)
+		} else {
+			playerCount++
 		}
 	}
 
-	log.Printf("Roster sync completed for team %s", espnTeamID)
+	log.Printf("Roster sync completed for team %s: %d players processed", espnTeamID, playerCount)
 	return nil
 }
 
