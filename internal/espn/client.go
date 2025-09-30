@@ -213,3 +213,31 @@ func (c *Client) FetchGameDetails(ctx context.Context, gameID string) (*GameDeta
 
 	return &response, nil
 }
+
+// FetchTeamInjuries fetches injury reports for a specific team
+func (c *Client) FetchTeamInjuries(ctx context.Context, teamID string) (*InjuryReport, error) {
+	url := fmt.Sprintf("%s/apis/site/v2/sports/football/nfl/teams/%s/injuries", baseURL, teamID)
+	body, err := c.doRequest(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	var response InjuryReport
+	if err := json.Unmarshal(body, &response); err != nil {
+		return nil, fmt.Errorf("failed to parse injury report: %w", err)
+	}
+
+	return &response, nil
+}
+
+// FetchGameInjuries fetches injury reports from a game detail response
+func (c *Client) FetchGameInjuries(ctx context.Context, gameID string) ([]InjuryReport, error) {
+	gameDetail, err := c.FetchGameDetails(ctx, gameID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract injuries from game detail response
+	// ESPN includes injuries in the game summary
+	return gameDetail.Injuries, nil
+}

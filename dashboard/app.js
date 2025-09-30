@@ -321,15 +321,85 @@ async function viewPlayerDetails(playerId) {
                 // Sort by season descending (most recent first)
                 stats.sort((a, b) => b.season - a.season);
 
+                // Calculate career totals and highlights
+                const careerTotals = {
+                    seasons: stats.length,
+                    games: stats.reduce((sum, s) => sum + (s.games_played || 0), 0),
+                    passingYards: stats.reduce((sum, s) => sum + (s.passing_yards || 0), 0),
+                    passingTDs: stats.reduce((sum, s) => sum + (s.passing_tds || 0), 0),
+                    passingInts: stats.reduce((sum, s) => sum + (s.passing_ints || 0), 0),
+                    rushingYards: stats.reduce((sum, s) => sum + (s.rushing_yards || 0), 0),
+                    rushingTDs: stats.reduce((sum, s) => sum + (s.rushing_tds || 0), 0),
+                    receivingYards: stats.reduce((sum, s) => sum + (s.receiving_yards || 0), 0),
+                    receivingTDs: stats.reduce((sum, s) => sum + (s.receiving_tds || 0), 0),
+                    receptions: stats.reduce((sum, s) => sum + (s.receptions || 0), 0)
+                };
+
+                const yearsActive = `${stats[stats.length - 1].season}-${stats[0].season}`;
+
+                // Determine primary position based on stats
+                let primaryStats = [];
+                if (careerTotals.passingYards > 0) {
+                    primaryStats.push(`
+                        <div style="text-align: center; padding: 15px; background: rgba(76, 175, 80, 0.1); border-radius: 8px;">
+                            <div style="font-size: 28px; font-weight: bold; color: var(--primary);">${careerTotals.passingYards.toLocaleString()}</div>
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">Career Passing Yards</div>
+                            <div style="font-size: 14px; margin-top: 5px;">${careerTotals.passingTDs} TDs / ${careerTotals.passingInts} INTs</div>
+                        </div>
+                    `);
+                }
+                if (careerTotals.rushingYards > 0) {
+                    primaryStats.push(`
+                        <div style="text-align: center; padding: 15px; background: rgba(33, 150, 243, 0.1); border-radius: 8px;">
+                            <div style="font-size: 28px; font-weight: bold; color: #2196F3;">${careerTotals.rushingYards.toLocaleString()}</div>
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">Career Rushing Yards</div>
+                            <div style="font-size: 14px; margin-top: 5px;">${careerTotals.rushingTDs} TDs</div>
+                        </div>
+                    `);
+                }
+                if (careerTotals.receivingYards > 0) {
+                    primaryStats.push(`
+                        <div style="text-align: center; padding: 15px; background: rgba(255, 152, 0, 0.1); border-radius: 8px;">
+                            <div style="font-size: 28px; font-weight: bold; color: #FF9800;">${careerTotals.receivingYards.toLocaleString()}</div>
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">Career Receiving Yards</div>
+                            <div style="font-size: 14px; margin-top: 5px;">${careerTotals.receptions} Rec / ${careerTotals.receivingTDs} TDs</div>
+                        </div>
+                    `);
+                }
+
                 careerHTML = `
                     <h3 style="margin-top: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
-                        📊 Career Statistics
+                        📊 Career Statistics (${yearsActive})
                     </h3>
-                    <div style="max-height: 400px; overflow-y: auto;">
+
+                    <!-- Career Summary -->
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 32px; font-weight: bold; color: var(--primary);">${careerTotals.seasons}</div>
+                                <div style="font-size: 12px; color: #666;">Seasons</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 32px; font-weight: bold; color: var(--primary);">${careerTotals.games}</div>
+                                <div style="font-size: 12px; color: #666;">Games Played</div>
+                            </div>
+                        </div>
+
+                        ${primaryStats.length > 0 ? `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                                ${primaryStats.join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Season-by-Season Breakdown -->
+                    <h4 style="margin: 20px 0 10px 0; color: #666;">Season-by-Season Breakdown</h4>
+                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
                         <table class="data-table" style="font-size: 14px;">
-                            <thead>
+                            <thead style="position: sticky; top: 0; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 <tr>
                                     <th>Season</th>
+                                    <th>Team</th>
                                     <th>GP</th>
                                     <th>Pass Yds</th>
                                     <th>Pass TD</th>
@@ -345,15 +415,16 @@ async function viewPlayerDetails(playerId) {
                                 ${stats.map(s => `
                                     <tr style="${s.season === currentYear ? 'background-color: rgba(76, 175, 80, 0.1); font-weight: bold;' : ''}">
                                         <td>${s.season}${s.season === currentYear ? ' ⭐' : ''}</td>
+                                        <td>${s.team ? s.team.abbreviation : 'N/A'}</td>
                                         <td>${s.games_played || 0}</td>
-                                        <td>${s.passing_yards || 0}</td>
-                                        <td>${s.passing_tds || 0}</td>
-                                        <td>${s.passing_ints || 0}</td>
-                                        <td>${s.rushing_yards || 0}</td>
-                                        <td>${s.rushing_tds || 0}</td>
-                                        <td>${s.receptions || 0}</td>
-                                        <td>${s.receiving_yards || 0}</td>
-                                        <td>${s.receiving_tds || 0}</td>
+                                        <td>${s.passing_yards > 0 ? s.passing_yards.toLocaleString() : '-'}</td>
+                                        <td>${s.passing_tds > 0 ? s.passing_tds : '-'}</td>
+                                        <td>${s.passing_ints > 0 ? s.passing_ints : '-'}</td>
+                                        <td>${s.rushing_yards > 0 ? s.rushing_yards.toLocaleString() : '-'}</td>
+                                        <td>${s.rushing_tds > 0 ? s.rushing_tds : '-'}</td>
+                                        <td>${s.receptions > 0 ? s.receptions : '-'}</td>
+                                        <td>${s.receiving_yards > 0 ? s.receiving_yards.toLocaleString() : '-'}</td>
+                                        <td>${s.receiving_tds > 0 ? s.receiving_tds : '-'}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>

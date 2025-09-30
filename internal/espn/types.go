@@ -345,4 +345,58 @@ type GameDetailResponse struct {
 			Text string `json:"text"`
 		} `json:"link"`
 	} `json:"weather,omitempty"`
+	Injuries []InjuryReport `json:"injuries,omitempty"`
+}
+
+// InjuryReport represents injury reports from ESPN
+type InjuryReport struct {
+	Team     TeamDetail `json:"team"`
+	Injuries []Injury   `json:"injuries"`
+}
+
+// Injury represents an individual injury
+type Injury struct {
+	Status   string        `json:"status"`
+	Date     string        `json:"date"`
+	Athlete  AthleteBasic  `json:"athlete"`
+	Type     InjuryType    `json:"type"`
+	Details  InjuryDetails `json:"details"`
+}
+
+// AthleteBasic is a simplified athlete structure for injury reports
+type AthleteBasic struct {
+	ID          string   `json:"id"`
+	UID         string   `json:"uid"`
+	GUID        string   `json:"guid"`
+	LastName    string   `json:"lastName"`
+	FullName    string   `json:"fullName"`
+	DisplayName string   `json:"displayName"`
+	ShortName   string   `json:"shortName"`
+	Jersey      string   `json:"jersey"`
+	Position    Position `json:"position"`
+}
+
+// InjuryType represents the type/status of injury
+type InjuryType struct {
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
+	Abbreviation string `json:"abbreviation"`
+}
+
+// InjuryDetails contains detailed injury information
+type InjuryDetails struct {
+	FantasyStatus FantasyStatus `json:"fantasyStatus"`
+	Type          string        `json:"type"`
+	Location      string        `json:"location"`
+	Detail        string        `json:"detail"`
+	Side          string        `json:"side"`
+	ReturnDate    string        `json:"returnDate"`
+}
+
+// FantasyStatus represents fantasy football injury status
+type FantasyStatus struct {
+	Description        string `json:"description"`
+	Abbreviation       string `json:"abbreviation"`
+	DisplayDescription string `json:"displayDescription"`
 }

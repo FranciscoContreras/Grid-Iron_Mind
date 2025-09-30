@@ -318,3 +318,39 @@ CREATE TABLE IF NOT EXISTS game_team_stats (
 CREATE INDEX IF NOT EXISTS idx_game_team_stats_game ON game_team_stats(game_id);
 CREATE INDEX IF NOT EXISTS idx_game_team_stats_team ON game_team_stats(team_id);
 CREATE INDEX IF NOT EXISTS idx_game_team_stats_yards ON game_team_stats(total_yards);
+
+-- Player Injuries table
+CREATE TABLE IF NOT EXISTS player_injuries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+    team_id UUID REFERENCES teams(id),
+    game_id UUID REFERENCES games(id),
+
+    -- Injury status
+    status TEXT NOT NULL, -- Questionable, Doubtful, Out, IR, etc.
+    status_abbreviation TEXT, -- Q, D, O, IR
+
+    -- Injury details
+    injury_type TEXT, -- Concussion, Knee, Ankle, etc.
+    body_location TEXT, -- Head, Leg, Arm, etc.
+    detail TEXT, -- Full description
+    side TEXT, -- Left, Right, Not Specified
+
+    -- Timeline
+    injury_date TIMESTAMP,
+    return_date DATE,
+
+    -- ESPN metadata
+    espn_injury_id TEXT,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Prevent duplicate active injuries for same player
+    UNIQUE(player_id, injury_type, status)
+);
+
+CREATE INDEX IF NOT EXISTS idx_player_injuries_player ON player_injuries(player_id);
+CREATE INDEX IF NOT EXISTS idx_player_injuries_team ON player_injuries(team_id);
+CREATE INDEX IF NOT EXISTS idx_player_injuries_game ON player_injuries(game_id);
+CREATE INDEX IF NOT EXISTS idx_player_injuries_status ON player_injuries(status);
+CREATE INDEX IF NOT EXISTS idx_player_injuries_return_date ON player_injuries(return_date) WHERE return_date IS NOT NULL;
