@@ -1,5 +1,7 @@
 module github.com/francisco/gridironmind
 
+// +heroku install ./cmd/server
+
 go 1.21
 
 require (
