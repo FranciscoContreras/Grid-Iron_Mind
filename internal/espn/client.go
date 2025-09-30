@@ -159,3 +159,57 @@ func (c *Client) FetchPlayerOverview(ctx context.Context, athleteID string) (*Pl
 
 	return &response, nil
 }
+
+// FetchPlayerStats fetches career statistics for a specific player
+func (c *Client) FetchPlayerStats(ctx context.Context, athleteID string) (*PlayerStatsResponse, error) {
+	url := fmt.Sprintf("%s/apis/site/v2/sports/football/nfl/athletes/%s/statistics", baseURL, athleteID)
+	body, err := c.doRequest(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	var response PlayerStatsResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		return nil, fmt.Errorf("failed to parse player stats: %w", err)
+	}
+
+	return &response, nil
+}
+
+// FetchSeasonGames fetches all games for a specific season and week
+func (c *Client) FetchSeasonGames(ctx context.Context, season int, week int) (*ScoreboardResponse, error) {
+	var url string
+	if week > 0 {
+		url = fmt.Sprintf("%s/apis/site/v2/sports/football/nfl/scoreboard?dates=%d&seasontype=2&week=%d", baseURL, season, week)
+	} else {
+		url = fmt.Sprintf("%s/apis/site/v2/sports/football/nfl/scoreboard?dates=%d&seasontype=2", baseURL, season)
+	}
+
+	body, err := c.doRequest(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ScoreboardResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		return nil, fmt.Errorf("failed to parse scoreboard response: %w", err)
+	}
+
+	return &response, nil
+}
+
+// FetchGameDetails fetches detailed information for a specific game including stats
+func (c *Client) FetchGameDetails(ctx context.Context, gameID string) (*GameDetailResponse, error) {
+	url := fmt.Sprintf("%s/apis/site/v2/sports/football/nfl/summary?event=%s", baseURL, gameID)
+	body, err := c.doRequest(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	var response GameDetailResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		return nil, fmt.Errorf("failed to parse game details: %w", err)
+	}
+
+	return &response, nil
+}

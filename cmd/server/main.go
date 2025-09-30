@@ -59,6 +59,7 @@ func main() {
 	teamsHandler := handlers.NewTeamsHandler()
 	gamesHandler := handlers.NewGamesHandler()
 	statsHandler := handlers.NewStatsHandler()
+	careerHandler := handlers.NewCareerHandler()
 	aiHandler := handlers.NewAIHandler(cfg)
 	adminHandler := handlers.NewAdminHandler()
 
@@ -74,6 +75,10 @@ func main() {
 	mux.HandleFunc("/api/v1/games/", applyMiddleware(gamesHandler.HandleGames))
 	mux.HandleFunc("/api/v1/stats/leaders", applyMiddleware(statsHandler.HandleStatsLeaders))
 
+	// Career and history endpoints
+	mux.HandleFunc("/api/v1/players/:id/career", applyMiddleware(careerHandler.HandlePlayerCareerStats))
+	mux.HandleFunc("/api/v1/players/:id/history", applyMiddleware(careerHandler.HandlePlayerTeamHistory))
+
 	// AI endpoints (require API key and stricter rate limiting)
 	mux.HandleFunc("/api/v1/ai/predict/game/", applyAIMiddleware(aiHandler.HandlePredictGame))
 	mux.HandleFunc("/api/v1/ai/predict/player/", applyAIMiddleware(aiHandler.HandlePredictPlayer))
@@ -85,6 +90,8 @@ func main() {
 	mux.HandleFunc("/api/v1/admin/sync/rosters", applyMiddleware(adminHandler.HandleSyncRosters))
 	mux.HandleFunc("/api/v1/admin/sync/games", applyMiddleware(adminHandler.HandleSyncGames))
 	mux.HandleFunc("/api/v1/admin/sync/full", applyMiddleware(adminHandler.HandleFullSync))
+	mux.HandleFunc("/api/v1/admin/sync/historical/season", applyMiddleware(adminHandler.HandleSyncHistoricalGames))
+	mux.HandleFunc("/api/v1/admin/sync/historical/seasons", applyMiddleware(adminHandler.HandleSyncMultipleSeasons))
 	mux.HandleFunc("/api/v1/admin/keys/generate", applyMiddleware(adminHandler.HandleGenerateAPIKey))
 
 	// Health check endpoint

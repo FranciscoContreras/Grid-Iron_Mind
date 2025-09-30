@@ -228,3 +228,77 @@ type PlayerStatus struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
 }
+
+// PlayerStatsResponse represents career statistics response
+type PlayerStatsResponse struct {
+	Splits struct {
+		Categories []struct {
+			Name  string `json:"name"`
+			Stats []struct {
+				Name         string      `json:"name"`
+				DisplayName  string      `json:"displayName"`
+				Abbreviation string      `json:"abbreviation"`
+				Value        interface{} `json:"value"`
+			} `json:"stats"`
+		} `json:"categories"`
+	} `json:"splits"`
+	SeasonTypes []struct {
+		Year        int    `json:"year"`
+		Type        int    `json:"type"`
+		Name        string `json:"name"`
+		Abbreviation string `json:"abbreviation"`
+		Categories  []struct {
+			Name  string `json:"name"`
+			Stats []struct {
+				Name         string      `json:"name"`
+				DisplayName  string      `json:"displayName"`
+				Abbreviation string      `json:"abbreviation"`
+				Value        interface{} `json:"value"`
+			} `json:"stats"`
+		} `json:"categories"`
+	} `json:"seasonTypes"`
+}
+
+// GameDetailResponse represents detailed game information
+type GameDetailResponse struct {
+	Header struct {
+		ID          string    `json:"id"`
+		UID         string    `json:"uid"`
+		Season      Season    `json:"season"`
+		Week        Week      `json:"week"`
+		GameNote    string    `json:"gameNote"`
+		Competition Competition `json:"competition"`
+	} `json:"header"`
+	BoxScore struct {
+		Teams []struct {
+			Team       TeamInfo `json:"team"`
+			Statistics []struct {
+				Name             string `json:"name"`
+				DisplayValue     string `json:"displayValue"`
+				Abbreviation     string `json:"abbreviation"`
+			} `json:"statistics"`
+		} `json:"teams"`
+		Players []struct {
+			Team       TeamInfo `json:"team"`
+			Statistics []struct {
+				Name    string `json:"name"`
+				Keys    []string `json:"keys"`
+				Text    string `json:"text"`
+				Labels  []string `json:"labels"`
+				Athletes []struct {
+					Athlete Athlete  `json:"athlete"`
+					Stats   []string `json:"stats"`
+				} `json:"athletes"`
+			} `json:"statistics"`
+		} `json:"players"`
+	} `json:"boxscore"`
+	Weather *struct {
+		DisplayValue string `json:"displayValue"`
+		Temperature  int    `json:"temperature"`
+		HighTemperature int `json:"highTemperature"`
+		Condition    string `json:"conditionId"`
+		Link         struct {
+			Text string `json:"text"`
+		} `json:"link"`
+	} `json:"weather,omitempty"`
+}

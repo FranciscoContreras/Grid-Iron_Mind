@@ -180,3 +180,75 @@ func generateSecureAPIKey() (string, error) {
 	}
 	return "gim_" + hex.EncodeToString(bytes), nil
 }
+
+// HandleSyncHistoricalGames handles POST /admin/sync/historical/season/:year
+func (h *AdminHandler) HandleSyncHistoricalGames(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract year from URL
+	var yearStr struct {
+		Year int `json:"year"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&yearStr); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	log.Printf("Admin endpoint: Historical games sync requested for season %d", yearStr.Year)
+
+	ctx := r.Context()
+
+	// Run sync in background for long operations
+	go func() {
+		if err := h.ingestionService.SyncHistoricalGames(ctx, yearStr.Year); err != nil {
+			log.Printf("Historical games sync failed: %v", err)
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("Historical games sync started for season %d", yearStr.Year),
+		"season":  yearStr.Year,
+		"status":  "processing",
+	})
+}
+
+// HandleSyncMultipleSeasons handles POST /admin/sync/historical/seasons
+func (h *AdminHandler) HandleSyncMultipleSeasons(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse request body
+	var reqBody struct {
+		StartYear int `json:"start_year"`
+		EndYear   int `json:"end_year"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	log.Printf("Admin endpoint: Multi-season sync requested from %d to %d", reqBody.StartYear, reqBody.EndYear)
+
+	ctx := r.Context()
+
+	// Run sync in background
+	go func() {
+		if err := h.ingestionService.SyncMultipleSeasons(ctx, reqBody.StartYear, reqBody.EndYear); err != nil {
+			log.Printf("Multi-season sync failed: %v", err)
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message":    fmt.Sprintf("Multi-season sync started from %d to %d", reqBody.StartYear, reqBody.EndYear),
+		"start_year": reqBody.StartYear,
+		"end_year":   reqBody.EndYear,
+		"status":     "processing",
+	})
+}

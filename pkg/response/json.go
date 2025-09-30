@@ -101,3 +101,15 @@ func TooManyRequests(w http.ResponseWriter, retryAfter int) {
 	w.Header().Set("Retry-After", string(rune(retryAfter)))
 	Error(w, http.StatusTooManyRequests, "RATE_LIMIT_EXCEEDED", "Rate limit exceeded")
 }
+
+// ToJSON converts data to JSON string (for caching)
+func ToJSON(data interface{}) string {
+	response := SuccessResponse{
+		Data: data,
+		Meta: Meta{
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		},
+	}
+	jsonBytes, _ := json.Marshal(response)
+	return string(jsonBytes)
+}

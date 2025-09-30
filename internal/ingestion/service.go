@@ -10,6 +10,7 @@ import (
 
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/internal/espn"
+	"github.com/francisco/gridironmind/internal/models"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -352,5 +353,141 @@ func (s *Service) FullSync(ctx context.Context) error {
 	}
 
 	log.Println("Full data sync completed successfully")
+	return nil
+}
+// SyncPlayerCareerStats fetches and stores complete career statistics for a player
+func (s *Service) SyncPlayerCareerStats(ctx context.Context, playerID uuid.UUID, espnAthleteID string) error {
+	log.Printf("Syncing career stats for player %s (ESPN ID: %s)...", playerID, espnAthleteID)
+
+	// Fetch player stats from ESPN
+	statsResp, err := s.espnClient.FetchPlayerStats(ctx, espnAthleteID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch player stats: %w", err)
+	}
+
+	careerQueries := &db.CareerQueries{}
+
+	// Process season types (regular season stats)
+	for _, seasonType := range statsResp.SeasonTypes {
+		if seasonType.Type != 2 { // Only regular season
+			continue
+		}
+
+		// Create career stats entry
+		stats := &models.PlayerCareerStats{
+			PlayerID:    playerID,
+			Season:      seasonType.Year,
+			GamesPlayed: 0,
+		}
+
+		// Parse stats from categories
+		for _, category := range seasonType.Categories {
+			for _, stat := range category.Stats {
+				value := 0
+				switch v := stat.Value.(type) {
+				case float64:
+					value = int(v)
+				case string:
+					value, _ = strconv.Atoi(v)
+				}
+
+				// Map ESPN stat names to our fields
+				switch stat.Abbreviation {
+				case "GP":
+					stats.GamesPlayed = value
+				case "GS":
+					stats.GamesStarted = value
+				case "YDS":
+					if category.Name == "passing" {
+						stats.PassingYards = value
+					} else if category.Name == "rushing" {
+						stats.RushingYards = value
+					} else if category.Name == "receiving" {
+						stats.ReceivingYards = value
+					}
+				case "TD":
+					if category.Name == "passing" {
+						stats.PassingTDs = value
+					} else if category.Name == "rushing" {
+						stats.RushingTDs = value
+					} else if category.Name == "receiving" {
+						stats.ReceivingTDs = value
+					}
+				case "INT":
+					stats.PassingInts = value
+				case "REC":
+					stats.Receptions = value
+				case "TAR":
+					stats.ReceivingTargets = value
+				case "TAC":
+					stats.Tackles = value
+				case "SACK":
+					if f, ok := stat.Value.(float64); ok {
+						sacks := f
+						stats.Sacks = &sacks
+					}
+				}
+			}
+		}
+
+		// Only insert if player had activity that season
+		if stats.GamesPlayed > 0 {
+			if err := careerQueries.UpsertPlayerCareerStats(ctx, stats); err != nil {
+				log.Printf("Failed to upsert career stats for season %d: %v", stats.Season, err)
+			} else {
+				log.Printf("Synced stats for season %d: %d games", stats.Season, stats.GamesPlayed)
+			}
+		}
+	}
+
+	log.Printf("Career stats sync completed for player %s", playerID)
+	return nil
+}
+
+// SyncHistoricalGames fetches all games for a specific season
+func (s *Service) SyncHistoricalGames(ctx context.Context, season int) error {
+	log.Printf("Starting historical games sync for season %d...", season)
+
+	totalGames := 0
+
+	// Sync each week of the season (18 weeks in regular season)
+	for week := 1; week <= 18; week++ {
+		log.Printf("Syncing week %d of season %d...", week, season)
+
+		scoreboard, err := s.espnClient.FetchSeasonGames(ctx, season, week)
+		if err != nil {
+			log.Printf("Failed to fetch games for season %d week %d: %v", season, week, err)
+			continue
+		}
+
+		for _, event := range scoreboard.Events {
+			if err := s.upsertGame(ctx, event); err != nil {
+				log.Printf("Failed to upsert game %s: %v", event.Name, err)
+			} else {
+				totalGames++
+			}
+		}
+
+		// Rate limiting
+		time.Sleep(2 * time.Second)
+	}
+
+	log.Printf("Historical games sync completed for season %d: %d games", season, totalGames)
+	return nil
+}
+
+// SyncMultipleSeasons syncs historical games for multiple seasons
+func (s *Service) SyncMultipleSeasons(ctx context.Context, startYear, endYear int) error {
+	log.Printf("Starting multi-season sync from %d to %d...", startYear, endYear)
+
+	for year := startYear; year <= endYear; year++ {
+		if err := s.SyncHistoricalGames(ctx, year); err != nil {
+			log.Printf("Failed to sync season %d: %v", year, err)
+		}
+		// Longer delay between seasons
+		time.Sleep(5 * time.Second)
+	}
+
+	log.Println("Multi-season sync completed")
 	return nil
 }
