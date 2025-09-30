@@ -69,11 +69,11 @@ type Event struct {
 	Status      Status    `json:"status"`
 }
 
-// Season represents season information
+// Season represents season information (from Event)
 type Season struct {
-	Year int        `json:"year"`
-	Type SeasonType `json:"type"`
-	Slug string     `json:"slug"`
+	Year int    `json:"year"`
+	Type int    `json:"type"`
+	Slug string `json:"slug"`
 }
 
 // Week represents week information
