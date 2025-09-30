@@ -811,9 +811,11 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 		// Fetch game details with box score
 		gameDetail, err := s.espnClient.FetchGameDetails(ctx, game.NFLGameID)
 		if err != nil {
-			log.Printf("Failed to fetch game details for game %s: %v", game.NFLGameID, err)
+			log.Printf("ERROR: Failed to fetch game details for game %s (NFL ID: %s): %v", game.ID, game.NFLGameID, err)
+			log.Printf("ERROR: ESPN API error type: %T", err)
 			failedFetch++
-			continue
+			// Return error on first fetch failure to see what's wrong
+			return fmt.Errorf("ESPN API fetch failed for game %s: %w", game.NFLGameID, err)
 		}
 
 		// Process box score for both teams
