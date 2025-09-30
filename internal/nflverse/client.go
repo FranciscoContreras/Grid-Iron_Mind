@@ -2,11 +2,9 @@ package nflverse
 
 import (
 	"context"
-	"encoding/csv"
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -58,141 +56,51 @@ func (c *Client) doRequest(ctx context.Context, url string) ([]byte, error) {
 	return body, nil
 }
 
-// FetchPlayerStats fetches player statistics for a given season from nflverse CSV data
+// FetchPlayerStats fetches player statistics for a given season
+// NOTE: NFLverse data is available as CSV files, not JSON API
+// This function returns an error indicating the feature is not yet implemented
 func (c *Client) FetchPlayerStats(ctx context.Context, season int) ([]PlayerStats, error) {
-	// NFLverse provides player stats as CSV files on GitHub releases
-	url := fmt.Sprintf("%s/player_stats/player_stats_%d.csv", baseURL, season)
-
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	return c.parsePlayerStatsCSV(body)
-}
-
-// parsePlayerStatsCSV parses player stats from CSV data
-func (c *Client) parsePlayerStatsCSV(data []byte) ([]PlayerStats, error) {
-	reader := csv.NewReader(io.NopCloser(io.Reader(nil)))
-	// Create a new reader from the bytes
-	csvReader := csv.NewReader(io.NopCloser(io.Reader(nil)))
-	csvReader.Read() // Skip header row
-
-	var stats []PlayerStats
-	// For now, return empty slice - full CSV parsing to be implemented
-	// This requires mapping CSV columns to PlayerStats struct fields
-
-	return stats, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
 
 // FetchWeeklyStats fetches weekly player statistics
+// NOTE: Not yet implemented - requires CSV parsing
 func (c *Client) FetchWeeklyStats(ctx context.Context, season int, week int) ([]PlayerStats, error) {
-	url := fmt.Sprintf("%s/player_stats?season=%d&week=%d", baseURL, season, week)
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	var stats []PlayerStats
-	if err := json.Unmarshal(body, &stats); err != nil {
-		return nil, fmt.Errorf("failed to parse weekly stats: %w", err)
-	}
-
-	return stats, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
 
 // FetchSchedule fetches game schedule for a season
+// NOTE: Not yet implemented - requires CSV parsing
 func (c *Client) FetchSchedule(ctx context.Context, season int) ([]Schedule, error) {
-	url := fmt.Sprintf("%s/schedules?season=%d", baseURL, season)
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	var schedule []Schedule
-	if err := json.Unmarshal(body, &schedule); err != nil {
-		return nil, fmt.Errorf("failed to parse schedule: %w", err)
-	}
-
-	return schedule, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
 
 // FetchRosters fetches team rosters for a season
+// NOTE: Not yet implemented - requires CSV parsing
 func (c *Client) FetchRosters(ctx context.Context, season int) ([]Roster, error) {
-	url := fmt.Sprintf("%s/rosters?season=%d", baseURL, season)
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	var rosters []Roster
-	if err := json.Unmarshal(body, &rosters); err != nil {
-		return nil, fmt.Errorf("failed to parse rosters: %w", err)
-	}
-
-	return rosters, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
 
 // FetchPlayByPlay fetches play-by-play data for a season
+// NOTE: Not yet implemented - requires CSV parsing
 func (c *Client) FetchPlayByPlay(ctx context.Context, season int, week int) ([]PlayByPlay, error) {
-	url := fmt.Sprintf("%s/pbp?season=%d&week=%d", baseURL, season, week)
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	var pbp []PlayByPlay
-	if err := json.Unmarshal(body, &pbp); err != nil {
-		return nil, fmt.Errorf("failed to parse play-by-play: %w", err)
-	}
-
-	return pbp, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
 
 // FetchNextGenStats fetches Next Gen Stats data
+// NOTE: Not yet implemented - requires CSV parsing
 func (c *Client) FetchNextGenStats(ctx context.Context, season int, statType string) ([]NextGenStats, error) {
-	url := fmt.Sprintf("%s/nextgen_stats?season=%d&stat_type=%s", baseURL, season, statType)
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	var ngs []NextGenStats
-	if err := json.Unmarshal(body, &ngs); err != nil {
-		return nil, fmt.Errorf("failed to parse Next Gen Stats: %w", err)
-	}
-
-	return ngs, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
 
 // FetchDepthCharts fetches team depth charts
+// NOTE: Not yet implemented - requires CSV parsing
 func (c *Client) FetchDepthCharts(ctx context.Context, season int) ([]DepthChart, error) {
-	url := fmt.Sprintf("%s/depth_charts?season=%d", baseURL, season)
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	var charts []DepthChart
-	if err := json.Unmarshal(body, &charts); err != nil {
-		return nil, fmt.Errorf("failed to parse depth charts: %w", err)
-	}
-
-	return charts, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
 
 // FetchInjuries fetches injury reports
+// NOTE: Not yet implemented - requires CSV parsing
 func (c *Client) FetchInjuries(ctx context.Context, season int, week int) ([]Injury, error) {
-	url := fmt.Sprintf("%s/injuries?season=%d&week=%d", baseURL, season, week)
-	body, err := c.doRequest(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	var injuries []Injury
-	if err := json.Unmarshal(body, &injuries); err != nil {
-		return nil, fmt.Errorf("failed to parse injuries: %w", err)
-	}
-
-	return injuries, nil
+	return nil, fmt.Errorf("NFLverse integration requires CSV parsing - not yet implemented")
 }
