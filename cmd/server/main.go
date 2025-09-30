@@ -74,11 +74,11 @@ func main() {
 	mux.HandleFunc("/api/v1/games/", applyMiddleware(gamesHandler.HandleGames))
 	mux.HandleFunc("/api/v1/stats/leaders", applyMiddleware(statsHandler.HandleStatsLeaders))
 
-	// AI endpoints
-	mux.HandleFunc("/api/v1/ai/predict/game/", applyMiddleware(aiHandler.HandlePredictGame))
-	mux.HandleFunc("/api/v1/ai/predict/player/", applyMiddleware(aiHandler.HandlePredictPlayer))
-	mux.HandleFunc("/api/v1/ai/insights/player/", applyMiddleware(aiHandler.HandleAnalyzePlayer))
-	mux.HandleFunc("/api/v1/ai/query", applyMiddleware(aiHandler.HandleAIQuery))
+	// AI endpoints (require API key and stricter rate limiting)
+	mux.HandleFunc("/api/v1/ai/predict/game/", applyAIMiddleware(aiHandler.HandlePredictGame))
+	mux.HandleFunc("/api/v1/ai/predict/player/", applyAIMiddleware(aiHandler.HandlePredictPlayer))
+	mux.HandleFunc("/api/v1/ai/insights/player/", applyAIMiddleware(aiHandler.HandleAnalyzePlayer))
+	mux.HandleFunc("/api/v1/ai/query", applyAIMiddleware(aiHandler.HandleAIQuery))
 
 	// Admin endpoints for data ingestion
 	mux.HandleFunc("/api/v1/admin/sync/teams", applyMiddleware(adminHandler.HandleSyncTeams))
@@ -137,7 +137,21 @@ func main() {
 func applyMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 	return middleware.CORS(
 		middleware.LogRequest(
-			middleware.RecoverPanic(handler),
+			middleware.RecoverPanic(
+				middleware.StandardRateLimit(handler),
+			),
+		),
+	)
+}
+
+func applyAIMiddleware(handler http.HandlerFunc) http.HandlerFunc {
+	return middleware.CORS(
+		middleware.LogRequest(
+			middleware.RecoverPanic(
+				middleware.APIKeyAuth(
+					middleware.StrictRateLimit(handler),
+				),
+			),
 		),
 	)
 }
