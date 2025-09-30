@@ -284,6 +284,7 @@
                 <li><a href="#endpoints-games">Games Endpoints</a></li>
                 <li><a href="#endpoints-stats">Stats Endpoints</a></li>
                 <li><a href="#endpoints-career">Career Endpoints</a></li>
+                <li><a href="#endpoints-weather">Weather Endpoints</a></li>
                 <li><a href="#endpoints-ai">AI Endpoints</a></li>
                 <li><a href="#endpoints-admin">Admin Endpoints</a></li>
                 <li><a href="#data-sources">Data Sources</a></li>
@@ -922,6 +923,211 @@ X-RateLimit-Reset: 1640000000</pre>
             </div>
         </section>
 
+        <!-- Weather Endpoints -->
+        <section id="endpoints-weather" class="docs-section">
+            <h2>🌦️ Weather Endpoints</h2>
+
+            <p>Real-time and historical weather data powered by WeatherAPI.com. Get current conditions, historical data, and forecasts for any location.</p>
+
+            <!-- Current Weather -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/v1/weather/current</span>
+                </div>
+                <p class="endpoint-description">
+                    Get current weather conditions for a specific location or coordinates.
+                </p>
+
+                <h4>Query Parameters</h4>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="param-name">location</span></td>
+                            <td><span class="param-type">string</span></td>
+                            <td><span class="optional">Optional*</span></td>
+                            <td>Location name (e.g., "Kansas City, MO")</td>
+                        </tr>
+                        <tr>
+                            <td><span class="param-name">lat</span></td>
+                            <td><span class="param-type">float</span></td>
+                            <td><span class="optional">Optional*</span></td>
+                            <td>Latitude coordinate</td>
+                        </tr>
+                        <tr>
+                            <td><span class="param-name">lon</span></td>
+                            <td><span class="param-type">float</span></td>
+                            <td><span class="optional">Optional*</span></td>
+                            <td>Longitude coordinate</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><em>* Either <code>location</code> or both <code>lat</code> and <code>lon</code> are required</em></p>
+
+                <h4>Example Request</h4>
+                <div class="code-block">
+                    <pre>GET /api/v1/weather/current?location=Kansas+City,MO
+GET /api/v1/weather/current?lat=39.0489&lon=-94.4839</pre>
+                </div>
+
+                <h4>Example Response</h4>
+                <div class="code-block">
+                    <pre>{
+  "success": true,
+  "data": {
+    "temp_f": 45.0,
+    "temp_c": 7.2,
+    "condition": {
+      "text": "Partly cloudy",
+      "icon": "//cdn.weatherapi.com/weather/64x64/day/116.png",
+      "code": 1003
+    },
+    "wind_mph": 12.5,
+    "wind_dir": "NW",
+    "humidity": 65,
+    "feelslike_f": 38.0,
+    "vis_miles": 10.0,
+    "uv": 3.0,
+    "gust_mph": 18.2
+  }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Historical Weather -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/v1/weather/historical</span>
+                </div>
+                <p class="endpoint-description">
+                    Get historical weather data for a specific date and location. Perfect for analyzing game-day conditions.
+                </p>
+
+                <h4>Query Parameters</h4>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="param-name">location</span></td>
+                            <td><span class="param-type">string</span></td>
+                            <td><span class="optional">Optional*</span></td>
+                            <td>Location name</td>
+                        </tr>
+                        <tr>
+                            <td><span class="param-name">lat</span></td>
+                            <td><span class="param-type">float</span></td>
+                            <td><span class="optional">Optional*</span></td>
+                            <td>Latitude coordinate</td>
+                        </tr>
+                        <tr>
+                            <td><span class="param-name">lon</span></td>
+                            <td><span class="param-type">float</span></td>
+                            <td><span class="optional">Optional*</span></td>
+                            <td>Longitude coordinate</td>
+                        </tr>
+                        <tr>
+                            <td><span class="param-name">date</span></td>
+                            <td><span class="param-type">string</span></td>
+                            <td><span class="required">Required</span></td>
+                            <td>Date in YYYY-MM-DD format</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Example Request</h4>
+                <div class="code-block">
+                    <pre>GET /api/v1/weather/historical?location=Kansas+City,MO&date=2024-12-21</pre>
+                </div>
+
+                <h4>Example Response</h4>
+                <div class="code-block">
+                    <pre>{
+  "success": true,
+  "data": {
+    "location": {
+      "name": "Kansas City",
+      "region": "Missouri",
+      "country": "United States of America",
+      "lat": 39.1,
+      "lon": -94.58
+    },
+    "day": {
+      "maxtemp_f": 48.0,
+      "mintemp_f": 32.0,
+      "avgtemp_f": 40.0,
+      "maxwind_mph": 15.0,
+      "totalprecip_in": 0.0,
+      "avghumidity": 70.0,
+      "condition": {
+        "text": "Partly cloudy"
+      }
+    },
+    "date": "2024-12-21"
+  }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Forecast Weather -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/v1/weather/forecast</span>
+                </div>
+                <p class="endpoint-description">
+                    Get weather forecast for upcoming days (1-10 days ahead).
+                </p>
+
+                <h4>Query Parameters</h4>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="param-name">location</span></td>
+                            <td><span class="param-type">string</span></td>
+                            <td><span class="required">Required</span></td>
+                            <td>Location name</td>
+                        </tr>
+                        <tr>
+                            <td><span class="param-name">days</span></td>
+                            <td><span class="param-type">integer</span></td>
+                            <td><span class="optional">Optional</span></td>
+                            <td>Number of forecast days (1-10, default: 7)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Example Request</h4>
+                <div class="code-block">
+                    <pre>GET /api/v1/weather/forecast?location=Kansas+City,MO&days=7</pre>
+                </div>
+            </div>
+        </section>
+
         <!-- AI Endpoints -->
         <section id="endpoints-ai" class="docs-section">
             <h2>🤖 AI Endpoints</h2>
@@ -1094,6 +1300,26 @@ X-RateLimit-Reset: 1640000000</pre>
                 </div>
             </div>
 
+            <!-- Weather Enrichment -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/v1/admin/sync/weather</span>
+                </div>
+                <p class="endpoint-description">Enrich games with historical weather data from WeatherAPI.com using stadium coordinates.</p>
+
+                <h4>Request Body</h4>
+                <div class="code-block">
+                    <pre>{
+  "season": 2024
+}</pre>
+                </div>
+
+                <div class="info-box">
+                    <strong>ℹ️ Note:</strong> Uses stadium coordinates to fetch historical weather including temperature, conditions, wind speed, and humidity. Rate-limited to 500ms between requests.
+                </div>
+            </div>
+
             <!-- NFLverse Next Gen Stats -->
             <div class="endpoint">
                 <div class="endpoint-header">
@@ -1149,15 +1375,25 @@ X-RateLimit-Reset: 1640000000</pre>
             <ul>
                 <li>Advanced player statistics (EPA, CPOE, etc.)</li>
                 <li>Fantasy points (Standard, PPR, Half-PPR)</li>
-                <li>Weather data (temperature, wind, humidity)</li>
                 <li>Venue details (surface type, capacity)</li>
                 <li>Next Gen Stats (tracking data)</li>
                 <li>Play-by-play data</li>
             </ul>
 
+            <h3>WeatherAPI.com</h3>
+            <p>Real-time and historical weather data for:</p>
+            <ul>
+                <li>Current weather conditions for any location</li>
+                <li>Historical weather data for game analysis</li>
+                <li>Weather forecasts for upcoming games</li>
+                <li>Game enrichment with temperature, wind, humidity, and conditions</li>
+                <li>Coordinate-based queries using stadium locations</li>
+            </ul>
+
             <div class="info-box">
                 <strong>ℹ️ Data Freshness:</strong> Games and scores are synced in real-time during game days.
                 Player stats and career data are cached for 1 hour. Historical data is static once imported.
+                Weather data is fetched on-demand or during game enrichment processes.
             </div>
         </section>
 
