@@ -235,7 +235,8 @@ CREATE TABLE IF NOT EXISTS player_career_stats (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    UNIQUE(player_id, season, team_id)
+    -- Ensure one stats record per player per season (not per team, as players can change teams mid-season)
+    UNIQUE(player_id, season)
 );
 
 -- Create player_team_history table to track which teams a player played for

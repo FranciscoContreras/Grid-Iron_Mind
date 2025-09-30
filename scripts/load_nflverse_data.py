@@ -65,16 +65,17 @@ def aggregate_season_stats(df):
     print("Aggregating weekly stats into season totals...")
 
     # Group by player and aggregate stats
+    # Note: nflverse uses 'attempts' for passing, 'carries' for rushing
     agg_stats = df.groupby(['player_id', 'player_display_name', 'position', 'season', 'recent_team']).agg({
         'week': 'count',  # games played
         'passing_yards': 'sum',
         'passing_tds': 'sum',
         'interceptions': 'sum',
-        'passing_attempts': 'sum',
+        'attempts': 'sum',  # passing attempts
         'completions': 'sum',
         'rushing_yards': 'sum',
         'rushing_tds': 'sum',
-        'rushing_attempts': 'sum',
+        'carries': 'sum',  # rushing attempts
         'receiving_yards': 'sum',
         'receiving_tds': 'sum',
         'receptions': 'sum',
@@ -85,7 +86,9 @@ def aggregate_season_stats(df):
     agg_stats.rename(columns={
         'week': 'games',
         'player_display_name': 'player_name',
-        'interceptions': 'passing_ints'
+        'interceptions': 'passing_ints',
+        'attempts': 'passing_attempts',
+        'carries': 'rushing_attempts'
     }, inplace=True)
 
     print(f"  Aggregated to {len(agg_stats)} player-season records\n")
