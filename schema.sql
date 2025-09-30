@@ -126,7 +126,7 @@ ON CONFLICT (abbreviation) DO NOTHING;
 
 -- San Francisco 49ers
 INSERT INTO teams (nfl_id, name, abbreviation, city, conference, division, stadium)
-VALUES (25, '49ers', 'SF', 'San Francisco', 'NFC', 'West', "Levi's Stadium")
+VALUES (25, '49ers', 'SF', 'San Francisco', 'NFC', 'West', 'Levi''s Stadium')
 ON CONFLICT (abbreviation) DO NOTHING;
 
 -- Sample players (using fictional data for testing)

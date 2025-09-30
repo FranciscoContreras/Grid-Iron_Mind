@@ -42,6 +42,7 @@ func main() {
 	// Initialize handlers
 	playersHandler := handlers.NewPlayersHandler()
 	teamsHandler := handlers.NewTeamsHandler()
+	adminHandler := handlers.NewAdminHandler()
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -51,6 +52,12 @@ func main() {
 	mux.HandleFunc("/api/v1/players/", applyMiddleware(playersHandler.HandlePlayers))
 	mux.HandleFunc("/api/v1/teams", applyMiddleware(teamsHandler.HandleTeams))
 	mux.HandleFunc("/api/v1/teams/", applyMiddleware(teamsHandler.HandleTeams))
+
+	// Admin endpoints for data ingestion
+	mux.HandleFunc("/api/v1/admin/sync/teams", applyMiddleware(adminHandler.HandleSyncTeams))
+	mux.HandleFunc("/api/v1/admin/sync/rosters", applyMiddleware(adminHandler.HandleSyncRosters))
+	mux.HandleFunc("/api/v1/admin/sync/games", applyMiddleware(adminHandler.HandleSyncGames))
+	mux.HandleFunc("/api/v1/admin/sync/full", applyMiddleware(adminHandler.HandleFullSync))
 
 	// Health check endpoint
 	mux.HandleFunc("/health", applyMiddleware(healthCheck))
