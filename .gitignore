@@ -41,7 +41,7 @@ temp/
 
 # Build output
 bin/
-server
+/server
 
 # Heroku
 .heroku/
