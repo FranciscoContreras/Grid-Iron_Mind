@@ -24,7 +24,7 @@ type Service struct {
 func NewService() *Service {
 	return &Service{
 		espnClient: espn.NewClient(),
-		dbPool:     db.Pool,
+		dbPool:     db.GetPool(),
 	}
 }
 
