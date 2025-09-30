@@ -42,6 +42,8 @@ func main() {
 	// Initialize handlers
 	playersHandler := handlers.NewPlayersHandler()
 	teamsHandler := handlers.NewTeamsHandler()
+	gamesHandler := handlers.NewGamesHandler()
+	statsHandler := handlers.NewStatsHandler()
 	adminHandler := handlers.NewAdminHandler()
 
 	// Setup router
@@ -52,6 +54,9 @@ func main() {
 	mux.HandleFunc("/api/v1/players/", applyMiddleware(playersHandler.HandlePlayers))
 	mux.HandleFunc("/api/v1/teams", applyMiddleware(teamsHandler.HandleTeams))
 	mux.HandleFunc("/api/v1/teams/", applyMiddleware(teamsHandler.HandleTeams))
+	mux.HandleFunc("/api/v1/games", applyMiddleware(gamesHandler.HandleGames))
+	mux.HandleFunc("/api/v1/games/", applyMiddleware(gamesHandler.HandleGames))
+	mux.HandleFunc("/api/v1/stats/leaders", applyMiddleware(statsHandler.HandleStatsLeaders))
 
 	// Admin endpoints for data ingestion
 	mux.HandleFunc("/api/v1/admin/sync/teams", applyMiddleware(adminHandler.HandleSyncTeams))
