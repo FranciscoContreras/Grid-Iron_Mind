@@ -309,19 +309,18 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 	// Check if game exists
 	var existingID uuid.UUID
 	err = s.dbPool.QueryRow(ctx,
-		"SELECT id FROM games WHERE espn_game_id = $1",
+		"SELECT id FROM games WHERE nfl_game_id = $1",
 		espnGameID,
 	).Scan(&existingID)
 
-	now := time.Now()
 	if err != nil {
 		// Game doesn't exist, insert
 		id := uuid.New()
 		_, err = s.dbPool.Exec(ctx,
-			`INSERT INTO games (id, espn_game_id, season_year, season_type, week, game_date, home_team_id, away_team_id, home_score, away_score, status, created_at, updated_at)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-			id, espnGameID, event.Season.Year, event.Season.Type, event.Week.Number,
-			event.Date.Time, homeTeamID, awayTeamID, homeScore, awayScore, status, now, now,
+			`INSERT INTO games (id, nfl_game_id, home_team_id, away_team_id, game_date, season, week, home_score, away_score, status)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+			id, espnGameID, homeTeamID, awayTeamID, event.Date.Time, event.Season.Year, event.Week.Number,
+			homeScore, awayScore, status,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to insert game: %w", err)
@@ -331,9 +330,9 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 		// Game exists, update scores and status
 		_, err = s.dbPool.Exec(ctx,
 			`UPDATE games
-			SET home_score = $1, away_score = $2, status = $3, updated_at = $4
-			WHERE id = $5`,
-			homeScore, awayScore, status, now, existingID,
+			SET home_score = $1, away_score = $2, status = $3
+			WHERE id = $4`,
+			homeScore, awayScore, status, existingID,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to update game: %w", err)
