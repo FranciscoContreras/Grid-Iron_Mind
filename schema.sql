@@ -265,3 +265,55 @@ CREATE INDEX IF NOT EXISTS idx_games_venue_city ON games(venue_city);
 CREATE INDEX IF NOT EXISTS idx_games_weather ON games(weather_condition) WHERE weather_condition IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_games_playoff ON games(playoff_round) WHERE playoff_round IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_players_rookie_year ON players(rookie_year);
+-- Game Team Stats table (from migration 003)
+CREATE TABLE IF NOT EXISTS game_team_stats (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    game_id UUID NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+    team_id UUID NOT NULL REFERENCES teams(id),
+    
+    -- Offensive Stats
+    first_downs INT DEFAULT 0,
+    total_yards INT DEFAULT 0,
+    passing_yards INT DEFAULT 0,
+    rushing_yards INT DEFAULT 0,
+    offensive_plays INT DEFAULT 0,
+    yards_per_play DECIMAL(4,2),
+    
+    -- Efficiency
+    third_down_attempts INT DEFAULT 0,
+    third_down_conversions INT DEFAULT 0,
+    third_down_pct DECIMAL(5,2),
+    fourth_down_attempts INT DEFAULT 0,
+    fourth_down_conversions INT DEFAULT 0,
+    fourth_down_pct DECIMAL(5,2),
+    red_zone_attempts INT DEFAULT 0,
+    red_zone_scores INT DEFAULT 0,
+    
+    -- Turnovers & Penalties
+    turnovers INT DEFAULT 0,
+    fumbles_lost INT DEFAULT 0,
+    interceptions_thrown INT DEFAULT 0,
+    penalties INT DEFAULT 0,
+    penalty_yards INT DEFAULT 0,
+    
+    -- Possession
+    possession_time VARCHAR(10), -- MM:SS format
+    possession_seconds INT,
+    
+    -- Passing Detail
+    completions INT DEFAULT 0,
+    pass_attempts INT DEFAULT 0,
+    sacks_allowed INT DEFAULT 0,
+    sack_yards INT DEFAULT 0,
+    
+    -- Rushing Detail
+    rushing_attempts INT DEFAULT 0,
+    rushing_avg DECIMAL(4,2),
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(game_id, team_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_game_team_stats_game ON game_team_stats(game_id);
+CREATE INDEX IF NOT EXISTS idx_game_team_stats_team ON game_team_stats(team_id);
+CREATE INDEX IF NOT EXISTS idx_game_team_stats_yards ON game_team_stats(total_yards);
