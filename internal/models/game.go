@@ -9,7 +9,7 @@ import (
 // Game represents an NFL game
 type Game struct {
 	ID               uuid.UUID `json:"id"`
-	EspnGameID       int       `json:"espn_game_id"`
+	EspnGameID       string    `json:"espn_game_id"`
 	SeasonYear       int       `json:"season_year"`
 	SeasonType       int       `json:"season_type"`
 	Week             int       `json:"week"`
