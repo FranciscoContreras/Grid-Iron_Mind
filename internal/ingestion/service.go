@@ -803,6 +803,8 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 	log.Printf("Found %d completed games to sync stats for", len(games))
 
 	count := 0
+	var failedFetch, failedBoxScore, failedTeamLookup, failedInsert int
+
 	for _, game := range games {
 		log.Printf("Processing game %s (ID: %s)", game.NFLGameID, game.ID)
 
@@ -810,12 +812,14 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 		gameDetail, err := s.espnClient.FetchGameDetails(ctx, game.NFLGameID)
 		if err != nil {
 			log.Printf("Failed to fetch game details for game %s: %v", game.NFLGameID, err)
+			failedFetch++
 			continue
 		}
 
 		// Process box score for both teams
 		if gameDetail.BoxScore.Teams == nil || len(gameDetail.BoxScore.Teams) < 2 {
 			log.Printf("No box score data for game %s", game.NFLGameID)
+			failedBoxScore++
 			continue
 		}
 
@@ -962,6 +966,7 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 
 			if err != nil {
 				log.Printf("Failed to insert stats for team %s in game %s: %v", teamID, game.ID, err)
+				failedInsert++
 				continue
 			}
 
@@ -977,10 +982,13 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 
 	log.Printf("========================================")
 	log.Printf("Team stats sync completed: %d team stats records created/updated out of %d games", count, len(games))
+	log.Printf("Failures: %d fetch errors, %d missing box scores, %d team lookup errors, %d insert errors",
+		failedFetch, failedBoxScore, failedTeamLookup, failedInsert)
 	log.Printf("========================================")
 
 	if count == 0 {
-		return fmt.Errorf("no team stats were synced - processed %d games but inserted 0 records", len(games))
+		return fmt.Errorf("no team stats were synced - processed %d games, failures: fetch=%d boxscore=%d teamlookup=%d insert=%d",
+			len(games), failedFetch, failedBoxScore, failedTeamLookup, failedInsert)
 	}
 
 	return nil
