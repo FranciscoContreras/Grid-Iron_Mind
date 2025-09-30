@@ -453,7 +453,37 @@ async function viewPlayerDetails(playerId) {
             `;
         }
 
-        // Update the modal with loaded career stats
+        // Fetch injury data
+        let injuryHTML = '';
+        try {
+            const injuryResult = await apiCall(`/api/v1/players/${playerId}/injuries`);
+            const injuries = injuryResult.data.injuries;
+
+            if (injuries && injuries.length > 0) {
+                const currentInjuries = injuries.filter(inj =>
+                    inj.status !== 'Healthy' && inj.status !== 'Active'
+                );
+
+                if (currentInjuries.length > 0) {
+                    injuryHTML = `
+                        <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                            <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ Current Injuries</h4>
+                            ${currentInjuries.map(inj => `
+                                <div style="margin-bottom: 8px;">
+                                    <strong>${inj.status}</strong> - ${inj.injury_type || 'Unknown'}
+                                    ${inj.body_location ? ` (${inj.body_location})` : ''}
+                                    ${inj.return_date ? `<br><small>Expected return: ${new Date(inj.return_date).toLocaleDateString()}</small>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load injuries:', error);
+        }
+
+        // Update the modal with loaded career stats and injuries
         detailsContainer.innerHTML = `
             <div style="line-height: 2;">
                 <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
@@ -466,6 +496,7 @@ async function viewPlayerDetails(playerId) {
                 <p><strong>Weight:</strong> ${player.weight_pounds ? player.weight_pounds + ' lbs' : 'N/A'}</p>
                 <p><strong>College:</strong> ${player.college || 'N/A'}</p>
                 <p><strong>Draft:</strong> ${player.draft_year ? `${player.draft_year} - Round ${player.draft_round}, Pick ${player.draft_pick}` : 'N/A'}</p>
+                ${injuryHTML}
             </div>
             ${careerHTML}
         `;
