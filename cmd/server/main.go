@@ -60,7 +60,6 @@ func main() {
 	teamsHandler := handlers.NewTeamsHandler()
 	gamesHandler := handlers.NewGamesHandler()
 	statsHandler := handlers.NewStatsHandler()
-	careerHandler := handlers.NewCareerHandler()
 	aiHandler := handlers.NewAIHandler(cfg)
 	adminHandler := handlers.NewAdminHandler(cfg.WeatherAPIKey)
 	weatherHandler := handlers.NewWeatherHandler(weather.NewClient(cfg.WeatherAPIKey))
@@ -76,10 +75,6 @@ func main() {
 	mux.HandleFunc("/api/v1/games", applyMiddleware(gamesHandler.HandleGames))
 	mux.HandleFunc("/api/v1/games/", applyMiddleware(gamesHandler.HandleGames))
 	mux.HandleFunc("/api/v1/stats/leaders", applyMiddleware(statsHandler.HandleStatsLeaders))
-
-	// Career and history endpoints
-	mux.HandleFunc("/api/v1/players/:id/career", applyMiddleware(careerHandler.HandlePlayerCareerStats))
-	mux.HandleFunc("/api/v1/players/:id/history", applyMiddleware(careerHandler.HandlePlayerTeamHistory))
 
 	// AI endpoints (require API key and stricter rate limiting)
 	mux.HandleFunc("/api/v1/ai/predict/game/", applyAIMiddleware(aiHandler.HandlePredictGame))

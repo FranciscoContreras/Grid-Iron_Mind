@@ -21,20 +21,28 @@ func NewPlayersHandler() *PlayersHandler {
 	}
 }
 
-// HandlePlayers handles both GET /players (list) and GET /players/:id (single)
+// HandlePlayers handles GET /players (list), GET /players/:id (single), GET /players/:id/career, and GET /players/:id/history
 func (h *PlayersHandler) HandlePlayers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
 		return
 	}
 
-	// Parse path to determine if this is a list or single player request
+	// Parse path to determine the request type
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players")
 	path = strings.Trim(path, "/")
 
 	if path == "" {
 		// List players
 		h.listPlayers(w, r)
+	} else if strings.HasSuffix(path, "/career") {
+		// Get player career stats
+		careerHandler := NewCareerHandler()
+		careerHandler.HandlePlayerCareerStats(w, r)
+	} else if strings.HasSuffix(path, "/history") {
+		// Get player team history
+		careerHandler := NewCareerHandler()
+		careerHandler.HandlePlayerTeamHistory(w, r)
 	} else {
 		// Get single player by ID
 		h.getPlayer(w, r, path)
