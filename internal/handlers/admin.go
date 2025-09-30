@@ -277,12 +277,13 @@ func (h *AdminHandler) HandleSyncNFLverseStats(w http.ResponseWriter, r *http.Re
 
 	log.Printf("Admin endpoint: NFLverse stats sync requested for season %d", reqBody.Season)
 
-	ctx := r.Context()
-
-	// Run sync in background
+	// Run sync in background with background context
 	go func() {
+		ctx := context.Background()
 		if err := h.ingestionService.SyncNFLversePlayerStats(ctx, reqBody.Season); err != nil {
 			log.Printf("NFLverse stats sync failed: %v", err)
+		} else {
+			log.Printf("NFLverse stats sync completed successfully for season %d", reqBody.Season)
 		}
 	}()
 
@@ -311,12 +312,13 @@ func (h *AdminHandler) HandleSyncNFLverseSchedule(w http.ResponseWriter, r *http
 
 	log.Printf("Admin endpoint: NFLverse schedule sync requested for season %d", reqBody.Season)
 
-	ctx := r.Context()
-
-	// Run sync in background
+	// Run sync in background with background context
 	go func() {
+		ctx := context.Background()
 		if err := h.ingestionService.SyncNFLverseSchedule(ctx, reqBody.Season); err != nil {
 			log.Printf("NFLverse schedule sync failed: %v", err)
+		} else {
+			log.Printf("NFLverse schedule sync completed successfully for season %d", reqBody.Season)
 		}
 	}()
 
@@ -350,12 +352,13 @@ func (h *AdminHandler) HandleSyncNFLverseNextGen(w http.ResponseWriter, r *http.
 
 	log.Printf("Admin endpoint: NFLverse Next Gen Stats sync requested for season %d, type: %s", reqBody.Season, reqBody.StatType)
 
-	ctx := r.Context()
-
-	// Run sync in background
+	// Run sync in background with background context
 	go func() {
+		ctx := context.Background()
 		if err := h.ingestionService.SyncNFLverseNextGenStats(ctx, reqBody.Season, reqBody.StatType); err != nil {
 			log.Printf("NFLverse Next Gen Stats sync failed: %v", err)
+		} else {
+			log.Printf("NFLverse Next Gen Stats sync completed successfully for season %d, type: %s", reqBody.Season, reqBody.StatType)
 		}
 	}()
 
