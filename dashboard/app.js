@@ -279,8 +279,37 @@ async function viewPlayerDetails(playerId) {
         const modal = document.getElementById('playerModal');
         document.getElementById('modalPlayerName').textContent = player.name;
 
-        // Load career stats
-        let careerHTML = '';
+        // Load career stats with loading indicator
+        let careerHTML = `
+            <h3 style="margin-top: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                📊 Career Statistics
+            </h3>
+            <div style="padding: 40px; text-align: center;">
+                <div class="spinner"></div>
+                <p style="margin-top: 20px; color: #666;">Loading career statistics...</p>
+            </div>
+        `;
+
+        // Show modal with loading state
+        const detailsContainer = document.getElementById('modalPlayerDetails');
+        detailsContainer.innerHTML = `
+            <div style="line-height: 2;">
+                <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
+                    ℹ️ Player Information
+                </h3>
+                <p><strong>Position:</strong> ${player.position}</p>
+                <p><strong>Jersey:</strong> ${player.jersey_number || 'N/A'}</p>
+                <p><strong>Status:</strong> <span class="badge badge-${player.status}">${player.status}</span></p>
+                <p><strong>Height:</strong> ${player.height_inches ? Math.floor(player.height_inches / 12) + "'" + (player.height_inches % 12) + '"' : 'N/A'}</p>
+                <p><strong>Weight:</strong> ${player.weight_pounds ? player.weight_pounds + ' lbs' : 'N/A'}</p>
+                <p><strong>College:</strong> ${player.college || 'N/A'}</p>
+                <p><strong>Draft:</strong> ${player.draft_year ? `${player.draft_year} - Round ${player.draft_round}, Pick ${player.draft_pick}` : 'N/A'}</p>
+            </div>
+            ${careerHTML}
+        `;
+        modal.classList.add('active');
+
+        // Now fetch career stats
         try {
             const careerResult = await apiCall(`/api/v1/players/${playerId}/career`);
             const careerData = careerResult.data.data;
@@ -353,7 +382,8 @@ async function viewPlayerDetails(playerId) {
             `;
         }
 
-        const details = `
+        // Update the modal with loaded career stats
+        detailsContainer.innerHTML = `
             <div style="line-height: 2;">
                 <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
                     ℹ️ Player Information
@@ -368,9 +398,6 @@ async function viewPlayerDetails(playerId) {
             </div>
             ${careerHTML}
         `;
-
-        document.getElementById('modalPlayerDetails').innerHTML = details;
-        modal.classList.add('active');
     } catch (error) {
         alert('Failed to load player details: ' + error.message);
     }
