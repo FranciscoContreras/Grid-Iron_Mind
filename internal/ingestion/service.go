@@ -759,3 +759,203 @@ func (s *Service) EnrichGamesWithWeather(ctx context.Context, season int) error 
 	log.Printf("Weather enrichment completed: %d games updated", count)
 	return nil
 }
+
+// SyncGameTeamStats syncs team statistics for completed games from ESPN box scores
+func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) error {
+	log.Printf("Starting team stats sync for season %d, week %d...", season, week)
+
+	// Fetch completed games for the given season/week
+	query := `
+		SELECT id, nfl_game_id, home_team_id, away_team_id
+		FROM games
+		WHERE season = $1 AND week = $2 AND status = 'completed'
+		ORDER BY game_date
+	`
+
+	rows, err := s.dbPool.Query(ctx, query, season, week)
+	if err != nil {
+		return fmt.Errorf("failed to fetch games: %w", err)
+	}
+	defer rows.Close()
+
+	type gameInfo struct {
+		ID         uuid.UUID
+		NFLGameID  string
+		HomeTeamID uuid.UUID
+		AwayTeamID uuid.UUID
+	}
+
+	var games []gameInfo
+	for rows.Next() {
+		var g gameInfo
+		if err := rows.Scan(&g.ID, &g.NFLGameID, &g.HomeTeamID, &g.AwayTeamID); err != nil {
+			log.Printf("Error scanning game row: %v", err)
+			continue
+		}
+		games = append(games, g)
+	}
+
+	if len(games) == 0 {
+		log.Printf("No completed games found for season %d, week %d", season, week)
+		return nil
+	}
+
+	log.Printf("Found %d completed games to sync stats for", len(games))
+
+	count := 0
+	for _, game := range games {
+		// Fetch game details with box score
+		gameDetail, err := s.espnClient.FetchGameDetails(ctx, game.NFLGameID)
+		if err != nil {
+			log.Printf("Failed to fetch game details for game %s: %v", game.NFLGameID, err)
+			continue
+		}
+
+		// Process box score for both teams
+		if gameDetail.BoxScore.Teams == nil || len(gameDetail.BoxScore.Teams) < 2 {
+			log.Printf("No box score data for game %s", game.NFLGameID)
+			continue
+		}
+
+		for _, teamStats := range gameDetail.BoxScore.Teams {
+			// Determine which team this is
+			espnTeamID := teamStats.Team.ID
+			var teamID uuid.UUID
+
+			// Match ESPN team ID to our team ID
+			var dbTeamID uuid.UUID
+			teamQuery := `SELECT id FROM teams WHERE espn_team_id = $1`
+			if err := s.dbPool.QueryRow(ctx, teamQuery, espnTeamID).Scan(&dbTeamID); err != nil {
+				log.Printf("Could not find team with ESPN ID %s: %v", espnTeamID, err)
+				continue
+			}
+			teamID = dbTeamID
+
+			// Parse statistics into a map for easy access
+			stats := make(map[string]float64)
+			statsDisplay := make(map[string]string)
+			for _, stat := range teamStats.Statistics {
+				statsDisplay[stat.Name] = stat.DisplayValue
+				// Handle the value field which can be float64 or string "-"
+				if stat.Name == "thirdDownEff" || stat.Name == "fourthDownEff" ||
+					stat.Name == "redZoneAttempts" || stat.Name == "completionAttempts" ||
+					stat.Name == "sacksYardsLost" || stat.Name == "totalPenaltiesYards" {
+					// Parse X-Y format for efficiency stats
+					parts := strings.Split(stat.DisplayValue, "-")
+					if len(parts) == 2 {
+						made, _ := strconv.ParseFloat(parts[0], 64)
+						att, _ := strconv.ParseFloat(parts[1], 64)
+						stats[stat.Name+"_made"] = made
+						stats[stat.Name+"_att"] = att
+					}
+				} else {
+					// For regular numeric stats, try to parse the display value
+					if val, err := strconv.ParseFloat(stat.DisplayValue, 64); err == nil {
+						stats[stat.Name] = val
+					}
+				}
+			}
+
+			// Parse possession time
+			possessionTime := statsDisplay["possessionTime"]
+			var possessionSeconds int
+			if possessionTime != "" {
+				parts := strings.Split(possessionTime, ":")
+				if len(parts) == 2 {
+					minutes, _ := strconv.Atoi(parts[0])
+					seconds, _ := strconv.Atoi(parts[1])
+					possessionSeconds = (minutes * 60) + seconds
+				}
+			}
+
+			// Calculate percentages
+			var thirdDownPct, fourthDownPct float64
+			if stats["thirdDownEff_att"] > 0 {
+				thirdDownPct = (stats["thirdDownEff_made"] / stats["thirdDownEff_att"]) * 100
+			}
+			if stats["fourthDownEff_att"] > 0 {
+				fourthDownPct = (stats["fourthDownEff_made"] / stats["fourthDownEff_att"]) * 100
+			}
+
+			// Upsert team stats
+			insertQuery := `
+				INSERT INTO game_team_stats (
+					game_id, team_id,
+					first_downs, total_yards, passing_yards, rushing_yards,
+					offensive_plays, yards_per_play,
+					third_down_attempts, third_down_conversions, third_down_pct,
+					fourth_down_attempts, fourth_down_conversions, fourth_down_pct,
+					red_zone_attempts, red_zone_scores,
+					turnovers, fumbles_lost, interceptions_thrown,
+					penalties, penalty_yards,
+					possession_time, possession_seconds,
+					completions, pass_attempts,
+					sacks_allowed, sack_yards,
+					rushing_attempts, rushing_avg
+				) VALUES (
+					$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
+					$17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29
+				)
+				ON CONFLICT (game_id, team_id)
+				DO UPDATE SET
+					first_downs = EXCLUDED.first_downs,
+					total_yards = EXCLUDED.total_yards,
+					passing_yards = EXCLUDED.passing_yards,
+					rushing_yards = EXCLUDED.rushing_yards,
+					offensive_plays = EXCLUDED.offensive_plays,
+					yards_per_play = EXCLUDED.yards_per_play,
+					third_down_attempts = EXCLUDED.third_down_attempts,
+					third_down_conversions = EXCLUDED.third_down_conversions,
+					third_down_pct = EXCLUDED.third_down_pct,
+					fourth_down_attempts = EXCLUDED.fourth_down_attempts,
+					fourth_down_conversions = EXCLUDED.fourth_down_conversions,
+					fourth_down_pct = EXCLUDED.fourth_down_pct,
+					red_zone_attempts = EXCLUDED.red_zone_attempts,
+					red_zone_scores = EXCLUDED.red_zone_scores,
+					turnovers = EXCLUDED.turnovers,
+					fumbles_lost = EXCLUDED.fumbles_lost,
+					interceptions_thrown = EXCLUDED.interceptions_thrown,
+					penalties = EXCLUDED.penalties,
+					penalty_yards = EXCLUDED.penalty_yards,
+					possession_time = EXCLUDED.possession_time,
+					possession_seconds = EXCLUDED.possession_seconds,
+					completions = EXCLUDED.completions,
+					pass_attempts = EXCLUDED.pass_attempts,
+					sacks_allowed = EXCLUDED.sacks_allowed,
+					sack_yards = EXCLUDED.sack_yards,
+					rushing_attempts = EXCLUDED.rushing_attempts,
+					rushing_avg = EXCLUDED.rushing_avg
+			`
+
+			_, err = s.dbPool.Exec(ctx, insertQuery,
+				game.ID, teamID,
+				int(stats["firstDowns"]), int(stats["totalYards"]),
+				int(stats["netPassingYards"]), int(stats["rushingYards"]),
+				int(stats["totalOffensivePlays"]), stats["yardsPerPlay"],
+				int(stats["thirdDownEff_att"]), int(stats["thirdDownEff_made"]), thirdDownPct,
+				int(stats["fourthDownEff_att"]), int(stats["fourthDownEff_made"]), fourthDownPct,
+				int(stats["redZoneAttempts_att"]), int(stats["redZoneAttempts_made"]),
+				int(stats["turnovers"]), int(stats["fumblesLost"]), int(stats["interceptions"]),
+				int(stats["totalPenaltiesYards_att"]), int(stats["totalPenaltiesYards_made"]),
+				possessionTime, possessionSeconds,
+				int(stats["completionAttempts_made"]), int(stats["completionAttempts_att"]),
+				int(stats["sacksYardsLost_att"]), int(stats["sacksYardsLost_made"]),
+				int(stats["rushingAttempts"]), stats["yardsPerRushAttempt"],
+			)
+
+			if err != nil {
+				log.Printf("Failed to insert stats for team %s in game %s: %v", teamID, game.ID, err)
+				continue
+			}
+
+			log.Printf("✓ Synced stats for team %s in game %s (NFL ID: %s)", teamID, game.ID, game.NFLGameID)
+			count++
+		}
+
+		// Rate limiting - be respectful to ESPN API
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	log.Printf("Team stats sync completed: %d team stats records created/updated", count)
+	return nil
+}

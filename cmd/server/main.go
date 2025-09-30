@@ -103,6 +103,9 @@ func main() {
 	// Weather enrichment endpoint
 	mux.HandleFunc("/api/v1/admin/sync/weather", applyMiddleware(adminHandler.HandleEnrichWeather))
 
+	// Team stats sync endpoint
+	mux.HandleFunc("/api/v1/admin/sync/team-stats", applyMiddleware(adminHandler.HandleSyncTeamStats))
+
 	// Weather API endpoints
 	mux.HandleFunc("/api/v1/weather/current", applyMiddleware(weatherHandler.HandleCurrentWeather))
 	mux.HandleFunc("/api/v1/weather/historical", applyMiddleware(weatherHandler.HandleHistoricalWeather))

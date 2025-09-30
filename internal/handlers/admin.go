@@ -400,3 +400,50 @@ func (h *AdminHandler) HandleEnrichWeather(w http.ResponseWriter, r *http.Reques
 		"status":  "processing",
 	})
 }
+
+// HandleSyncTeamStats triggers team stats sync for completed games
+func (h *AdminHandler) HandleSyncTeamStats(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season int `json:"season"`
+		Week   int `json:"week"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	if reqBody.Season == 0 {
+		reqBody.Season = time.Now().Year()
+	}
+	if reqBody.Week == 0 {
+		response.Error(w, http.StatusBadRequest, "MISSING_WEEK", "Week parameter is required")
+		return
+	}
+
+	log.Printf("Admin endpoint: Team stats sync requested for season %d, week %d", reqBody.Season, reqBody.Week)
+
+	ctx := r.Context()
+	if err := h.ingestionService.SyncGameTeamStats(ctx, reqBody.Season, reqBody.Week); err != nil {
+		log.Printf("Team stats sync failed: %v", err)
+		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", "Failed to sync team stats")
+		return
+	}
+
+	// Invalidate games cache since stats are now available
+	if err := cache.DeletePattern(ctx, cache.InvalidateGamesCache()); err != nil {
+		log.Printf("Failed to invalidate games cache: %v", err)
+	}
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("Team stats sync completed for season %d, week %d", reqBody.Season, reqBody.Week),
+		"season":  reqBody.Season,
+		"week":    reqBody.Week,
+		"status":  "success",
+	})
+}
