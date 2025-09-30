@@ -804,6 +804,8 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 
 	count := 0
 	for _, game := range games {
+		log.Printf("Processing game %s (ID: %s)", game.NFLGameID, game.ID)
+
 		// Fetch game details with box score
 		gameDetail, err := s.espnClient.FetchGameDetails(ctx, game.NFLGameID)
 		if err != nil {
@@ -816,6 +818,8 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 			log.Printf("No box score data for game %s", game.NFLGameID)
 			continue
 		}
+
+		log.Printf("Found %d teams in box score for game %s", len(gameDetail.BoxScore.Teams), game.NFLGameID)
 
 		for _, teamStats := range gameDetail.BoxScore.Teams {
 			// Determine which team this is
@@ -878,6 +882,9 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 			}
 
 			// Upsert team stats
+			log.Printf("Inserting stats for team %s (ESPN ID: %s) in game %s: %d yards, %d first downs",
+				teamID, espnTeamID, game.ID, int(stats["totalYards"]), int(stats["firstDowns"]))
+
 			insertQuery := `
 				INSERT INTO game_team_stats (
 					game_id, team_id,
