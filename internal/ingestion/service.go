@@ -866,8 +866,10 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 					case float64:
 						stats[stat.Name] = v
 					case string:
-						// Skip string values like "-"
-						continue
+						// For string values like "-", try parsing displayValue instead
+						if val, err := strconv.ParseFloat(stat.DisplayValue, 64); err == nil {
+							stats[stat.Name] = val
+						}
 					}
 				}
 			}
