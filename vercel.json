@@ -1,26 +1,12 @@
 {
-  "functions": {
-    "api/**/*.go": {
-      "runtime": "vercel-go@3.1.0",
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/v1/players(/.*)?",
-      "dest": "/api/v1/players.go"
+      "source": "/api/v1/players/:path*",
+      "destination": "/api/v1/players.go"
     },
     {
-      "src": "/api/v1/teams(/.*)?",
-      "dest": "/api/v1/teams.go"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dashboard/$1"
+      "source": "/api/v1/teams/:path*",
+      "destination": "/api/v1/teams.go"
     }
-  ],
-  "env": {
-    "GO111MODULE": "on"
-  }
+  ]
 }
