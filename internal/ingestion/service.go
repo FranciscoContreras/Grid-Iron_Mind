@@ -321,7 +321,7 @@ func (s *Service) upsertGame(ctx context.Context, event espn.Event) error {
 			`INSERT INTO games (id, espn_game_id, season_year, season_type, week, game_date, home_team_id, away_team_id, home_score, away_score, status, created_at, updated_at)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
 			id, espnGameID, event.Season.Year, event.Season.Type, event.Week.Number,
-			event.Date, homeTeamID, awayTeamID, homeScore, awayScore, status, now, now,
+			event.Date.Time, homeTeamID, awayTeamID, homeScore, awayScore, status, now, now,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to insert game: %w", err)

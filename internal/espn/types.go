@@ -1,6 +1,40 @@
 package espn
 
-import "time"
+import (
+	"strings"
+	"time"
+)
+
+// FlexibleTime wraps time.Time to handle multiple ESPN date formats
+type FlexibleTime struct {
+	time.Time
+}
+
+// UnmarshalJSON handles multiple date formats from ESPN API
+func (ft *FlexibleTime) UnmarshalJSON(data []byte) error {
+	str := strings.Trim(string(data), "\"")
+
+	// Try common ESPN formats
+	formats := []string{
+		time.RFC3339,
+		"2006-01-02T15:04Z",           // ESPN's simplified format
+		"2006-01-02T15:04:05Z",        // ESPN's format with seconds
+		"2006-01-02T15:04:05.000Z",    // ESPN's format with milliseconds
+		time.RFC3339Nano,
+	}
+
+	var lastErr error
+	for _, format := range formats {
+		t, err := time.Parse(format, str)
+		if err == nil {
+			ft.Time = t
+			return nil
+		}
+		lastErr = err
+	}
+
+	return lastErr
+}
 
 // ScoreboardResponse represents the ESPN scoreboard API response
 type ScoreboardResponse struct {
@@ -18,7 +52,7 @@ type ScoreboardResponse struct {
 type Event struct {
 	ID          string    `json:"id"`
 	UID         string    `json:"uid"`
-	Date        time.Time `json:"date"`
+	Date        FlexibleTime `json:"date"`
 	Name        string    `json:"name"`
 	ShortName   string    `json:"shortName"`
 	Season      Season    `json:"season"`
@@ -43,7 +77,7 @@ type Week struct {
 type Competition struct {
 	ID          string       `json:"id"`
 	UID         string       `json:"uid"`
-	Date        time.Time    `json:"date"`
+	Date        FlexibleTime `json:"date"`
 	Attendance  int          `json:"attendance"`
 	Venue       Venue        `json:"venue"`
 	Competitors []Competitor `json:"competitors"`
