@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Iron Mind - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🏈 Grid Iron Mind</h1>
+                <div class="header-status">
+                    <span class="status-indicator" id="statusIndicator">
+                        <span class="status-dot"></span>
+                        <span id="statusText">Disconnected</span>
+                    </span>
+                    <span class="response-time" id="responseTime">--ms</span>
+                    <button class="btn-icon" id="darkModeToggle" title="Toggle dark mode">🌙</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab active" data-tab="players">Players</button>
+            <button class="tab" data-tab="teams">Teams</button>
+            <button class="tab" data-tab="stats">Stats</button>
+            <button class="tab" data-tab="api-test">API Testing</button>
+        </nav>
+
+        <!-- Tab Content -->
+        <main class="content">
+            <!-- Players Tab -->
+            <section id="players-tab" class="tab-content active">
+                <div class="section-header">
+                    <h2>Players</h2>
+                    <button class="btn-refresh" id="refreshPlayers">↻ Refresh</button>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="playerSearch" placeholder="Search by name..." class="input">
+                    <select id="positionFilter" class="select">
+                        <option value="">All Positions</option>
+                        <option value="QB">QB</option>
+                        <option value="RB">RB</option>
+                        <option value="WR">WR</option>
+                        <option value="TE">TE</option>
+                        <option value="OL">OL</option>
+                        <option value="DL">DL</option>
+                        <option value="LB">LB</option>
+                        <option value="CB">CB</option>
+                        <option value="S">S</option>
+                        <option value="K">K</option>
+                        <option value="P">P</option>
+                    </select>
+                    <select id="statusFilter" class="select">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="injured">Injured</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <select id="teamFilter" class="select">
+                        <option value="">All Teams</option>
+                    </select>
+                </div>
+
+                <div class="loading" id="playersLoading">Loading...</div>
+                <div class="error" id="playersError" style="display: none;"></div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Team</th>
+                                <th>Jersey</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button class="btn" id="prevPlayers" disabled>← Previous</button>
+                    <span id="playersPageInfo">Page 1</span>
+                    <button class="btn" id="nextPlayers">Next →</button>
+                </div>
+            </section>
+
+            <!-- Teams Tab -->
+            <section id="teams-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>Teams</h2>
+                    <button class="btn-refresh" id="refreshTeams">↻ Refresh</button>
+                </div>
+
+                <div class="loading" id="teamsLoading">Loading...</div>
+                <div class="error" id="teamsError" style="display: none;"></div>
+
+                <div class="teams-grid" id="teamsGrid">
+                </div>
+            </section>
+
+            <!-- Stats Tab -->
+            <section id="stats-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>Stat Leaders</h2>
+                    <button class="btn-refresh" id="refreshStats">↻ Refresh</button>
+                </div>
+
+                <div class="filters">
+                    <select id="statTypeFilter" class="select">
+                        <option value="passing_yards">Passing Yards</option>
+                        <option value="rushing_yards">Rushing Yards</option>
+                        <option value="receiving_yards">Receiving Yards</option>
+                        <option value="touchdowns">Touchdowns</option>
+                        <option value="interceptions">Interceptions</option>
+                    </select>
+                    <select id="statPositionFilter" class="select">
+                        <option value="">All Positions</option>
+                        <option value="QB">QB</option>
+                        <option value="RB">RB</option>
+                        <option value="WR">WR</option>
+                        <option value="TE">TE</option>
+                    </select>
+                    <select id="limitFilter" class="select">
+                        <option value="10">Top 10</option>
+                        <option value="25">Top 25</option>
+                        <option value="50">Top 50</option>
+                    </select>
+                </div>
+
+                <div class="stats-placeholder">
+                    <p>📊 Stat leaders will be available after implementing game stats endpoints (Phase 4)</p>
+                </div>
+            </section>
+
+            <!-- API Testing Tab -->
+            <section id="api-test-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>API Testing</h2>
+                </div>
+
+                <div class="api-test-form">
+                    <div class="form-group">
+                        <label>Endpoint</label>
+                        <select id="apiEndpoint" class="select">
+                            <option value="/api/v1/players">GET /api/v1/players</option>
+                            <option value="/api/v1/players/:id">GET /api/v1/players/:id</option>
+                            <option value="/api/v1/teams">GET /api/v1/teams</option>
+                            <option value="/api/v1/teams/:id">GET /api/v1/teams/:id</option>
+                            <option value="/api/v1/teams/:id/players">GET /api/v1/teams/:id/players</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="apiIdField" style="display: none;">
+                        <label>ID (UUID)</label>
+                        <input type="text" id="apiId" class="input" placeholder="Enter UUID">
+                    </div>
+
+                    <div class="form-group" id="apiParamsField">
+                        <label>Query Parameters (JSON)</label>
+                        <textarea id="apiParams" class="textarea" rows="4" placeholder='{"limit": 10, "position": "QB"}'></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" id="executeApiCall">Execute Request</button>
+                </div>
+
+                <div class="api-response">
+                    <div class="response-header">
+                        <h3>Response</h3>
+                        <div>
+                            <span id="apiStatusCode" class="status-badge"></span>
+                            <span id="apiResponseTime" class="response-time-badge"></span>
+                            <button class="btn-icon" id="copyResponse" title="Copy to clipboard">📋</button>
+                        </div>
+                    </div>
+                    <pre id="apiResponseBody" class="response-body">No request executed yet</pre>
+                </div>
+            </section>
+        </main>
+
+        <!-- Player Detail Modal -->
+        <div id="playerModal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <h2 id="modalPlayerName"></h2>
+                <div id="modalPlayerDetails"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

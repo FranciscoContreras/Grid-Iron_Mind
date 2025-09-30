@@ -1,0 +1,125 @@
+package handlers
+
+import (
+	"log"
+	"net/http"
+	"strings"
+
+	"github.com/francisco/gridironmind/internal/db"
+	"github.com/francisco/gridironmind/pkg/response"
+	"github.com/francisco/gridironmind/pkg/validation"
+	"github.com/google/uuid"
+)
+
+type PlayersHandler struct {
+	queries *db.PlayerQueries
+}
+
+func NewPlayersHandler() *PlayersHandler {
+	return &PlayersHandler{
+		queries: &db.PlayerQueries{},
+	}
+}
+
+// HandlePlayers handles both GET /players (list) and GET /players/:id (single)
+func (h *PlayersHandler) HandlePlayers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
+		return
+	}
+
+	// Parse path to determine if this is a list or single player request
+	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players")
+	path = strings.Trim(path, "/")
+
+	if path == "" {
+		// List players
+		h.listPlayers(w, r)
+	} else {
+		// Get single player by ID
+		h.getPlayer(w, r, path)
+	}
+}
+
+func (h *PlayersHandler) listPlayers(w http.ResponseWriter, r *http.Request) {
+	// Parse query parameters
+	query := r.URL.Query()
+
+	limit := validation.ValidateLimit(validation.ParseIntParam(query.Get("limit"), 50))
+	offset := validation.ValidateOffset(validation.ParseIntParam(query.Get("offset"), 0))
+	position := strings.TrimSpace(query.Get("position"))
+	status := strings.TrimSpace(query.Get("status"))
+	teamIDStr := strings.TrimSpace(query.Get("team"))
+
+	// Build filters
+	filters := db.PlayerFilters{
+		Limit:  limit,
+		Offset: offset,
+	}
+
+	// Validate and set position filter
+	if position != "" {
+		position = strings.ToUpper(position)
+		if err := validation.ValidatePosition(position); err != nil {
+			response.BadRequest(w, err.Error())
+			return
+		}
+		filters.Position = position
+	}
+
+	// Validate and set status filter
+	if status != "" {
+		status = strings.ToLower(status)
+		if err := validation.ValidateStatus(status); err != nil {
+			response.BadRequest(w, err.Error())
+			return
+		}
+		filters.Status = status
+	}
+
+	// Parse team ID filter
+	if teamIDStr != "" {
+		teamID, err := uuid.Parse(teamIDStr)
+		if err != nil {
+			response.BadRequest(w, "Invalid team ID format")
+			return
+		}
+		filters.TeamID = teamID
+	}
+
+	// Query database
+	players, total, err := h.queries.ListPlayers(r.Context(), filters)
+	if err != nil {
+		log.Printf("Error listing players: %v", err)
+		response.InternalError(w, "Failed to retrieve players")
+		return
+	}
+
+	// Return response with pagination
+	response.SuccessWithPagination(w, players, total, limit, offset)
+}
+
+func (h *PlayersHandler) getPlayer(w http.ResponseWriter, r *http.Request, idStr string) {
+	// Parse player ID
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		response.BadRequest(w, "Invalid player ID format")
+		return
+	}
+
+	// Query database
+	player, err := h.queries.GetPlayerByID(r.Context(), id)
+	if err != nil {
+		log.Printf("Error getting player: %v", err)
+		response.InternalError(w, "Failed to retrieve player")
+		return
+	}
+
+	if player == nil {
+		response.NotFound(w, "Player")
+		return
+	}
+
+	// Return response
+	response.Success(w, player)
+}
