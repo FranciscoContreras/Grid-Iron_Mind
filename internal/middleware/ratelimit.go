@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/francisco/gridironmind/internal/cache"
@@ -34,6 +36,15 @@ var AIRateLimit = RateLimitConfig{
 func RateLimit(config RateLimitConfig) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
+			// Check if client has unlimited access
+			if hasUnlimitedAccess(r) {
+				w.Header().Set("X-RateLimit-Limit", "unlimited")
+				w.Header().Set("X-RateLimit-Remaining", "unlimited")
+				w.Header().Set("X-RateLimit-Reset", "0")
+				next(w, r)
+				return
+			}
+
 			// Get client identifier (IP address or API key)
 			clientID := getClientIdentifier(r)
 
@@ -143,4 +154,25 @@ func StandardRateLimit(next http.HandlerFunc) http.HandlerFunc {
 // StrictRateLimit applies strict rate limiting for AI endpoints
 func StrictRateLimit(next http.HandlerFunc) http.HandlerFunc {
 	return RateLimit(AIRateLimit)(next)
+}
+
+// hasUnlimitedAccess checks if the request has an unlimited API key
+func hasUnlimitedAccess(r *http.Request) bool {
+	unlimitedKey := os.Getenv("UNLIMITED_API_KEY")
+
+	// If no unlimited key configured, no one has unlimited access
+	if unlimitedKey == "" {
+		return false
+	}
+
+	// Extract API key from request
+	apiKey := r.Header.Get("X-API-Key")
+	if apiKey == "" {
+		authHeader := r.Header.Get("Authorization")
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			apiKey = strings.TrimPrefix(authHeader, "Bearer ")
+		}
+	}
+
+	return apiKey == unlimitedKey
 }

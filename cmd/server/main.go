@@ -85,6 +85,7 @@ func main() {
 	mux.HandleFunc("/api/v1/admin/sync/rosters", applyMiddleware(adminHandler.HandleSyncRosters))
 	mux.HandleFunc("/api/v1/admin/sync/games", applyMiddleware(adminHandler.HandleSyncGames))
 	mux.HandleFunc("/api/v1/admin/sync/full", applyMiddleware(adminHandler.HandleFullSync))
+	mux.HandleFunc("/api/v1/admin/keys/generate", applyMiddleware(adminHandler.HandleGenerateAPIKey))
 
 	// Health check endpoint
 	mux.HandleFunc("/health", applyMiddleware(healthCheck))

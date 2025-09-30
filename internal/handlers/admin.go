@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -125,4 +128,55 @@ func (h *AdminHandler) HandleFullSync(w http.ResponseWriter, r *http.Request) {
 		"message": "Full sync started in background",
 		"status":  "processing",
 	})
+}
+
+// HandleGenerateAPIKey generates a new API key
+func (h *AdminHandler) HandleGenerateAPIKey(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse request body
+	var reqBody struct {
+		Unlimited bool   `json:"unlimited"`
+		Label     string `json:"label"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	// Generate secure random API key
+	apiKey, err := generateSecureAPIKey()
+	if err != nil {
+		log.Printf("Failed to generate API key: %v", err)
+		response.Error(w, http.StatusInternalServerError, "GENERATION_FAILED", "Failed to generate API key")
+		return
+	}
+
+	keyType := "standard"
+	if reqBody.Unlimited {
+		keyType = "unlimited"
+	}
+
+	log.Printf("Admin endpoint: Generated %s API key with label '%s'", keyType, reqBody.Label)
+
+	response.Success(w, map[string]interface{}{
+		"api_key":   apiKey,
+		"type":      keyType,
+		"label":     reqBody.Label,
+		"unlimited": reqBody.Unlimited,
+		"message":   "API key generated successfully. Store this key securely - it cannot be retrieved again.",
+	})
+}
+
+// generateSecureAPIKey generates a cryptographically secure random API key
+func generateSecureAPIKey() (string, error) {
+	bytes := make([]byte, 32) // 256 bits
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return "gim_" + hex.EncodeToString(bytes), nil
 }

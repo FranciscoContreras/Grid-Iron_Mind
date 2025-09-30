@@ -10,13 +10,14 @@ import (
 
 // Config holds all application configuration
 type Config struct {
-	Environment  string
-	DatabaseURL  string
-	RedisURL     string
-	APIKey       string
-	ClaudeAPIKey string
-	DBMaxConns   int32
-	DBMinConns   int32
+	Environment        string
+	DatabaseURL        string
+	RedisURL           string
+	APIKey             string
+	UnlimitedAPIKey    string
+	ClaudeAPIKey       string
+	DBMaxConns         int32
+	DBMinConns         int32
 }
 
 // Load reads configuration from environment variables
@@ -25,13 +26,14 @@ func Load() (*Config, error) {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		Environment:  getEnv("ENVIRONMENT", "development"),
-		DatabaseURL:  getEnv("DATABASE_URL", ""),
-		RedisURL:     getEnv("REDIS_URL", ""),
-		APIKey:       getEnv("API_KEY", ""),
-		ClaudeAPIKey: getEnv("CLAUDE_API_KEY", ""),
-		DBMaxConns:   int32(getEnvInt("DB_MAX_CONNS", 25)),
-		DBMinConns:   int32(getEnvInt("DB_MIN_CONNS", 5)),
+		Environment:     getEnv("ENVIRONMENT", "development"),
+		DatabaseURL:     getEnv("DATABASE_URL", ""),
+		RedisURL:        getEnv("REDIS_URL", ""),
+		APIKey:          getEnv("API_KEY", ""),
+		UnlimitedAPIKey: getEnv("UNLIMITED_API_KEY", ""),
+		ClaudeAPIKey:    getEnv("CLAUDE_API_KEY", ""),
+		DBMaxConns:      int32(getEnvInt("DB_MAX_CONNS", 25)),
+		DBMinConns:      int32(getEnvInt("DB_MIN_CONNS", 5)),
 	}
 
 	// Validate required fields
