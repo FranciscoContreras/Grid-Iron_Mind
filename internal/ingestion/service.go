@@ -886,9 +886,13 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 				fourthDownPct = (stats["fourthDownEff_made"] / stats["fourthDownEff_att"]) * 100
 			}
 
+			// Debug: log parsed stats
+			log.Printf("Parsed %d stats for ESPN team %s. Sample: totalYards=%.0f, firstDowns=%.0f",
+				len(stats), espnTeamID, stats["totalYards"], stats["firstDowns"])
+
 			// Upsert team stats
-			log.Printf("Inserting stats for team %s (ESPN ID: %s) in game %s: %d yards, %d first downs",
-				teamID, espnTeamID, game.ID, int(stats["totalYards"]), int(stats["firstDowns"]))
+			log.Printf("Inserting stats for team %s (ESPN ID: %s) in game %s",
+				teamID, espnTeamID, game.ID)
 
 			insertQuery := `
 				INSERT INTO game_team_stats (
@@ -939,7 +943,7 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 					rushing_avg = EXCLUDED.rushing_avg
 			`
 
-			_, err = s.dbPool.Exec(ctx, insertQuery,
+			result, err := s.dbPool.Exec(ctx, insertQuery,
 				game.ID, teamID,
 				int(stats["firstDowns"]), int(stats["totalYards"]),
 				int(stats["netPassingYards"]), int(stats["rushingYards"]),
@@ -960,7 +964,9 @@ func (s *Service) SyncGameTeamStats(ctx context.Context, season int, week int) e
 				continue
 			}
 
-			log.Printf("✓ Synced stats for team %s in game %s (NFL ID: %s)", teamID, game.ID, game.NFLGameID)
+			rowsAffected := result.RowsAffected()
+			log.Printf("✓ Synced stats for team %s in game %s (NFL ID: %s) - %d rows affected",
+				teamID, game.ID, game.NFLGameID, rowsAffected)
 			count++
 		}
 
