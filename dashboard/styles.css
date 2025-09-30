@@ -626,3 +626,69 @@ body.dark-mode .error {
     background: var(--success);
     color: #fff;
 }
+
+/* Player Headshot Styles */
+.player-headshot {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+}
+
+.position-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--primary);
+    color: white;
+}
+
+/* Weather Grid */
+.weather-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.weather-card {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.weather-card h3 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.weather-card p {
+    margin: 8px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* Fantasy Leaders */
+.fantasy-leaders {
+    margin-top: 20px;
+}
+
+.fantasy-leaders h3 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+/* Enhanced Data Table */
+.data-table td img {
+    vertical-align: middle;
+}
+
+.data-table .position-badge {
+    margin: 0 auto;
+    display: inline-block;
+}

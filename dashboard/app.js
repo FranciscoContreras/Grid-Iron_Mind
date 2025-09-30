@@ -183,17 +183,23 @@ function renderPlayers() {
     }
 
     if (filteredPlayers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No players found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;">No players found</td></tr>';
         return;
     }
 
     filteredPlayers.forEach(player => {
         const row = document.createElement('tr');
+        const headshotUrl = player.headshot_url || `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${player.espn_athlete_id || 'default'}.png&w=350&h=254`;
+        const yearsPro = player.years_pro ? `${player.years_pro} yrs` : 'Rookie';
+
         row.innerHTML = `
+            <td><img src="${headshotUrl}" alt="${player.name}" class="player-headshot" onerror="this.src='https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/nfl.png&h=50&w=50'"></td>
             <td><strong>${player.name}</strong></td>
-            <td>${player.position}</td>
+            <td><span class="position-badge">${player.position}</span></td>
             <td>--</td>
-            <td>${player.jersey_number || '--'}</td>
+            <td>#${player.jersey_number || '--'}</td>
+            <td>${player.college || '--'}</td>
+            <td>${yearsPro}</td>
             <td><span class="badge badge-${player.status}">${player.status}</span></td>
             <td><button class="btn" onclick="viewPlayerDetails('${player.id}')">View</button></td>
         `;
@@ -577,6 +583,164 @@ function renderCareerStats(data) {
     }
 }
 
+// Weather Analysis Functions
+async function loadWeatherAnalysis() {
+    showLoading('weatherLoading');
+    hideError('weatherError');
+
+    const season = document.getElementById('weatherSeason').value;
+
+    try {
+        const result = await apiCall('/api/v1/games', { season, limit: 1000 });
+        const games = result.data.data || [];
+
+        analyzeWeather(games);
+        renderWeatherGames(games);
+    } catch (error) {
+        showError('weatherError', `Failed to load weather data: ${error.message}`);
+    } finally {
+        hideLoading('weatherLoading');
+    }
+}
+
+function analyzeWeather(games) {
+    let temps = [];
+    let winds = [];
+    let venueTypes = { indoor: 0, outdoor: 0, retractable: 0 };
+
+    games.forEach(game => {
+        if (game.weather_temp) temps.push(game.weather_temp);
+        if (game.weather_wind_speed) winds.push(game.weather_wind_speed);
+        if (game.venue_type) {
+            venueTypes[game.venue_type.toLowerCase()] = (venueTypes[game.venue_type.toLowerCase()] || 0) + 1;
+        }
+    });
+
+    // Temperature stats
+    const avgTemp = temps.length > 0 ? (temps.reduce((a, b) => a + b, 0) / temps.length).toFixed(1) : '--';
+    const maxTemp = temps.length > 0 ? Math.max(...temps) : '--';
+    const minTemp = temps.length > 0 ? Math.min(...temps) : '--';
+
+    document.getElementById('tempStats').innerHTML = `
+        <p>Average: ${avgTemp}°F</p>
+        <p>High: ${maxTemp}°F</p>
+        <p>Low: ${minTemp}°F</p>
+    `;
+
+    // Wind stats
+    const avgWind = winds.length > 0 ? (winds.reduce((a, b) => a + b, 0) / winds.length).toFixed(1) : '--';
+    const highWind = winds.filter(w => w > 15).length;
+
+    document.getElementById('windStats').innerHTML = `
+        <p>Average Wind: ${avgWind} mph</p>
+        <p>High Wind Games (>15mph): ${highWind}</p>
+    `;
+
+    // Venue stats
+    document.getElementById('venueStats').innerHTML = `
+        <p>Indoor: ${venueTypes.indoor || 0}</p>
+        <p>Outdoor: ${venueTypes.outdoor || 0}</p>
+        <p>Retractable: ${venueTypes.retractable || 0}</p>
+    `;
+}
+
+function renderWeatherGames(games) {
+    const tbody = document.getElementById('weatherGamesBody');
+
+    const filteredGames = games.filter(g => g.weather_temp || g.weather_condition);
+
+    if (filteredGames.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No weather data available</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filteredGames.map(game => `
+        <tr>
+            <td>${game.game_date ? new Date(game.game_date).toLocaleDateString() : 'TBD'}</td>
+            <td>${game.away_team || 'N/A'} @ ${game.home_team || 'N/A'}</td>
+            <td>${game.weather_temp ? `${game.weather_temp}°F` : 'N/A'}</td>
+            <td>${game.weather_condition || 'N/A'}</td>
+            <td>${game.weather_wind_speed ? `${game.weather_wind_speed} mph` : 'N/A'}</td>
+            <td>${game.venue_name || 'N/A'}</td>
+            <td>${game.away_score !== null ? `${game.away_score}-${game.home_score}` : 'N/A'}</td>
+        </tr>
+    `).join('');
+}
+
+// Fantasy Stats Functions
+async function loadFantasyStats() {
+    showLoading('fantasyLoading');
+    hideError('fantasyError');
+
+    const season = document.getElementById('fantasySeason').value;
+    const week = document.getElementById('fantasyWeek').value;
+    const position = document.getElementById('fantasyPosition').value;
+
+    try {
+        // This would call a fantasy stats endpoint when available
+        // For now, we'll use player stats as a placeholder
+        const result = await apiCall('/api/v1/players', {
+            limit: 50,
+            position: position || undefined
+        });
+
+        renderFantasyLeaders(result.data.data || []);
+    } catch (error) {
+        showError('fantasyError', `Failed to load fantasy stats: ${error.message}`);
+    } finally {
+        hideLoading('fantasyLoading');
+    }
+}
+
+function renderFantasyLeaders(players) {
+    const tbody = document.getElementById('fantasyLeadersBody');
+    const scoringType = document.getElementById('fantasyScoring').value;
+
+    if (players.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 20px;">No data available</td></tr>';
+        return;
+    }
+
+    // Calculate fantasy points (simplified)
+    const playersWithPoints = players.map(p => ({
+        ...p,
+        fantasyPoints: calculateFantasyPoints(p, scoringType)
+    })).sort((a, b) => b.fantasyPoints - a.fantasyPoints);
+
+    tbody.innerHTML = playersWithPoints.slice(0, 25).map((player, index) => `
+        <tr>
+            <td><strong>${index + 1}</strong></td>
+            <td>${player.name}</td>
+            <td><span class="position-badge">${player.position}</span></td>
+            <td>--</td>
+            <td><strong>${player.fantasyPoints.toFixed(1)}</strong></td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+        </tr>
+    `).join('');
+}
+
+function calculateFantasyPoints(player, scoringType) {
+    // Placeholder calculation - would be enhanced with actual stats
+    let points = 0;
+
+    // This is a simplified example - real implementation would use actual game stats
+    if (player.position === 'QB') points = Math.random() * 30;
+    else if (player.position === 'RB') points = Math.random() * 25;
+    else if (player.position === 'WR') points = Math.random() * 22;
+    else if (player.position === 'TE') points = Math.random() * 15;
+
+    if (scoringType === 'ppr') points += Math.random() * 5;
+    else if (scoringType === 'half_ppr') points += Math.random() * 2.5;
+
+    return points;
+}
+
 // Admin Sync Functions
 async function syncData(endpoint, body = {}) {
     const statusDiv = document.getElementById('syncStatus');
@@ -622,6 +786,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Career stats
     document.getElementById('loadCareerStats').addEventListener('click', loadCareerStats);
+
+    // Weather analysis
+    document.getElementById('refreshWeather').addEventListener('click', loadWeatherAnalysis);
+
+    // Fantasy stats
+    document.getElementById('refreshFantasy').addEventListener('click', loadFantasyStats);
 
     // Admin sync buttons - ESPN
     document.getElementById('syncTeams').addEventListener('click', () => syncData('teams'));

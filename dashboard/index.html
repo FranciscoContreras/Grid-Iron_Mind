@@ -29,6 +29,8 @@
             <button class="tab" data-tab="teams">Teams</button>
             <button class="tab" data-tab="games">Games</button>
             <button class="tab" data-tab="career">Career Stats</button>
+            <button class="tab" data-tab="weather">Weather Analysis</button>
+            <button class="tab" data-tab="fantasy">Fantasy Stats</button>
             <button class="tab" data-tab="admin">Admin Sync</button>
             <button class="tab" data-tab="api-test">API Testing</button>
         </nav>
@@ -76,10 +78,13 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th>Photo</th>
                                 <th>Name</th>
                                 <th>Position</th>
                                 <th>Team</th>
                                 <th>Jersey</th>
+                                <th>College</th>
+                                <th>Experience</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -205,6 +210,135 @@
                                 </tr>
                             </thead>
                             <tbody id="careerStatsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weather Analysis Tab -->
+            <section id="weather-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>Weather Impact Analysis</h2>
+                    <button class="btn-refresh" id="refreshWeather">↻ Refresh</button>
+                </div>
+
+                <div class="filters">
+                    <input type="number" id="weatherSeason" placeholder="Season (e.g., 2024)" class="input" value="2024">
+                    <select id="weatherCondition" class="select">
+                        <option value="">All Conditions</option>
+                        <option value="clear">Clear</option>
+                        <option value="cloudy">Cloudy</option>
+                        <option value="rain">Rain</option>
+                        <option value="snow">Snow</option>
+                    </select>
+                    <select id="tempRange" class="select">
+                        <option value="">All Temperatures</option>
+                        <option value="cold">Cold (< 40°F)</option>
+                        <option value="moderate">Moderate (40-70°F)</option>
+                        <option value="hot">Hot (> 70°F)</option>
+                    </select>
+                </div>
+
+                <div class="loading" id="weatherLoading" style="display: none;">Loading...</div>
+                <div class="error" id="weatherError" style="display: none;"></div>
+
+                <div class="weather-grid" id="weatherGrid">
+                    <div class="weather-card">
+                        <h3>🌡️ Temperature Stats</h3>
+                        <div id="tempStats">
+                            <p>Average: --°F</p>
+                            <p>High: --°F</p>
+                            <p>Low: --°F</p>
+                        </div>
+                    </div>
+                    <div class="weather-card">
+                        <h3>💨 Wind Impact</h3>
+                        <div id="windStats">
+                            <p>Average Wind: -- mph</p>
+                            <p>High Wind Games: --</p>
+                        </div>
+                    </div>
+                    <div class="weather-card">
+                        <h3>🏟️ Venue Types</h3>
+                        <div id="venueStats">
+                            <p>Indoor: --</p>
+                            <p>Outdoor: --</p>
+                            <p>Retractable: --</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Games by Weather Conditions</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Teams</th>
+                                <th>Temp</th>
+                                <th>Condition</th>
+                                <th>Wind</th>
+                                <th>Venue</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weatherGamesBody">
+                            <tr><td colspan="7" style="text-align: center; padding: 20px;">Select filters and click Refresh</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Fantasy Stats Tab -->
+            <section id="fantasy-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>Fantasy Football Stats</h2>
+                    <button class="btn-refresh" id="refreshFantasy">↻ Refresh</button>
+                </div>
+
+                <div class="filters">
+                    <input type="number" id="fantasySeason" placeholder="Season" class="input" value="2024">
+                    <input type="number" id="fantasyWeek" placeholder="Week (optional)" class="input">
+                    <select id="fantasyPosition" class="select">
+                        <option value="">All Positions</option>
+                        <option value="QB">QB</option>
+                        <option value="RB">RB</option>
+                        <option value="WR">WR</option>
+                        <option value="TE">TE</option>
+                    </select>
+                    <select id="fantasyScoring" class="select">
+                        <option value="standard">Standard</option>
+                        <option value="ppr">PPR</option>
+                        <option value="half_ppr">Half PPR</option>
+                    </select>
+                </div>
+
+                <div class="loading" id="fantasyLoading" style="display: none;">Loading...</div>
+                <div class="error" id="fantasyError" style="display: none;"></div>
+
+                <div class="fantasy-leaders">
+                    <h3>Top Fantasy Performers</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Position</th>
+                                    <th>Team</th>
+                                    <th>Fantasy Points</th>
+                                    <th>Pass Yds</th>
+                                    <th>Pass TD</th>
+                                    <th>Rush Yds</th>
+                                    <th>Rush TD</th>
+                                    <th>Rec</th>
+                                    <th>Rec Yds</th>
+                                    <th>Rec TD</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fantasyLeadersBody">
+                                <tr><td colspan="12" style="text-align: center; padding: 20px;">Select filters and click Refresh</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
