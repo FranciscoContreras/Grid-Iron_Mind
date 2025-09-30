@@ -53,14 +53,18 @@ func (q *GameQueries) ListGames(ctx context.Context, filters models.GameFilters)
 		return nil, 0, fmt.Errorf("failed to count games: %w", err)
 	}
 
-	// Fetch games
+	// Fetch games with team names
 	query := fmt.Sprintf(`
-		SELECT id, nfl_game_id, season, week, game_date,
-		       home_team_id, away_team_id, home_score, away_score, status,
-		       created_at
-		FROM games
+		SELECT g.id, g.nfl_game_id, g.season, g.week, g.game_date,
+		       g.home_team_id, g.away_team_id, g.home_score, g.away_score, g.status,
+		       g.created_at,
+		       ht.name as home_team, ht.abbreviation as home_team_abbr,
+		       at.name as away_team, at.abbreviation as away_team_abbr
+		FROM games g
+		LEFT JOIN teams ht ON g.home_team_id = ht.id
+		LEFT JOIN teams at ON g.away_team_id = at.id
 		%s
-		ORDER BY game_date DESC, id
+		ORDER BY g.game_date DESC, g.id
 		LIMIT $%d OFFSET $%d
 	`, whereClause, argPos, argPos+1)
 
@@ -75,12 +79,26 @@ func (q *GameQueries) ListGames(ctx context.Context, filters models.GameFilters)
 	var games []models.Game
 	for rows.Next() {
 		var g models.Game
+		var homeTeamName, homeTeamAbbr, awayTeamName, awayTeamAbbr *string
 		if err := rows.Scan(
 			&g.ID, &g.EspnGameID, &g.SeasonYear, &g.Week,
 			&g.GameDate, &g.HomeTeamID, &g.AwayTeamID, &g.HomeScore,
 			&g.AwayScore, &g.Status, &g.CreatedAt,
+			&homeTeamName, &homeTeamAbbr, &awayTeamName, &awayTeamAbbr,
 		); err != nil {
 			return nil, 0, fmt.Errorf("failed to scan game: %w", err)
+		}
+		if homeTeamName != nil {
+			g.HomeTeamName = *homeTeamName
+		}
+		if homeTeamAbbr != nil {
+			g.HomeTeamAbbr = *homeTeamAbbr
+		}
+		if awayTeamName != nil {
+			g.AwayTeamName = *awayTeamName
+		}
+		if awayTeamAbbr != nil {
+			g.AwayTeamAbbr = *awayTeamAbbr
 		}
 		games = append(games, g)
 	}

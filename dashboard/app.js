@@ -505,12 +505,12 @@ function renderTeamGames(games) {
                 ${games.map(game => `
                     <tr>
                         <td>${game.game_date ? new Date(game.game_date).toLocaleDateString() : 'TBD'}</td>
-                        <td>${game.away_team || 'N/A'} @ ${game.home_team || 'N/A'}</td>
+                        <td>${game.away_team_name || game.away_team_abbr || 'N/A'} @ ${game.home_team_name || game.home_team_abbr || 'N/A'}</td>
                         <td style="font-weight: bold;">
                             ${game.away_score !== null ? `${game.away_score} - ${game.home_score}` : 'N/A'}
                         </td>
                         <td><span class="badge badge-${game.status}">${game.status || 'scheduled'}</span></td>
-                        <td><button class="btn" onclick="viewGameDetail('${game.id}', '${game.away_team} @ ${game.home_team}', ${JSON.stringify(game).replace(/'/g, "&apos;")})">View Game</button></td>
+                        <td><button class="btn" onclick="viewGameDetail('${game.id}', '${game.away_team_name || game.away_team_abbr || 'Away'} @ ${game.home_team_name || game.home_team_abbr || 'Home'}', ${JSON.stringify(game).replace(/'/g, "&apos;")})">View Game</button></td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -1068,11 +1068,11 @@ function renderGames(games) {
     tbody.innerHTML = games.map(game => `
         <tr>
             <td>${game.game_date ? new Date(game.game_date).toLocaleDateString() : 'TBD'}</td>
-            <td>${game.away_team || 'N/A'}</td>
+            <td>${game.away_team_name || game.away_team_abbr || 'N/A'}</td>
             <td style="text-align: center; font-weight: bold;">
                 ${game.away_score !== null ? game.away_score : '-'} - ${game.home_score !== null ? game.home_score : '-'}
             </td>
-            <td>${game.home_team || 'N/A'}</td>
+            <td>${game.home_team_name || game.home_team_abbr || 'N/A'}</td>
             <td><span class="badge badge-${game.status}">${game.status || 'scheduled'}</span></td>
             <td>${game.weather_temp ? `${game.weather_temp}°F ${game.weather_condition || ''}` : 'N/A'}</td>
             <td>${game.venue_name || 'N/A'}${game.venue_city ? `, ${game.venue_city}` : ''}</td>
@@ -1221,7 +1221,7 @@ function renderWeatherGames(games) {
     tbody.innerHTML = filteredGames.map(game => `
         <tr>
             <td>${game.game_date ? new Date(game.game_date).toLocaleDateString() : 'TBD'}</td>
-            <td>${game.away_team || 'N/A'} @ ${game.home_team || 'N/A'}</td>
+            <td>${game.away_team_name || game.away_team_abbr || 'N/A'} @ ${game.home_team_name || game.home_team_abbr || 'N/A'}</td>
             <td>${game.weather_temp ? `${game.weather_temp}°F` : 'N/A'}</td>
             <td>${game.weather_condition || 'N/A'}</td>
             <td>${game.weather_wind_speed ? `${game.weather_wind_speed} mph` : 'N/A'}</td>

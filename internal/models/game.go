@@ -44,6 +44,12 @@ type Game struct {
 	// Optional nested team data
 	HomeTeam *Team `json:"home_team,omitempty"`
 	AwayTeam *Team `json:"away_team,omitempty"`
+
+	// Team name fields for quick access (populated from JOINs)
+	HomeTeamName string `json:"home_team_name,omitempty"`
+	HomeTeamAbbr string `json:"home_team_abbr,omitempty"`
+	AwayTeamName string `json:"away_team_name,omitempty"`
+	AwayTeamAbbr string `json:"away_team_abbr,omitempty"`
 }
 
 // GameFilters for filtering games
