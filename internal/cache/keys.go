@@ -105,3 +105,15 @@ func InvalidateLeadersCache() string {
 func InvalidateAllCache() string {
 	return "*"
 }
+
+// CacheKey generates a generic cache key with multiple parts
+func CacheKey(parts ...string) string {
+	key := ""
+	for i, part := range parts {
+		if i > 0 {
+			key += ":"
+		}
+		key += part
+	}
+	return key
+}
