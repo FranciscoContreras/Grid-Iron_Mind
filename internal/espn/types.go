@@ -304,11 +304,11 @@ type PlayerStatsResponse struct {
 // GameDetailResponse represents detailed game information
 type GameDetailResponse struct {
 	Header struct {
-		ID          string    `json:"id"`
-		UID         string    `json:"uid"`
-		Season      Season    `json:"season"`
-		Week        Week      `json:"week"`
-		GameNote    string    `json:"gameNote"`
+		ID          string      `json:"id"`
+		UID         string      `json:"uid"`
+		Season      Season      `json:"season"`
+		Week        int         `json:"week"` // Just a number in game details API
+		GameNote    string      `json:"gameNote"`
 		Competition Competition `json:"competition"`
 	} `json:"header"`
 	BoxScore struct {
