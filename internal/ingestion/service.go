@@ -11,21 +11,24 @@ import (
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/internal/espn"
 	"github.com/francisco/gridironmind/internal/models"
+	"github.com/francisco/gridironmind/internal/nflverse"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Service handles data ingestion from ESPN API
+// Service handles data ingestion from ESPN and nflverse APIs
 type Service struct {
-	espnClient *espn.Client
-	dbPool     *pgxpool.Pool
+	espnClient     *espn.Client
+	nflverseClient *nflverse.Client
+	dbPool         *pgxpool.Pool
 }
 
 // NewService creates a new ingestion service
 func NewService() *Service {
 	return &Service{
-		espnClient: espn.NewClient(),
-		dbPool:     db.GetPool(),
+		espnClient:     espn.NewClient(),
+		nflverseClient: nflverse.NewClient(),
+		dbPool:         db.GetPool(),
 	}
 }
 
@@ -490,4 +493,130 @@ func (s *Service) SyncMultipleSeasons(ctx context.Context, startYear, endYear in
 
 	log.Println("Multi-season sync completed")
 	return nil
+}
+
+// SyncNFLversePlayerStats syncs enriched player statistics from nflverse
+func (s *Service) SyncNFLversePlayerStats(ctx context.Context, season int) error {
+	log.Printf("Starting nflverse player stats sync for season %d...", season)
+
+	stats, err := s.nflverseClient.FetchPlayerStats(ctx, season)
+	if err != nil {
+		return fmt.Errorf("failed to fetch nflverse player stats: %w", err)
+	}
+
+	log.Printf("Fetched %d player stat records from nflverse", len(stats))
+
+	careerQueries := &db.CareerQueries{}
+	updatedPlayers := 0
+
+	for _, stat := range stats {
+		// Find player by nflverse player_id (need to map to our UUID)
+		playerID, err := s.findPlayerByExternalID(ctx, stat.PlayerID)
+		if err != nil {
+			continue // Player not in our system yet
+		}
+
+		// Upsert career stats with nflverse data
+		careerStats := &models.PlayerCareerStats{
+			PlayerID:     playerID,
+			Season:       stat.Season,
+			GamesPlayed:  0, // nflverse doesn't track this directly
+			PassingYards: int(stat.PassingYards),
+			PassingTDs:   stat.PassingTDs,
+			PassingInts:  stat.Interceptions,
+			RushingYards: int(stat.RushingYards),
+			RushingTDs:   stat.RushingTDs,
+			Receptions:   stat.Receptions,
+			ReceivingYards: int(stat.ReceivingYards),
+			ReceivingTDs: stat.ReceivingTDs,
+		}
+
+		if err := careerQueries.UpsertPlayerCareerStats(ctx, careerStats); err != nil {
+			log.Printf("Failed to upsert career stats for player %s: %v", stat.PlayerName, err)
+			continue
+		}
+		updatedPlayers++
+	}
+
+	log.Printf("Successfully updated %d player career stats from nflverse", updatedPlayers)
+	return nil
+}
+
+// SyncNFLverseSchedule syncs enriched schedule data including weather and venue details
+func (s *Service) SyncNFLverseSchedule(ctx context.Context, season int) error {
+	log.Printf("Starting nflverse schedule sync for season %d...", season)
+
+	schedules, err := s.nflverseClient.FetchSchedule(ctx, season)
+	if err != nil {
+		return fmt.Errorf("failed to fetch nflverse schedule: %w", err)
+	}
+
+	log.Printf("Fetched %d games from nflverse schedule", len(schedules))
+
+	updatedGames := 0
+
+	for _, sched := range schedules {
+		// Update existing games with enhanced data
+		query := `
+			UPDATE games
+			SET
+				weather_temp = $1,
+				weather_wind_speed = $2,
+				venue_name = $3
+			WHERE game_id = $4
+		`
+
+		_, err := s.dbPool.Exec(ctx, query,
+			sched.Temp,
+			sched.Wind,
+			sched.Stadium,
+			sched.GameID,
+		)
+
+		if err != nil {
+			log.Printf("Failed to update game %s: %v", sched.GameID, err)
+			continue
+		}
+		updatedGames++
+	}
+
+	log.Printf("Successfully updated %d games with nflverse schedule data", updatedGames)
+	return nil
+}
+
+// SyncNFLverseNextGenStats syncs Next Gen Stats for advanced metrics
+func (s *Service) SyncNFLverseNextGenStats(ctx context.Context, season int, statType string) error {
+	log.Printf("Starting nflverse Next Gen Stats sync for season %d, type: %s...", season, statType)
+
+	ngsStats, err := s.nflverseClient.FetchNextGenStats(ctx, season, statType)
+	if err != nil {
+		return fmt.Errorf("failed to fetch Next Gen Stats: %w", err)
+	}
+
+	log.Printf("Fetched %d Next Gen Stats records", len(ngsStats))
+
+	// Store NGS data in a dedicated table or extend player_career_stats
+	// For now, we'll log the availability
+	for _, ngs := range ngsStats {
+		log.Printf("Player: %s, Team: %s, Season: %d, Week: %d",
+			ngs.PlayerName, ngs.TeamAbbr, ngs.Season, ngs.Week)
+	}
+
+	log.Println("Next Gen Stats sync completed (logging only - storage TBD)")
+	return nil
+}
+
+// findPlayerByExternalID finds a player in our database by their external ID (ESPN, nflverse, etc.)
+func (s *Service) findPlayerByExternalID(ctx context.Context, externalID string) (uuid.UUID, error) {
+	var playerID uuid.UUID
+	query := `
+		SELECT id FROM players
+		WHERE espn_athlete_id = $1
+		LIMIT 1
+	`
+	err := s.dbPool.QueryRow(ctx, query, externalID).Scan(&playerID)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("player not found: %w", err)
+	}
+	return playerID, nil
 }

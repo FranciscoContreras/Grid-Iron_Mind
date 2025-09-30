@@ -253,3 +253,111 @@ func (h *AdminHandler) HandleSyncMultipleSeasons(w http.ResponseWriter, r *http.
 		"status":     "processing",
 	})
 }
+
+// HandleSyncNFLverseStats handles POST /admin/sync/nflverse/stats
+func (h *AdminHandler) HandleSyncNFLverseStats(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season int `json:"season"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	log.Printf("Admin endpoint: NFLverse stats sync requested for season %d", reqBody.Season)
+
+	ctx := r.Context()
+
+	// Run sync in background
+	go func() {
+		if err := h.ingestionService.SyncNFLversePlayerStats(ctx, reqBody.Season); err != nil {
+			log.Printf("NFLverse stats sync failed: %v", err)
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("NFLverse stats sync started for season %d", reqBody.Season),
+		"season":  reqBody.Season,
+		"status":  "processing",
+	})
+}
+
+// HandleSyncNFLverseSchedule handles POST /admin/sync/nflverse/schedule
+func (h *AdminHandler) HandleSyncNFLverseSchedule(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season int `json:"season"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	log.Printf("Admin endpoint: NFLverse schedule sync requested for season %d", reqBody.Season)
+
+	ctx := r.Context()
+
+	// Run sync in background
+	go func() {
+		if err := h.ingestionService.SyncNFLverseSchedule(ctx, reqBody.Season); err != nil {
+			log.Printf("NFLverse schedule sync failed: %v", err)
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("NFLverse schedule sync started for season %d", reqBody.Season),
+		"season":  reqBody.Season,
+		"status":  "processing",
+	})
+}
+
+// HandleSyncNFLverseNextGen handles POST /admin/sync/nflverse/nextgen
+func (h *AdminHandler) HandleSyncNFLverseNextGen(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season   int    `json:"season"`
+		StatType string `json:"stat_type"` // passing, rushing, receiving
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	if reqBody.StatType == "" {
+		reqBody.StatType = "passing"
+	}
+
+	log.Printf("Admin endpoint: NFLverse Next Gen Stats sync requested for season %d, type: %s", reqBody.Season, reqBody.StatType)
+
+	ctx := r.Context()
+
+	// Run sync in background
+	go func() {
+		if err := h.ingestionService.SyncNFLverseNextGenStats(ctx, reqBody.Season, reqBody.StatType); err != nil {
+			log.Printf("NFLverse Next Gen Stats sync failed: %v", err)
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message":   fmt.Sprintf("NFLverse Next Gen Stats sync started for season %d", reqBody.Season),
+		"season":    reqBody.Season,
+		"stat_type": reqBody.StatType,
+		"status":    "processing",
+	})
+}

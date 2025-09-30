@@ -92,6 +92,12 @@ func main() {
 	mux.HandleFunc("/api/v1/admin/sync/full", applyMiddleware(adminHandler.HandleFullSync))
 	mux.HandleFunc("/api/v1/admin/sync/historical/season", applyMiddleware(adminHandler.HandleSyncHistoricalGames))
 	mux.HandleFunc("/api/v1/admin/sync/historical/seasons", applyMiddleware(adminHandler.HandleSyncMultipleSeasons))
+
+	// NFLverse enrichment endpoints
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/stats", applyMiddleware(adminHandler.HandleSyncNFLverseStats))
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/schedule", applyMiddleware(adminHandler.HandleSyncNFLverseSchedule))
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/nextgen", applyMiddleware(adminHandler.HandleSyncNFLverseNextGen))
+
 	mux.HandleFunc("/api/v1/admin/keys/generate", applyMiddleware(adminHandler.HandleGenerateAPIKey))
 
 	// Health check endpoint
