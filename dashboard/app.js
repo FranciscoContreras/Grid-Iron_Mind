@@ -88,12 +88,18 @@ function updateStatus(connected, responseTime) {
 
 function showLoading(elementId) {
     const el = document.getElementById(elementId);
-    if (el) el.style.display = 'block';
+    if (el) {
+        el.style.display = 'flex';
+        el.style.visibility = 'visible';
+    }
 }
 
 function hideLoading(elementId) {
     const el = document.getElementById(elementId);
-    if (el) el.style.display = 'none';
+    if (el) {
+        el.style.display = 'none';
+        el.style.visibility = 'hidden';
+    }
 }
 
 function showError(elementId, message) {
