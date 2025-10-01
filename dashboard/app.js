@@ -1350,7 +1350,7 @@ async function loadCareerStats() {
 
     try {
         const result = await apiCall(`/api/v1/players/${playerId}/career`);
-        const data = result.data.data;
+        const data = result.data;
         renderCareerStats(data);
     } catch (error) {
         showError('careerError', `Failed to load career stats: ${error.message}`);
