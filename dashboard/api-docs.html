@@ -4,1480 +4,1495 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grid Iron Mind API Documentation</title>
-    <link rel="stylesheet" href="styles.css?v=3.0">
     <style>
-        .docs-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            background: var(--bg-primary);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .docs-header {
-            text-align: center;
-            margin-bottom: 60px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid var(--border);
+        :root {
+            --primary: #0066cc;
+            --secondary: #00509E;
+            --success: #00B167;
+            --danger: #E63946;
+            --warning: #F77F00;
+            --dark: #1a1a1a;
+            --gray: #6c757d;
+            --light: #f8f9fa;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+            --sidebar-width: 280px;
         }
 
-        .docs-header h1 {
-            font-size: 42px;
-            color: var(--text-primary);
-            margin-bottom: 10px;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: #fff;
         }
 
-        .docs-header .version {
-            font-size: 18px;
-            color: var(--text-secondary);
-            font-weight: 500;
+        .container {
+            display: flex;
+            min-height: 100vh;
         }
 
-        .docs-nav {
-            background: var(--bg-primary);
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            margin-bottom: 40px;
-            position: sticky;
-            top: 20px;
-            box-shadow: var(--shadow-md);
-            backdrop-filter: blur(10px);
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
         }
 
-        .docs-nav h3 {
-            margin-bottom: 15px;
-            color: var(--text-primary);
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .docs-nav ul {
-            list-style: none;
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
         }
 
-        .docs-nav li {
-            margin: 8px 0;
+        .sidebar-header .version {
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.6);
         }
 
-        .docs-nav a {
-            color: var(--primary);
+        .nav-section {
+            margin: 1.5rem 0;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.05em;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: rgba(255,255,255,0.8);
             text-decoration: none;
-            transition: color 0.3s;
+            transition: all 0.2s;
         }
 
-        .docs-nav a:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
         }
 
-        .docs-section {
-            margin-bottom: 60px;
-            padding: 30px;
-            background: var(--bg-primary);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
-            backdrop-filter: blur(10px);
+        .nav-link.active {
+            background: var(--primary);
+            color: #fff;
         }
 
-        .docs-section h2 {
-            font-size: 32px;
-            color: var(--text-primary);
-            margin-bottom: 20px;
+        /* Main Content */
+        .content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 3rem;
+            max-width: 1200px;
         }
 
-        .docs-section h3 {
-            font-size: 24px;
-            color: var(--text-primary);
-            margin-top: 30px;
-            margin-bottom: 15px;
+        .header {
+            margin-bottom: 3rem;
         }
 
-        .docs-section h4 {
-            font-size: 18px;
-            color: var(--primary);
-            margin-top: 20px;
-            margin-bottom: 10px;
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
         }
 
-        .endpoint {
-            background: var(--bg-secondary);
-            padding: 20px;
+        .header .subtitle {
+            font-size: 1.125rem;
+            color: var(--gray);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
             border-radius: 12px;
-            margin: 20px 0;
+            margin-left: 0.5rem;
+        }
+
+        .badge-success { background: var(--success); color: #fff; }
+        .badge-warning { background: var(--warning); color: #fff; }
+        .badge-danger { background: var(--danger); color: #fff; }
+        .badge-primary { background: var(--primary); color: #fff; }
+
+        /* Sections */
+        section {
+            margin-bottom: 4rem;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        section h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--secondary);
+        }
+
+        section h4 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
             border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            background: var(--code-bg);
+            padding: 0.125rem 0.25rem;
+            border-radius: 3px;
+            font-size: 0.875em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Endpoint Blocks */
+        .endpoint {
+            background: #fff;
             border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 2rem 0;
+            overflow: hidden;
         }
 
         .endpoint-header {
+            background: var(--light);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .method {
-            padding: 6px 12px;
-            border-radius: 4px;
+        .http-method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
             font-weight: 700;
-            font-size: 12px;
-            color: white;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            font-family: monospace;
         }
 
-        .method.get { background: #28a745; }
-        .method.post { background: #007bff; }
-        .method.put { background: #ffc107; color: #000; }
-        .method.delete { background: #dc3545; }
+        .http-method.get { background: var(--success); color: #fff; }
+        .http-method.post { background: var(--primary); color: #fff; }
+        .http-method.put { background: var(--warning); color: #fff; }
+        .http-method.delete { background: var(--danger); color: #fff; }
 
         .endpoint-path {
-            font-family: monospace;
-            font-size: 16px;
-            color: var(--text-primary);
-            font-weight: 600;
+            font-family: 'SF Mono', monospace;
+            font-size: 1rem;
+            color: var(--dark);
         }
 
-        .auth-required {
-            padding: 4px 10px;
-            background: var(--warning);
-            color: #000;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
+        .endpoint-body {
+            padding: 1.5rem;
         }
 
-        .endpoint-description {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            line-height: 1.6;
+        .endpoint-body p {
+            margin-bottom: 1rem;
         }
 
-        .param-table {
+        /* Tables */
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            margin: 1rem 0;
+            font-size: 0.875rem;
         }
 
-        .param-table th {
-            background: var(--bg-secondary);
-            padding: 10px;
+        table th {
+            background: var(--light);
+            padding: 0.75rem;
             text-align: left;
             font-weight: 600;
-            border-bottom: 2px solid var(--border);
+            border: 1px solid var(--border);
         }
 
-        .param-table td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
+        table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
         }
 
-        .param-name {
-            font-family: monospace;
-            color: var(--primary);
-            font-weight: 600;
+        table tr:hover {
+            background: var(--light);
         }
 
-        .param-type {
-            font-family: monospace;
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-
-        .required {
-            color: var(--danger);
-            font-weight: 700;
-        }
-
-        .optional {
-            color: var(--text-secondary);
-        }
-
-        .code-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 20px;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            margin: 15px 0;
-        }
-
-        .code-block pre {
-            margin: 0;
-        }
-
+        /* Info Boxes */
         .info-box {
-            background: #d1ecf1;
-            border-left: 4px solid #0c5460;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid;
         }
 
-        body.dark-mode .info-box {
-            background: #0c5460;
-            color: #d1ecf1;
+        .info-box.info {
+            background: #e3f2fd;
+            border-color: var(--primary);
         }
 
-        .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #856404;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
+        .info-box.warning {
+            background: #fff3e0;
+            border-color: var(--warning);
         }
 
-        body.dark-mode .warning-box {
-            background: #856404;
-            color: #fff3cd;
+        .info-box.success {
+            background: #e8f5e9;
+            border-color: var(--success);
         }
 
+        .info-box.danger {
+            background: #ffebee;
+            border-color: var(--danger);
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        /* Links */
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Feature Grid */
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
 
         .feature-card {
-            background: var(--bg-primary);
-            padding: 20px;
-            border-radius: 6px;
+            padding: 1.5rem;
+            background: var(--light);
+            border-radius: 8px;
             border: 1px solid var(--border);
         }
 
         .feature-card h4 {
-            margin-top: 0;
-            color: var(--primary);
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
+        .feature-card p {
+            margin: 0;
+            color: var(--gray);
+            font-size: 0.875rem;
         }
 
-        .back-link:hover {
-            text-decoration: underline;
+        /* Response Examples */
+        .response-example {
+            margin: 1rem 0;
+        }
+
+        .response-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: -1px;
+        }
+
+        .response-tab {
+            padding: 0.5rem 1rem;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .response-tab.active {
+            background: var(--code-bg);
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary);
         }
     </style>
 </head>
 <body>
-    <div class="docs-container">
-        <a href="/" class="back-link">← Back to Dashboard</a>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Grid Iron Mind</h1>
+                <div class="version">API v1.0.0</div>
+            </div>
 
-        <div class="docs-header">
-            <h1>⚡ Grid Iron Mind API</h1>
-            <p class="version">Version 1.0.0 | RESTful JSON API</p>
-            <p style="color: var(--text-secondary); margin-top: 10px;">
-                Comprehensive NFL data API with player statistics, team information, game data, weather conditions,
-                career history, and AI-powered insights.
-            </p>
-        </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Getting Started</div>
+                <a href="#overview" class="nav-link">Overview</a>
+                <a href="#authentication" class="nav-link">Authentication</a>
+                <a href="#rate-limiting" class="nav-link">Rate Limiting</a>
+                <a href="#response-format" class="nav-link">Response Format</a>
+            </div>
 
-        <!-- Table of Contents -->
-        <div class="docs-nav">
-            <h3>📋 Table of Contents</h3>
-            <ul>
-                <li><a href="#overview">Overview</a></li>
-                <li><a href="#authentication">Authentication</a></li>
-                <li><a href="#rate-limiting">Rate Limiting</a></li>
-                <li><a href="#response-format">Response Format</a></li>
-                <li><a href="#endpoints-players">Players Endpoints</a></li>
-                <li><a href="#endpoints-teams">Teams Endpoints</a></li>
-                <li><a href="#endpoints-games">Games Endpoints</a></li>
-                <li><a href="#endpoints-stats">Stats Endpoints</a></li>
-                <li><a href="#endpoints-career">Career Endpoints</a></li>
-                <li><a href="#endpoints-weather">Weather Endpoints</a></li>
-                <li><a href="#endpoints-ai">AI Endpoints</a></li>
-                <li><a href="#endpoints-admin">Admin Endpoints</a></li>
-                <li><a href="#data-sources">Data Sources</a></li>
-                <li><a href="#error-codes">Error Codes</a></li>
-            </ul>
-        </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Core Endpoints</div>
+                <a href="#players" class="nav-link">Players</a>
+                <a href="#teams" class="nav-link">Teams</a>
+                <a href="#games" class="nav-link">Games</a>
+                <a href="#statistics" class="nav-link">Statistics</a>
+            </div>
 
-        <!-- Overview Section -->
-        <section id="overview" class="docs-section">
-            <h2>📖 Overview</h2>
-            <p>
-                Grid Iron Mind is a production-grade NFL data API providing comprehensive access to player statistics,
-                team information, historical game data, weather conditions, career trajectories, and AI-powered analytics.
-            </p>
+            <div class="nav-section">
+                <div class="nav-section-title">Advanced Features</div>
+                <a href="#defensive-stats" class="nav-link">Defensive Stats</a>
+                <a href="#injuries" class="nav-link">Injuries</a>
+                <a href="#career" class="nav-link">Career Stats</a>
+                <a href="#weather" class="nav-link">Weather</a>
+            </div>
 
-            <h3>Key Features</h3>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <h4>🏈 Player Data</h4>
-                    <p>Complete player profiles with biographical info, physical stats, draft history, and career timelines.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>🏟️ Team Information</h4>
-                    <p>All 32 NFL teams with stadium details, conference/division data, and current rosters.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>📊 Historical Stats</h4>
-                    <p>Season-by-season statistics dating back to rookie years with game-level granularity.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>🌦️ Weather Data</h4>
-                    <p>Game-day weather conditions including temperature, wind speed, venue type, and surface.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>🤖 AI Insights</h4>
-                    <p>Machine learning predictions for game outcomes, player performance, and analytics.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>⚡ Fast & Cached</h4>
-                    <p>Redis caching with 1-hour TTL for optimal performance and reduced latency.</p>
+            <div class="nav-section">
+                <div class="nav-section-title">AI Features</div>
+                <a href="#ai-endpoints" class="nav-link">AI Predictions</a>
+                <a href="#ai-garden" class="nav-link">AI Data Garden</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Reference</div>
+                <a href="#data-models" class="nav-link">Data Models</a>
+                <a href="#error-codes" class="nav-link">Error Codes</a>
+                <a href="#auto-fetch" class="nav-link">Auto-Fetch System</a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Grid Iron Mind API Documentation</h1>
+                <p class="subtitle">High-performance NFL data API with AI-powered insights</p>
+                <div style="margin-top: 1rem;">
+                    <code>https://nfl.wearemachina.com/api/v1</code>
+                    <span class="badge badge-success">v1.0.0</span>
                 </div>
             </div>
 
-            <h3>Base URL</h3>
-            <div class="code-block">
-                <pre>https://your-production-url.herokuapp.com/api/v1</pre>
-            </div>
+            <!-- Overview -->
+            <section id="overview">
+                <h2>Overview</h2>
+                <p>Grid Iron Mind is a comprehensive NFL data API providing real-time and historical statistics, player information, team data, game schedules, injury reports, and AI-powered insights.</p>
 
-            <h3>Technology Stack</h3>
-            <ul>
-                <li><strong>Language:</strong> Go 1.21+</li>
-                <li><strong>Database:</strong> PostgreSQL with pgx/v5</li>
-                <li><strong>Cache:</strong> Redis (optional)</li>
-                <li><strong>Data Sources:</strong> ESPN API, NFLverse API</li>
-                <li><strong>Hosting:</strong> Heroku</li>
-            </ul>
-        </section>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>⚡ High Performance</h4>
+                        <p>Sub-200ms response times with aggressive Redis caching</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🤖 AI-Powered</h4>
+                        <p>Claude 3.5 Sonnet and Grok with automatic fallback</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔄 Auto-Fetch</h4>
+                        <p>Automatically retrieves missing data on-demand</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Comprehensive</h4>
+                        <p>Complete NFL data from 2020-2025 seasons</p>
+                    </div>
+                </div>
 
-        <!-- Authentication Section -->
-        <section id="authentication" class="docs-section">
-            <h2>🔐 Authentication</h2>
-            <p>
-                Most endpoints are publicly accessible. AI endpoints require an API key for authentication.
-            </p>
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Players</strong>: Complete player profiles, stats, career history, injuries</li>
+                    <li><strong>Teams</strong>: All 32 NFL teams with rosters, stats, schedules</li>
+                    <li><strong>Games</strong>: Live scores, schedules, weather conditions, results</li>
+                    <li><strong>Statistics</strong>: Player and team stats, leaders, historical data</li>
+                    <li><strong>Defensive Analytics</strong>: Matchup analysis, rankings, player vs defense</li>
+                    <li><strong>AI Predictions</strong>: Game outcomes, player performance, insights</li>
+                    <li><strong>AI Data Garden</strong>: Self-healing database with natural language queries</li>
+                    <li><strong>Weather Data</strong>: Current, historical, and forecast weather</li>
+                </ul>
+            </section>
 
-            <h3>Public Endpoints</h3>
-            <p>The following endpoints do not require authentication:</p>
-            <ul>
-                <li>All <code>/api/v1/players</code> endpoints</li>
-                <li>All <code>/api/v1/teams</code> endpoints</li>
-                <li>All <code>/api/v1/games</code> endpoints</li>
-                <li>All <code>/api/v1/stats</code> endpoints</li>
-            </ul>
+            <!-- Authentication -->
+            <section id="authentication">
+                <h2>Authentication</h2>
 
-            <h3>API Key Authentication</h3>
-            <p>AI endpoints require an API key passed in the <code>X-API-Key</code> header:</p>
+                <h3>Public Endpoints</h3>
+                <p>Most endpoints are publicly accessible without authentication:</p>
+                <ul>
+                    <li>Players, Teams, Games</li>
+                    <li>Statistics, Weather</li>
+                    <li>Defensive stats, Injuries, Career stats</li>
+                </ul>
 
-            <div class="code-block">
-                <pre>curl -H "X-API-Key: your_api_key_here" \
-     https://api.example.com/api/v1/ai/query</pre>
-            </div>
+                <h3>Protected Endpoints (API Key Required)</h3>
+                <p>AI-powered endpoints require authentication via API key.</p>
 
-            <div class="info-box">
-                <strong>ℹ️ Note:</strong> Contact the administrator to generate an API key using the
-                <code>POST /api/v1/admin/keys/generate</code> endpoint.
-            </div>
-        </section>
+                <div class="info-box warning">
+                    <strong>⚠️ API Key Required</strong>
+                    All endpoints under <code>/api/v1/ai/*</code> and <code>/api/v1/garden/*</code> (except health check) require an API key.
+                </div>
 
-        <!-- Rate Limiting Section -->
-        <section id="rate-limiting" class="docs-section">
-            <h2>⏱️ Rate Limiting</h2>
+                <h4>Using Your API Key</h4>
+                <pre><code>// Header Method (Recommended)
+X-API-Key: your_api_key_here
 
-            <h3>Standard Endpoints</h3>
-            <p><strong>Limit:</strong> 100 requests per minute per IP address</p>
-            <p>Applied to all public endpoints (players, teams, games, stats).</p>
+// Bearer Token Method
+Authorization: Bearer your_api_key_here</code></pre>
 
-            <h3>AI Endpoints</h3>
-            <p><strong>Limit:</strong> 10 requests per minute per API key</p>
-            <p>Stricter limits for computationally expensive AI operations.</p>
-
-            <h3>Rate Limit Headers</h3>
-            <div class="code-block">
-                <pre>X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1640000000</pre>
-            </div>
-
-            <div class="warning-box">
-                <strong>⚠️ Warning:</strong> Exceeding rate limits returns <code>429 Too Many Requests</code>.
-                Implement exponential backoff for retry logic.
-            </div>
-        </section>
-
-        <!-- Response Format Section -->
-        <section id="response-format" class="docs-section">
-            <h2>📦 Response Format</h2>
-
-            <p>All responses are JSON formatted with a consistent structure:</p>
-
-            <h3>Success Response</h3>
-            <div class="code-block">
-                <pre>{
-  "success": true,
+                <h4>Generate an API Key</h4>
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/admin/keys/generate</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p><strong>Request Body:</strong></p>
+                        <pre><code>{
+  "description": "My Application",
+  "tier": "standard"
+}</code></pre>
+                        <p><strong>Response:</strong></p>
+                        <pre><code>{
   "data": {
-    // Response data here
-  },
-  "meta": {
-    "total": 100,
-    "page": 1,
-    "limit": 20,
-    "offset": 0
+    "api_key": "gim_1234567890abcdef...",
+    "description": "My Application",
+    "tier": "standard",
+    "created_at": "2025-10-01T12:00:00Z"
   }
-}</pre>
-            </div>
-
-            <h3>Error Response</h3>
-            <div class="code-block">
-                <pre>{
-  "success": false,
-  "error": {
-    "code": "INVALID_REQUEST",
-    "message": "Missing required parameter: player_id"
-  }
-}</pre>
-            </div>
-
-            <h3>Pagination</h3>
-            <p>List endpoints support pagination via query parameters:</p>
-            <ul>
-                <li><code>limit</code> - Number of items per page (default: 20, max: 100)</li>
-                <li><code>offset</code> - Number of items to skip (default: 0)</li>
-            </ul>
-        </section>
-
-        <!-- Players Endpoints -->
-        <section id="endpoints-players" class="docs-section">
-            <h2>👤 Players Endpoints</h2>
-
-            <!-- List Players -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/players</span>
+}</code></pre>
+                    </div>
                 </div>
-                <p class="endpoint-description">
-                    Retrieve a paginated list of NFL players with optional filtering by position, status, and team.
-                </p>
+            </section>
 
-                <h4>Query Parameters</h4>
-                <table class="param-table">
+            <!-- Rate Limiting -->
+            <section id="rate-limiting">
+                <h2>Rate Limiting</h2>
+
+                <table>
                     <thead>
                         <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
+                            <th>Endpoint Type</th>
+                            <th>Rate Limit</th>
+                            <th>Window</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="param-name">position</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Filter by position (QB, RB, WR, TE, etc.)</td>
+                            <td>Public Endpoints</td>
+                            <td>100 requests</td>
+                            <td>Per minute</td>
                         </tr>
                         <tr>
-                            <td><span class="param-name">status</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Filter by status (active, injured, inactive)</td>
+                            <td>AI Endpoints</td>
+                            <td>10 requests</td>
+                            <td>Per minute</td>
                         </tr>
                         <tr>
-                            <td><span class="param-name">team</span></td>
-                            <td><span class="param-type">uuid</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Filter by team ID</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">limit</span></td>
-                            <td><span class="param-type">integer</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Number of results (default: 20, max: 100)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">offset</span></td>
-                            <td><span class="param-type">integer</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Pagination offset (default: 0)</td>
+                            <td>Unlimited API Keys</td>
+                            <td>No limit</td>
+                            <td>-</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <h4>Example Request</h4>
-                <div class="code-block">
-                    <pre>GET /api/v1/players?position=QB&status=active&limit=10</pre>
-                </div>
+                <h3>Rate Limit Headers</h3>
+                <pre><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1696176000</code></pre>
 
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
+                <h3>Rate Limit Exceeded (429)</h3>
+                <pre><code>{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Rate limit exceeded",
+    "status": 429
+  }
+}</code></pre>
+            </section>
+
+            <!-- Response Format -->
+            <section id="response-format">
+                <h2>Response Format</h2>
+
+                <h3>Success Response (Single Resource)</h3>
+                <pre><code>{
+  "data": {
+    "id": "uuid",
+    "name": "Patrick Mahomes",
+    "position": "QB",
+    ...
+  },
+  "meta": {
+    "timestamp": "2025-10-01T12:00:00Z"
+  }
+}</code></pre>
+
+                <h3>Success Response (Collection)</h3>
+                <pre><code>{
+  "data": [
+    { "id": "uuid", ... },
+    { "id": "uuid", ... }
+  ],
+  "meta": {
+    "total": 150,
+    "limit": 50,
+    "offset": 0,
+    "timestamp": "2025-10-01T12:00:00Z"
+  }
+}</code></pre>
+
+                <h3>Error Response</h3>
+                <pre><code>{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Player not found",
+    "status": 404
+  }
+}</code></pre>
+
+                <h3>Special Headers</h3>
+                <ul>
+                    <li><code>X-Cache: HIT|MISS</code> - Cache status</li>
+                    <li><code>X-Auto-Fetched: true</code> - Data was auto-fetched</li>
+                    <li><code>X-AI-Provider: claude|grok</code> - AI provider used</li>
+                </ul>
+            </section>
+
+            <!-- Players Endpoints -->
+            <section id="players">
+                <h2>Players Endpoints</h2>
+
+                <!-- List Players -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/players</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get a paginated list of NFL players with optional filters.</p>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>limit</code></td>
+                                    <td>integer</td>
+                                    <td>Results per page (default: 50, max: 100)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>offset</code></td>
+                                    <td>integer</td>
+                                    <td>Pagination offset (default: 0)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>position</code></td>
+                                    <td>string</td>
+                                    <td>Filter by position (QB, RB, WR, TE, etc.)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>string</td>
+                                    <td>Filter by status (active, injured, inactive)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>team</code></td>
+                                    <td>uuid</td>
+                                    <td>Filter by team ID</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Example Request</h4>
+                        <pre><code>GET /api/v1/players?position=QB&limit=20&status=active</code></pre>
+
+                        <h4>Response</h4>
+                        <pre><code>{
   "data": [
     {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "nfl_id": 4046838,
       "name": "Patrick Mahomes",
       "position": "QB",
+      "team_id": "c1d6c4d6-3a8d-4e48-9c3a-8f7e6d5c4b3a",
       "jersey_number": 15,
-      "status": "active",
       "height_inches": 75,
-      "weight_pounds": 230,
+      "weight_pounds": 225,
+      "birth_date": "1995-09-17T00:00:00Z",
       "college": "Texas Tech",
       "draft_year": 2017,
       "draft_round": 1,
       "draft_pick": 10,
-      "years_pro": 7,
-      "rookie_year": 2017,
-      "birth_city": "Tyler",
-      "birth_state": "TX",
-      "espn_athlete_id": "3139477",
-      "headshot_url": "https://a.espncdn.com/...",
-      "created_at": "2024-01-01T00:00:00Z"
+      "status": "active",
+      "headshot_url": "https://...",
+      "created_at": "2024-09-30T12:00:00Z",
+      "updated_at": "2024-10-01T12:00:00Z"
     }
   ],
   "meta": {
-    "total": 45,
-    "limit": 10,
-    "offset": 0
-  }
-}</pre>
-                </div>
-            </div>
-
-            <!-- Get Player by ID -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/players/{id}</span>
-                </div>
-                <p class="endpoint-description">
-                    Retrieve detailed information for a specific player by their UUID.
-                </p>
-
-                <h4>Path Parameters</h4>
-                <table class="param-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="param-name">id</span></td>
-                            <td><span class="param-type">uuid</span></td>
-                            <td><span class="required">Required</span></td>
-                            <td>Player UUID</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4>Example Request</h4>
-                <div class="code-block">
-                    <pre>GET /api/v1/players/550e8400-e29b-41d4-a716-446655440000</pre>
-                </div>
-            </div>
-        </section>
-
-        <!-- Teams Endpoints -->
-        <section id="endpoints-teams" class="docs-section">
-            <h2>🏟️ Teams Endpoints</h2>
-
-            <!-- List Teams -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/teams</span>
-                </div>
-                <p class="endpoint-description">
-                    Retrieve all 32 NFL teams with stadium and location information.
-                </p>
-
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
-  "data": [
-    {
-      "id": "660e8400-e29b-41d4-a716-446655440000",
-      "name": "Kansas City Chiefs",
-      "abbreviation": "KC",
-      "city": "Kansas City",
-      "state": "MO",
-      "conference": "AFC",
-      "division": "West",
-      "stadium": "GEHA Field at Arrowhead Stadium",
-      "stadium_latitude": 39.0489,
-      "stadium_longitude": -94.4839,
-      "venue_type": "outdoor",
-      "venue_surface": "grass",
-      "venue_capacity": 76416,
-      "espn_team_id": "12",
-      "created_at": "2024-01-01T00:00:00Z"
-    }
-  ]
-}</pre>
-                </div>
-            </div>
-
-            <!-- Get Team by ID -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/teams/{id}</span>
-                </div>
-                <p class="endpoint-description">
-                    Retrieve detailed information for a specific team by UUID.
-                </p>
-            </div>
-
-            <!-- Get Team Players -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/teams/{id}/players</span>
-                </div>
-                <p class="endpoint-description">
-                    Get the current roster for a specific team.
-                </p>
-
-                <h4>Example Request</h4>
-                <div class="code-block">
-                    <pre>GET /api/v1/teams/660e8400-e29b-41d4-a716-446655440000/players</pre>
-                </div>
-            </div>
-        </section>
-
-        <!-- Games Endpoints -->
-        <section id="endpoints-games" class="docs-section">
-            <h2>🏈 Games Endpoints</h2>
-
-            <!-- List Games -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/games</span>
-                </div>
-                <p class="endpoint-description">
-                    Retrieve games with optional filters for season, week, team, and status. Includes weather data and venue information.
-                </p>
-
-                <h4>Query Parameters</h4>
-                <table class="param-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="param-name">season</span></td>
-                            <td><span class="param-type">integer</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Filter by season year (e.g., 2024)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">week</span></td>
-                            <td><span class="param-type">integer</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Filter by week number (1-18)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">team</span></td>
-                            <td><span class="param-type">uuid</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Filter by team ID (home or away)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">status</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Filter by status (scheduled, in_progress, final)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
-  "data": [
-    {
-      "id": "770e8400-e29b-41d4-a716-446655440000",
-      "nfl_game_id": "401547420",
-      "season": 2024,
-      "week": 15,
-      "game_date": "2024-12-21T20:15:00Z",
-      "home_team_id": "660e8400-e29b-41d4-a716-446655440000",
-      "away_team_id": "770e8400-e29b-41d4-a716-446655440001",
-      "home_team": "Kansas City Chiefs",
-      "away_team": "Buffalo Bills",
-      "home_score": 27,
-      "away_score": 24,
-      "status": "final",
-      "weather_temp": 32,
-      "weather_condition": "Clear",
-      "weather_wind_speed": 12,
-      "weather_humidity": 65,
-      "venue_name": "GEHA Field at Arrowhead Stadium",
-      "venue_city": "Kansas City",
-      "venue_type": "outdoor",
-      "venue_surface": "grass",
-      "created_at": "2024-12-15T00:00:00Z"
-    }
-  ],
-  "meta": {
-    "total": 256,
+    "total": 1875,
     "limit": 20,
-    "offset": 0
+    "offset": 0,
+    "timestamp": "2025-10-01T12:00:00Z"
   }
-}</pre>
-                </div>
-            </div>
-
-            <!-- Get Game by ID -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/games/{id}</span>
-                </div>
-                <p class="endpoint-description">
-                    Retrieve detailed information for a specific game including weather and venue data.
-                </p>
-            </div>
-
-            <!-- Get Game Stats -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/games/{id}/stats</span>
-                </div>
-                <p class="endpoint-description">
-                    Get player statistics for a specific game.
-                </p>
-
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
-  "data": [
-    {
-      "id": "880e8400-e29b-41d4-a716-446655440000",
-      "player_id": "550e8400-e29b-41d4-a716-446655440000",
-      "player_name": "Patrick Mahomes",
-      "position": "QB",
-      "game_id": "770e8400-e29b-41d4-a716-446655440000",
-      "team_id": "660e8400-e29b-41d4-a716-446655440000",
-      "season": 2024,
-      "week": 15,
-      "passing_yards": 320,
-      "passing_touchdowns": 3,
-      "passing_interceptions": 1,
-      "passing_completions": 28,
-      "passing_attempts": 38,
-      "rushing_yards": 25,
-      "rushing_touchdowns": 0,
-      "rushing_attempts": 4,
-      "receiving_yards": 0,
-      "receiving_touchdowns": 0,
-      "receiving_receptions": 0,
-      "receiving_targets": 0
-    }
-  ]
-}</pre>
-                </div>
-            </div>
-        </section>
-
-        <!-- Stats Endpoints -->
-        <section id="endpoints-stats" class="docs-section">
-            <h2>📊 Stats Endpoints</h2>
-
-            <!-- Stats Leaders -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/stats/leaders</span>
-                </div>
-                <p class="endpoint-description">
-                    Get statistical leaders by category for a given season.
-                </p>
-
-                <h4>Query Parameters</h4>
-                <table class="param-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="param-name">category</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="required">Required</span></td>
-                            <td>Stat category (passing_yards, passing_touchdowns, rushing_yards, rushing_touchdowns, receiving_yards, receiving_touchdowns)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">season</span></td>
-                            <td><span class="param-type">integer</span></td>
-                            <td><span class="required">Required</span></td>
-                            <td>Season year</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">limit</span></td>
-                            <td><span class="param-type">integer</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Number of leaders (default: 10)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4>Example Request</h4>
-                <div class="code-block">
-                    <pre>GET /api/v1/stats/leaders?category=passing_yards&season=2024&limit=10</pre>
+}</code></pre>
+                    </div>
                 </div>
 
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
-  "data": [
-    {
-      "player_id": "550e8400-e29b-41d4-a716-446655440000",
-      "player_name": "Patrick Mahomes",
-      "position": "QB",
-      "jersey_number": 15,
-      "team_id": "660e8400-e29b-41d4-a716-446655440000",
-      "team_abbr": "KC",
-      "category": "passing_yards",
-      "total_stat": 4839,
-      "games_played": 17
-    }
-  ]
-}</pre>
+                <!-- Get Single Player -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/players/:id</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get detailed information for a single player.</p>
+
+                        <h4>Path Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>uuid</td>
+                                    <td>Player UUID (required)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Example Request</h4>
+                        <pre><code>GET /api/v1/players/a1b2c3d4-e5f6-7890-abcd-ef1234567890</code></pre>
+                    </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Career Endpoints -->
-        <section id="endpoints-career" class="docs-section">
-            <h2>📈 Career & History Endpoints</h2>
+                <!-- Player Career Stats -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/players/:id/career</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get career statistics and team history for a player.</p>
 
-            <!-- Player Career Stats -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/players/{id}/career</span>
-                </div>
-                <p class="endpoint-description">
-                    Get complete career statistics for a player, including season-by-season breakdown and team history.
-                    <strong>Cached for 1 hour.</strong>
-                </p>
-
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
+                        <h4>Example Response</h4>
+                        <pre><code>{
   "data": {
-    "player_id": "550e8400-e29b-41d4-a716-446655440000",
+    "player_id": "uuid",
     "total_seasons": 7,
-    "team_history": [
-      {
-        "team_id": "660e8400-e29b-41d4-a716-446655440000",
-        "team_name": "Kansas City Chiefs",
-        "position": "QB",
-        "season_start": 2017,
-        "season_end": null,
-        "is_current": true
-      }
-    ],
     "career_stats": [
       {
         "season": 2024,
         "team_name": "Kansas City Chiefs",
         "games_played": 17,
         "passing_yards": 4839,
-        "passing_tds": 38,
-        "rushing_yards": 358,
-        "rushing_tds": 2,
-        "receptions": 0,
-        "receiving_yards": 0,
-        "receiving_tds": 0
+        "passing_tds": 41,
+        "rushing_yards": 284,
+        "rushing_tds": 4
+      }
+    ],
+    "team_history": [
+      {
+        "team_name": "Kansas City Chiefs",
+        "position": "QB",
+        "season_start": 2017,
+        "season_end": null,
+        "is_current": true
       }
     ]
   }
-}</pre>
-                </div>
-            </div>
-
-            <!-- Player Team History -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/players/{id}/history</span>
-                </div>
-                <p class="endpoint-description">
-                    Get team history for a player showing all teams they've played for throughout their career.
-                </p>
-            </div>
-        </section>
-
-        <!-- Weather Endpoints -->
-        <section id="endpoints-weather" class="docs-section">
-            <h2>🌦️ Weather Endpoints</h2>
-
-            <p>Real-time and historical weather data powered by WeatherAPI.com. Get current conditions, historical data, and forecasts for any location.</p>
-
-            <!-- Current Weather -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/weather/current</span>
-                </div>
-                <p class="endpoint-description">
-                    Get current weather conditions for a specific location or coordinates.
-                </p>
-
-                <h4>Query Parameters</h4>
-                <table class="param-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="param-name">location</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="optional">Optional*</span></td>
-                            <td>Location name (e.g., "Kansas City, MO")</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">lat</span></td>
-                            <td><span class="param-type">float</span></td>
-                            <td><span class="optional">Optional*</span></td>
-                            <td>Latitude coordinate</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">lon</span></td>
-                            <td><span class="param-type">float</span></td>
-                            <td><span class="optional">Optional*</span></td>
-                            <td>Longitude coordinate</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <p><em>* Either <code>location</code> or both <code>lat</code> and <code>lon</code> are required</em></p>
-
-                <h4>Example Request</h4>
-                <div class="code-block">
-                    <pre>GET /api/v1/weather/current?location=Kansas+City,MO
-GET /api/v1/weather/current?lat=39.0489&lon=-94.4839</pre>
+}</code></pre>
+                    </div>
                 </div>
 
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
+                <!-- Player Injuries -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/players/:id/injuries</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get injury reports for a specific player.</p>
+                    </div>
+                </div>
+
+                <!-- Player vs Defense -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/players/:playerId/vs-defense/:teamId</span>
+                        <span class="badge badge-primary">New</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get historical performance data for a player against a specific defense.</p>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>season</code></td>
+                                    <td>integer</td>
+                                    <td>Filter to specific season (optional)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>limit</code></td>
+                                    <td>integer</td>
+                                    <td>Number of games (default: 5, max: 50)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Example</h4>
+                        <pre><code>GET /api/v1/players/abc.../vs-defense/def...?season=2024</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Teams Endpoints -->
+            <section id="teams">
+                <h2>Teams Endpoints</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/teams</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get all 32 NFL teams with stadium and location data.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/teams/:id</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get detailed information for a single team.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/teams/:id/players</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get current roster for a team.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/teams/:id/injuries</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get injury report for a team grouped by status.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/teams/:teamId/defense/stats</span>
+                        <span class="badge badge-primary">New</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get comprehensive defensive statistics for a team.</p>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>season</code></td>
+                                    <td>integer</td>
+                                    <td>NFL season year (required)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>week</code></td>
+                                    <td>integer</td>
+                                    <td>Specific week (1-18, optional)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Games Endpoints -->
+            <section id="games">
+                <h2>Games Endpoints</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/games</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get games with optional filters for season, week, team, and status.</p>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>season</code></td>
+                                    <td>integer</td>
+                                    <td>Filter by season (e.g., 2024)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>week</code></td>
+                                    <td>integer</td>
+                                    <td>Filter by week (1-18)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>team</code></td>
+                                    <td>uuid</td>
+                                    <td>Filter by team ID</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>string</td>
+                                    <td>Filter by status (scheduled, in_progress, final)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="info-box info">
+                            <strong>🔄 Auto-Fetch Enabled</strong>
+                            If no games are found for a requested season/week, the system automatically fetches the schedule from ESPN API.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/games/:id</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get detailed information for a single game including weather conditions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Endpoints -->
+            <section id="statistics">
+                <h2>Statistics Endpoints</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/stats/game/:gameId</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get player statistics for a specific game.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/stats/leaders</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get statistical leaders by category.</p>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>season</code></td>
+                                    <td>integer</td>
+                                    <td>Season year (required)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>category</code></td>
+                                    <td>string</td>
+                                    <td>passing_yards, passing_tds, rushing_yards, etc. (required)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>limit</code></td>
+                                    <td>integer</td>
+                                    <td>Number of leaders (default: 10, max: 50)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Defensive Stats -->
+            <section id="defensive-stats">
+                <h2>Defensive Statistics</h2>
+
+                <div class="info-box success">
+                    <strong>✨ New Feature</strong>
+                    Comprehensive defensive analytics for fantasy football matchup analysis.
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/defense/rankings</span>
+                        <span class="badge badge-primary">New</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get league-wide defensive rankings by category.</p>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Options</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>season</code></td>
+                                    <td>integer</td>
+                                    <td>Required</td>
+                                </tr>
+                                <tr>
+                                    <td><code>category</code></td>
+                                    <td>string</td>
+                                    <td>overall, pass, rush, points_allowed (default: overall)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Example</h4>
+                        <pre><code>GET /api/v1/defense/rankings?season=2024&category=pass</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weather -->
+            <section id="weather">
+                <h2>Weather Endpoints</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/weather/current</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get current weather conditions for a location.</p>
+
+                        <h4>Query Parameters (one required)</h4>
+                        <ul>
+                            <li><code>location</code> - City, State (e.g., "Kansas City, MO")</li>
+                            <li><code>lat</code> + <code>lon</code> - Coordinates</li>
+                        </ul>
+
+                        <h4>Example</h4>
+                        <pre><code>GET /api/v1/weather/current?location=Kansas+City,MO</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/weather/historical</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get historical weather for a specific date.</p>
+
+                        <h4>Query Parameters</h4>
+                        <ul>
+                            <li><code>location</code> OR <code>lat</code>+<code>lon</code> (required)</li>
+                            <li><code>date</code> - Format: YYYY-MM-DD (required)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/weather/forecast</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get weather forecast for upcoming days.</p>
+
+                        <h4>Query Parameters</h4>
+                        <ul>
+                            <li><code>location</code> OR <code>lat</code>+<code>lon</code> (required)</li>
+                            <li><code>days</code> - Number of days (default: 7, max: 14)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Endpoints -->
+            <section id="ai-endpoints">
+                <h2>AI Prediction Endpoints</h2>
+
+                <div class="info-box warning">
+                    <strong>🔐 Authentication Required</strong>
+                    All AI endpoints require an API key via <code>X-API-Key</code> header.
+                </div>
+
+                <div class="info-box info">
+                    <strong>🤖 Multi-Provider AI</strong>
+                    Uses Claude 3.5 Sonnet as primary with automatic fallback to Grok. The <code>ai_provider</code> field indicates which AI was used.
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/ai/predict/game/:gameId</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get AI-powered game outcome prediction with confidence scores.</p>
+
+                        <h4>Example Response</h4>
+                        <pre><code>{
   "data": {
-    "temp_f": 45.0,
-    "temp_c": 7.2,
-    "condition": {
-      "text": "Partly cloudy",
-      "icon": "//cdn.weatherapi.com/weather/64x64/day/116.png",
-      "code": 1003
+    "game_id": "uuid",
+    "home_team": "Kansas City Chiefs",
+    "away_team": "Las Vegas Raiders",
+    "prediction": {
+      "winner": "Kansas City Chiefs",
+      "confidence": 78.5,
+      "predicted_score": {
+        "home": 27,
+        "away": 20
+      },
+      "key_factors": [
+        "Home field advantage",
+        "QB performance differential"
+      ]
     },
-    "wind_mph": 12.5,
-    "wind_dir": "NW",
-    "humidity": 65,
-    "feelslike_f": 38.0,
-    "vis_miles": 10.0,
-    "uv": 3.0,
-    "gust_mph": 18.2
+    "ai_provider": "claude"
   }
-}</pre>
+}</code></pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Historical Weather -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/weather/historical</span>
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/ai/predict/player/:playerId</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get AI-powered player performance prediction for next game.</p>
+                    </div>
                 </div>
-                <p class="endpoint-description">
-                    Get historical weather data for a specific date and location. Perfect for analyzing game-day conditions.
-                </p>
 
-                <h4>Query Parameters</h4>
-                <table class="param-table">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/ai/insights/player/:playerId</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get comprehensive AI analysis of a player including strengths, weaknesses, and fantasy outlook.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/ai/query</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Ask natural language questions about NFL data.</p>
+
+                        <h4>Request Body</h4>
+                        <pre><code>{
+  "query": "Who are the top 5 running backs this season?"
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Data Garden -->
+            <section id="ai-garden">
+                <h2>AI Data Garden</h2>
+
+                <p>Self-healing database system powered by AI that monitors data health, automatically fixes issues, and provides natural language data access.</p>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/garden/health</span>
+                        <span class="badge badge-success">Public</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Run AI-powered health check on database without auto-healing.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/garden/health</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Run health check and automatically fix detected issues.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/garden/query</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Query the database using natural language.</p>
+
+                        <h4>Example Request</h4>
+                        <pre><code>{
+  "query": "Show me all games where weather was below 32 degrees"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method post">POST</span>
+                        <span class="endpoint-path">/api/v1/garden/enrich/player/:playerId</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Enrich player data with AI-generated insights.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="http-method get">GET</span>
+                        <span class="endpoint-path">/api/v1/garden/status</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p>Get current status of the AI Data Garden system.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Models -->
+            <section id="data-models">
+                <h2>Data Models</h2>
+
+                <h3>Player</h3>
+                <pre><code>{
+  id: UUID
+  nfl_id: number
+  name: string
+  position: string
+  team_id: UUID | null
+  jersey_number: number | null
+  height_inches: number | null
+  weight_pounds: number | null
+  birth_date: Date | null
+  college: string | null
+  draft_year: number | null
+  draft_round: number | null
+  draft_pick: number | null
+  status: "active" | "injured" | "inactive"
+  headshot_url: string | null
+  created_at: Date
+  updated_at: Date
+}</code></pre>
+
+                <h3>Team</h3>
+                <pre><code>{
+  id: UUID
+  nfl_id: number
+  name: string
+  abbreviation: string
+  city: string
+  conference: "AFC" | "NFC"
+  division: "North" | "South" | "East" | "West"
+  logo_url: string
+  stadium_name: string
+  stadium_city: string
+  stadium_state: string
+  stadium_capacity: number
+  stadium_surface: string
+  stadium_type: "outdoor" | "indoor" | "retractable"
+  stadium_lat: number
+  stadium_lon: number
+}</code></pre>
+
+                <h3>Game</h3>
+                <pre><code>{
+  id: UUID
+  nfl_game_id: string
+  season: number
+  week: number
+  game_type: "regular" | "playoff" | "preseason"
+  home_team_id: UUID
+  away_team_id: UUID
+  home_score: number | null
+  away_score: number | null
+  status: "scheduled" | "in_progress" | "final"
+  game_date: Date
+  venue_name: string
+  weather_temp: number | null
+  weather_condition: string | null
+}</code></pre>
+            </section>
+
+            <!-- Error Codes -->
+            <section id="error-codes">
+                <h2>Error Codes</h2>
+
+                <table>
                     <thead>
                         <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Required</th>
+                            <th>Code</th>
+                            <th>Status</th>
                             <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="param-name">location</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="optional">Optional*</span></td>
-                            <td>Location name</td>
+                            <td><code>BAD_REQUEST</code></td>
+                            <td>400</td>
+                            <td>Invalid request parameters</td>
                         </tr>
                         <tr>
-                            <td><span class="param-name">lat</span></td>
-                            <td><span class="param-type">float</span></td>
-                            <td><span class="optional">Optional*</span></td>
-                            <td>Latitude coordinate</td>
+                            <td><code>UNAUTHORIZED</code></td>
+                            <td>401</td>
+                            <td>Missing or invalid API key</td>
                         </tr>
                         <tr>
-                            <td><span class="param-name">lon</span></td>
-                            <td><span class="param-type">float</span></td>
-                            <td><span class="optional">Optional*</span></td>
-                            <td>Longitude coordinate</td>
+                            <td><code>NOT_FOUND</code></td>
+                            <td>404</td>
+                            <td>Resource not found</td>
                         </tr>
                         <tr>
-                            <td><span class="param-name">date</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="required">Required</span></td>
-                            <td>Date in YYYY-MM-DD format</td>
+                            <td><code>METHOD_NOT_ALLOWED</code></td>
+                            <td>405</td>
+                            <td>HTTP method not allowed</td>
+                        </tr>
+                        <tr>
+                            <td><code>RATE_LIMIT_EXCEEDED</code></td>
+                            <td>429</td>
+                            <td>Too many requests</td>
+                        </tr>
+                        <tr>
+                            <td><code>INTERNAL_ERROR</code></td>
+                            <td>500</td>
+                            <td>Server error</td>
+                        </tr>
+                        <tr>
+                            <td><code>AI_UNAVAILABLE</code></td>
+                            <td>503</td>
+                            <td>AI service not configured</td>
                         </tr>
                     </tbody>
                 </table>
+            </section>
 
-                <h4>Example Request</h4>
-                <div class="code-block">
-                    <pre>GET /api/v1/weather/historical?location=Kansas+City,MO&date=2024-12-21</pre>
-                </div>
+            <!-- Auto-Fetch -->
+            <section id="auto-fetch">
+                <h2>Auto-Fetch System</h2>
 
-                <h4>Example Response</h4>
-                <div class="code-block">
-                    <pre>{
-  "success": true,
-  "data": {
-    "location": {
-      "name": "Kansas City",
-      "region": "Missouri",
-      "country": "United States of America",
-      "lat": 39.1,
-      "lon": -94.58
-    },
-    "day": {
-      "maxtemp_f": 48.0,
-      "mintemp_f": 32.0,
-      "avgtemp_f": 40.0,
-      "maxwind_mph": 15.0,
-      "totalprecip_in": 0.0,
-      "avghumidity": 70.0,
-      "condition": {
-        "text": "Partly cloudy"
-      }
-    },
-    "date": "2024-12-21"
-  }
-}</pre>
-                </div>
-            </div>
+                <p>The API includes intelligent auto-fetching that automatically retrieves missing data when queried.</p>
 
-            <!-- Forecast Weather -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/v1/weather/forecast</span>
+                <h3>How It Works</h3>
+                <ol>
+                    <li>You query an endpoint (e.g., <code>/api/v1/games?season=2025&week=1</code>)</li>
+                    <li>If the database returns empty results:
+                        <ul>
+                            <li>System automatically fetches data from ESPN API</li>
+                            <li>Stores it in the database</li>
+                            <li>Returns the freshly fetched data</li>
+                        </ul>
+                    </li>
+                    <li>Response includes <code>X-Auto-Fetched: true</code> header</li>
+                </ol>
+
+                <h3>Supported Auto-Fetch</h3>
+                <ul>
+                    <li><strong>Games</strong>: Automatically fetches game schedules</li>
+                    <li><strong>Players</strong>: Fetches rosters when individual player missing</li>
+                    <li><strong>Stats</strong>: Fetches game statistics from NFLverse</li>
+                    <li><strong>Teams</strong>: Ensures all 32 teams exist</li>
+                </ul>
+
+                <div class="info-box info">
+                    <strong>⚡ Performance Note</strong>
+                    The first request may take 2-10 seconds while data is fetched, but subsequent requests are served instantly from the database.
                 </div>
-                <p class="endpoint-description">
-                    Get weather forecast for upcoming days (1-10 days ahead).
+            </section>
+
+            <!-- Footer -->
+            <section style="border-top: 2px solid var(--border); padding-top: 2rem; margin-top: 4rem;">
+                <h3>Support & Resources</h3>
+                <ul>
+                    <li><strong>API Base URL</strong>: <code>https://nfl.wearemachina.com/api/v1</code></li>
+                    <li><strong>Dashboard</strong>: <a href="https://nfl.wearemachina.com">https://nfl.wearemachina.com</a></li>
+                    <li><strong>Health Check</strong>: <a href="https://nfl.wearemachina.com/health">https://nfl.wearemachina.com/health</a></li>
+                </ul>
+                <p style="margin-top: 2rem; color: var(--gray);">
+                    <strong>Last Updated:</strong> October 1, 2025<br>
+                    <strong>Version:</strong> 1.0.0
                 </p>
+            </section>
+        </main>
+    </div>
 
-                <h4>Query Parameters</h4>
-                <table class="param-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="param-name">location</span></td>
-                            <td><span class="param-type">string</span></td>
-                            <td><span class="required">Required</span></td>
-                            <td>Location name</td>
-                        </tr>
-                        <tr>
-                            <td><span class="param-name">days</span></td>
-                            <td><span class="param-type">integer</span></td>
-                            <td><span class="optional">Optional</span></td>
-                            <td>Number of forecast days (1-10, default: 7)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4>Example Request</h4>
-                <div class="code-block">
-                    <pre>GET /api/v1/weather/forecast?location=Kansas+City,MO&days=7</pre>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Endpoints -->
-        <section id="endpoints-ai" class="docs-section">
-            <h2>🤖 AI Endpoints</h2>
-
-            <div class="warning-box">
-                <strong>⚠️ Authentication Required:</strong> All AI endpoints require an API key via the <code>X-API-Key</code> header.
-                Rate limited to 10 requests/minute.
-            </div>
-
-            <!-- AI Game Prediction -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/ai/predict/game/{gameId}</span>
-                    <span class="auth-required">🔑 AUTH REQUIRED</span>
-                </div>
-                <p class="endpoint-description">
-                    Predict game outcomes using machine learning models based on historical data, weather, and team performance.
-                </p>
-            </div>
-
-            <!-- AI Player Prediction -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/ai/predict/player/{playerId}</span>
-                    <span class="auth-required">🔑 AUTH REQUIRED</span>
-                </div>
-                <p class="endpoint-description">
-                    Predict player performance for upcoming games based on historical trends, opponent strength, and conditions.
-                </p>
-            </div>
-
-            <!-- AI Player Insights -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/ai/insights/player/{playerId}</span>
-                    <span class="auth-required">🔑 AUTH REQUIRED</span>
-                </div>
-                <p class="endpoint-description">
-                    Generate AI-powered insights and analysis for a player's performance, strengths, and weaknesses.
-                </p>
-            </div>
-
-            <!-- AI Natural Query -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/ai/query</span>
-                    <span class="auth-required">🔑 AUTH REQUIRED</span>
-                </div>
-                <p class="endpoint-description">
-                    Process natural language queries about NFL data and return intelligent responses.
-                </p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "query": "Who are the top 5 quarterbacks by passing yards in 2024?"
-}</pre>
-                </div>
-            </div>
-        </section>
-
-        <!-- Admin Endpoints -->
-        <section id="endpoints-admin" class="docs-section">
-            <h2>⚙️ Admin Endpoints</h2>
-
-            <p>Admin endpoints for data synchronization and management. These trigger background jobs.</p>
-
-            <!-- Sync Teams -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/teams</span>
-                </div>
-                <p class="endpoint-description">Sync all NFL teams from ESPN API.</p>
-            </div>
-
-            <!-- Sync Rosters -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/rosters</span>
-                </div>
-                <p class="endpoint-description">Sync current rosters for all teams from ESPN API.</p>
-            </div>
-
-            <!-- Sync Games -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/games</span>
-                </div>
-                <p class="endpoint-description">Sync current season games and scores.</p>
-            </div>
-
-            <!-- Full Sync -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/full</span>
-                </div>
-                <p class="endpoint-description">Perform full sync: teams → rosters → games (in sequence).</p>
-            </div>
-
-            <!-- Historical Season Sync -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/historical/season</span>
-                </div>
-                <p class="endpoint-description">Sync historical games for a specific season.</p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "year": 2023
-}</pre>
-                </div>
-            </div>
-
-            <!-- Multiple Seasons Sync -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/historical/seasons</span>
-                </div>
-                <p class="endpoint-description">Sync historical games for multiple seasons.</p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "start_year": 2020,
-  "end_year": 2023
-}</pre>
-                </div>
-            </div>
-
-            <!-- NFLverse Stats Sync -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/nflverse/stats</span>
-                </div>
-                <p class="endpoint-description">Enrich player stats with NFLverse data including fantasy points and advanced metrics.</p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "season": 2024
-}</pre>
-                </div>
-            </div>
-
-            <!-- NFLverse Schedule Sync -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/nflverse/schedule</span>
-                </div>
-                <p class="endpoint-description">Enrich games with weather and venue data from NFLverse.</p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "season": 2024
-}</pre>
-                </div>
-            </div>
-
-            <!-- Weather Enrichment -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/weather</span>
-                </div>
-                <p class="endpoint-description">Enrich games with historical weather data from WeatherAPI.com using stadium coordinates.</p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "season": 2024
-}</pre>
-                </div>
-
-                <div class="info-box">
-                    <strong>ℹ️ Note:</strong> Uses stadium coordinates to fetch historical weather including temperature, conditions, wind speed, and humidity. Rate-limited to 500ms between requests.
-                </div>
-            </div>
-
-            <!-- NFLverse Next Gen Stats -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/sync/nflverse/nextgen</span>
-                </div>
-                <p class="endpoint-description">Sync Next Gen Stats (advanced tracking metrics).</p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "season": 2024,
-  "stat_type": "passing"
-}</pre>
-                </div>
-
-                <p><strong>Valid stat types:</strong> passing, rushing, receiving</p>
-            </div>
-
-            <!-- Generate API Key -->
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/v1/admin/keys/generate</span>
-                </div>
-                <p class="endpoint-description">Generate a new API key for accessing AI endpoints.</p>
-
-                <h4>Request Body</h4>
-                <div class="code-block">
-                    <pre>{
-  "name": "Dashboard API Key",
-  "description": "Unlimited access for dashboard"
-}</pre>
-                </div>
-            </div>
-        </section>
-
-        <!-- Data Sources Section -->
-        <section id="data-sources" class="docs-section">
-            <h2>🗂️ Data Sources</h2>
-
-            <h3>ESPN API</h3>
-            <p>Primary data source for:</p>
-            <ul>
-                <li>Player biographical information</li>
-                <li>Team information and logos</li>
-                <li>Current season games and scores</li>
-                <li>Player headshots and images</li>
-            </ul>
-
-            <h3>NFLverse API</h3>
-            <p>Secondary enrichment source for:</p>
-            <ul>
-                <li>Advanced player statistics (EPA, CPOE, etc.)</li>
-                <li>Fantasy points (Standard, PPR, Half-PPR)</li>
-                <li>Venue details (surface type, capacity)</li>
-                <li>Next Gen Stats (tracking data)</li>
-                <li>Play-by-play data</li>
-            </ul>
-
-            <h3>WeatherAPI.com</h3>
-            <p>Real-time and historical weather data for:</p>
-            <ul>
-                <li>Current weather conditions for any location</li>
-                <li>Historical weather data for game analysis</li>
-                <li>Weather forecasts for upcoming games</li>
-                <li>Game enrichment with temperature, wind, humidity, and conditions</li>
-                <li>Coordinate-based queries using stadium locations</li>
-            </ul>
-
-            <div class="info-box">
-                <strong>ℹ️ Data Freshness:</strong> Games and scores are synced in real-time during game days.
-                Player stats and career data are cached for 1 hour. Historical data is static once imported.
-                Weather data is fetched on-demand or during game enrichment processes.
-            </div>
-        </section>
-
-        <!-- Error Codes Section -->
-        <section id="error-codes" class="docs-section">
-            <h2>❌ Error Codes</h2>
-
-            <table class="param-table">
-                <thead>
-                    <tr>
-                        <th>HTTP Status</th>
-                        <th>Error Code</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>400</td>
-                        <td><span class="param-name">INVALID_REQUEST</span></td>
-                        <td>Malformed request or missing required parameters</td>
-                    </tr>
-                    <tr>
-                        <td>401</td>
-                        <td><span class="param-name">UNAUTHORIZED</span></td>
-                        <td>Missing or invalid API key</td>
-                    </tr>
-                    <tr>
-                        <td>404</td>
-                        <td><span class="param-name">NOT_FOUND</span></td>
-                        <td>Resource not found</td>
-                    </tr>
-                    <tr>
-                        <td>429</td>
-                        <td><span class="param-name">RATE_LIMIT_EXCEEDED</span></td>
-                        <td>Too many requests, rate limit exceeded</td>
-                    </tr>
-                    <tr>
-                        <td>500</td>
-                        <td><span class="param-name">INTERNAL_ERROR</span></td>
-                        <td>Internal server error</td>
-                    </tr>
-                    <tr>
-                        <td>503</td>
-                        <td><span class="param-name">SERVICE_UNAVAILABLE</span></td>
-                        <td>Service temporarily unavailable</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3>Error Response Example</h3>
-            <div class="code-block">
-                <pre>{
-  "success": false,
-  "error": {
-    "code": "RATE_LIMIT_EXCEEDED",
-    "message": "Rate limit exceeded. Please retry after 60 seconds."
-  }
-}</pre>
-            </div>
-        </section>
-
-        <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--border);">
-            <p style="color: var(--text-secondary);">
-                Built with ❤️ for NFL data enthusiasts and AI developers
-            </p>
-            <p style="color: var(--text-secondary); margin-top: 10px;">
-                <a href="/" style="color: var(--primary);">← Back to Dashboard</a> |
-                <a href="/health" style="color: var(--primary);">API Health</a>
-            </p>
-        </div>
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        ↑
     </div>
 
     <script>
-        // Dark mode sync
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
+        // Back to top button visibility
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                    // Update active link
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight active section on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>
