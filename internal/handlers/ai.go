@@ -17,20 +17,18 @@ import (
 )
 
 type AIHandler struct {
-	aiClient      *ai.Client
+	aiService     *ai.Service
 	gameQueries   *db.GameQueries
 	playerQueries *db.PlayerQueries
 	teamQueries   *db.TeamQueries
 }
 
 func NewAIHandler(cfg *config.Config) *AIHandler {
-	var aiClient *ai.Client
-	if cfg.ClaudeAPIKey != "" {
-		aiClient = ai.NewClient(cfg.ClaudeAPIKey)
-	}
+	// Initialize AI service with both Claude and Grok support
+	aiService := ai.NewService(cfg.ClaudeAPIKey, cfg.GrokAPIKey)
 
 	return &AIHandler{
-		aiClient:      aiClient,
+		aiService:     aiService,
 		gameQueries:   &db.GameQueries{},
 		playerQueries: &db.PlayerQueries{},
 		teamQueries:   &db.TeamQueries{},
@@ -44,7 +42,7 @@ func (h *AIHandler) HandlePredictGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if h.aiClient == nil {
+	if !h.aiService.IsAvailable() {
 		response.Error(w, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI service not configured")
 		return
 	}
@@ -88,20 +86,23 @@ func (h *AIHandler) HandlePredictGame(w http.ResponseWriter, r *http.Request) {
 	homeStats := fmt.Sprintf("Team: %s, Current Season Record", homeTeam.Name)
 	awayStats := fmt.Sprintf("Team: %s, Current Season Record", awayTeam.Name)
 
-	// Get AI prediction
-	prediction, err := h.aiClient.PredictGameOutcome(r.Context(), homeTeam.Name, awayTeam.Name, homeStats, awayStats)
+	// Get AI prediction with automatic fallback
+	prediction, provider, err := h.aiService.PredictGameOutcome(r.Context(), homeTeam.Name, awayTeam.Name, homeStats, awayStats)
 	if err != nil {
 		log.Printf("AI prediction failed: %v", err)
 		response.Error(w, http.StatusInternalServerError, "PREDICTION_FAILED", "Failed to generate prediction")
 		return
 	}
 
+	log.Printf("AI prediction generated using %s", provider)
+
 	// Build response
 	respData := map[string]interface{}{
-		"game_id":    gameID,
-		"home_team":  homeTeam.Name,
-		"away_team":  awayTeam.Name,
-		"prediction": prediction,
+		"game_id":      gameID,
+		"home_team":    homeTeam.Name,
+		"away_team":    awayTeam.Name,
+		"prediction":   prediction,
+		"ai_provider":  string(provider),
 		"generated_at": getCurrentTimestamp(),
 	}
 
@@ -127,7 +128,7 @@ func (h *AIHandler) HandlePredictPlayer(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if h.aiClient == nil {
+	if !h.aiService.IsAvailable() {
 		response.Error(w, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI service not configured")
 		return
 	}
@@ -163,13 +164,15 @@ func (h *AIHandler) HandlePredictPlayer(w http.ResponseWriter, r *http.Request) 
 	recentStats := fmt.Sprintf("Player: %s, Position: %s, Recent Performance Data", player.Name, player.Position)
 	opponent := "Upcoming Opponent"
 
-	// Get AI prediction
-	prediction, err := h.aiClient.PredictPlayerPerformance(r.Context(), player.Name, player.Position, opponent, recentStats)
+	// Get AI prediction with automatic fallback
+	prediction, provider, err := h.aiService.PredictPlayerPerformance(r.Context(), player.Name, player.Position, opponent, recentStats)
 	if err != nil {
 		log.Printf("AI prediction failed: %v", err)
 		response.Error(w, http.StatusInternalServerError, "PREDICTION_FAILED", "Failed to generate prediction")
 		return
 	}
+
+	log.Printf("AI prediction generated using %s", provider)
 
 	// Build response
 	respData := map[string]interface{}{
@@ -177,6 +180,7 @@ func (h *AIHandler) HandlePredictPlayer(w http.ResponseWriter, r *http.Request) 
 		"player_name":  player.Name,
 		"position":     player.Position,
 		"prediction":   prediction,
+		"ai_provider":  string(provider),
 		"generated_at": getCurrentTimestamp(),
 	}
 
@@ -202,7 +206,7 @@ func (h *AIHandler) HandleAnalyzePlayer(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if h.aiClient == nil {
+	if !h.aiService.IsAvailable() {
 		response.Error(w, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI service not configured")
 		return
 	}
@@ -237,13 +241,15 @@ func (h *AIHandler) HandleAnalyzePlayer(w http.ResponseWriter, r *http.Request) 
 	seasonStats := fmt.Sprintf("Player: %s, Position: %s, Season Statistics", player.Name, player.Position)
 	recentGames := "Recent game performances"
 
-	// Get AI analysis
-	analysis, err := h.aiClient.AnalyzePlayer(r.Context(), player.Name, player.Position, seasonStats, recentGames)
+	// Get AI analysis with automatic fallback
+	analysis, provider, err := h.aiService.AnalyzePlayer(r.Context(), player.Name, player.Position, seasonStats, recentGames)
 	if err != nil {
 		log.Printf("AI analysis failed: %v", err)
 		response.Error(w, http.StatusInternalServerError, "ANALYSIS_FAILED", "Failed to generate analysis")
 		return
 	}
+
+	log.Printf("AI analysis generated using %s", provider)
 
 	// Build response
 	respData := map[string]interface{}{
@@ -251,6 +257,7 @@ func (h *AIHandler) HandleAnalyzePlayer(w http.ResponseWriter, r *http.Request) 
 		"player_name":  player.Name,
 		"position":     player.Position,
 		"analysis":     analysis,
+		"ai_provider":  string(provider),
 		"generated_at": getCurrentTimestamp(),
 	}
 
@@ -276,7 +283,7 @@ func (h *AIHandler) HandleAIQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if h.aiClient == nil {
+	if !h.aiService.IsAvailable() {
 		response.Error(w, http.StatusServiceUnavailable, "AI_UNAVAILABLE", "AI service not configured")
 		return
 	}
@@ -298,18 +305,21 @@ func (h *AIHandler) HandleAIQuery(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("AI query: %s", reqBody.Query)
 
-	// Get AI response
-	answer, err := h.aiClient.AnswerQuery(r.Context(), reqBody.Query, "Current NFL season data")
+	// Get AI response with automatic fallback
+	answer, provider, err := h.aiService.AnswerQuery(r.Context(), reqBody.Query, "Current NFL season data")
 	if err != nil {
 		log.Printf("AI query failed: %v", err)
 		response.Error(w, http.StatusInternalServerError, "QUERY_FAILED", "Failed to process query")
 		return
 	}
 
+	log.Printf("AI query answered using %s", provider)
+
 	// Build response
 	respData := map[string]interface{}{
 		"query":        reqBody.Query,
 		"answer":       answer,
+		"ai_provider":  string(provider),
 		"generated_at": getCurrentTimestamp(),
 	}
 

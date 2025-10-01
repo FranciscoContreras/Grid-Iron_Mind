@@ -375,26 +375,40 @@ Standalone CLI for automated data sync:
 
 ## AI Integration
 
+### Multi-Provider AI Service with Automatic Fallback
+
+The system supports multiple AI providers with automatic failover for resilience:
+
+**AI Service (internal/ai/service.go):**
+- Manages multiple AI providers (Claude, Grok)
+- Automatic fallback when primary provider fails
+- Configurable primary provider (first available)
+- Returns provider used in each response
+
+**Providers:**
+1. **Claude** (internal/ai/claude.go) - Claude 3.5 Sonnet
+2. **Grok** (internal/ai/grok.go) - Grok Beta from xAI
+
+**Fallback Logic:**
+```go
+// Service tries primary provider, falls back to secondary automatically
+prediction, provider, err := aiService.PredictGameOutcome(ctx, home, away, stats...)
+log.Printf("Generated using %s", provider) // "claude" or "grok"
+```
+
 ### Claude API Client (internal/ai/claude.go)
 
 - Uses Claude 3.5 Sonnet model
 - Structured JSON-only responses
-- Retry logic with exponential backoff
 - Token usage tracking
 - Response caching (15-60 min TTL)
 
-**Pattern:**
-```go
-type ClaudeRequest struct {
-    Model     string    `json:"model"`
-    MaxTokens int       `json:"max_tokens"`
-    Messages  []Message `json:"messages"`
-}
+### Grok API Client (internal/ai/grok.go)
 
-// Request JSON-only output in prompt
-prompt := "Analyze this player and respond with ONLY JSON: {...}"
-result := ai.CallClaude(prompt)
-```
+- Uses Grok Beta model from xAI
+- OpenAI-compatible chat completions API
+- Structured JSON responses
+- Zero temperature for consistent results
 
 ### AI Handlers (internal/handlers/ai.go)
 
@@ -406,9 +420,10 @@ result := ai.CallClaude(prompt)
 All AI endpoints:
 1. Require API key authentication
 2. Apply strict rate limiting (10/min)
-3. Check CLAUDE_API_KEY env var (return 503 if missing)
+3. Support multiple AI providers with automatic fallback
 4. Cache results aggressively
 5. Return structured predictions with confidence scores
+6. Include `ai_provider` field in response indicating which AI was used
 
 ## Authentication & Rate Limiting
 
@@ -482,7 +497,8 @@ func applyAIMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 - `REDIS_URL` - Redis connection string (caching disabled if not set)
 - `API_KEY` - Standard API key (auth disabled if not set)
 - `UNLIMITED_API_KEY` - Unlimited rate limit API key
-- `CLAUDE_API_KEY` - Claude API key (AI endpoints return 503 if not set)
+- `CLAUDE_API_KEY` - Claude API key for primary AI (optional with Grok)
+- `GROK_API_KEY` - Grok API key from xAI for AI fallback/primary (optional with Claude)
 - `WEATHER_API_KEY` - Weather API key for weather endpoints
 - `DB_MAX_CONNS` - Max database connections (default 25)
 - `DB_MIN_CONNS` - Min database connections (default 5)
@@ -491,7 +507,9 @@ func applyAIMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 **Development mode triggers:**
 - No API_KEY set → Authentication bypassed
 - No REDIS_URL set → Caching disabled, rate limiting allows all
-- No CLAUDE_API_KEY set → AI endpoints return 503
+- No AI keys set → AI endpoints return 503
+- One AI key set → That provider is primary (no fallback)
+- Both AI keys set → First configured is primary, other is fallback
 
 ## Code Patterns
 
