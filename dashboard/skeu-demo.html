@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skeuomorphic UI Demo - Grid Iron Mind</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Pixelify+Sans:wght@400..700&display=swap');
+
+        @property --rotation {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+        }
 
         * {
             margin: 0;
@@ -66,85 +72,89 @@
 
         /* Skeuomorphic Button - Hero Style */
         .btn-skeu {
+            --inset: 15px;
+            --rad: 18px;
+            background: rgb(255 255 255 / 0.3);
+            padding: var(--inset);
+            border-radius: calc(var(--rad) + var(--inset));
+            border: none;
             position: relative;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 18px 36px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #fafafa;
-            background: linear-gradient(145deg, #3a3a3d, #2a2a2d);
-            border: 8px solid rgba(255, 255, 255, 0.9);
-            border-radius: 24px;
+            box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow:
-                0 8px 24px rgba(0, 0, 0, 0.2),
-                0 4px 12px rgba(0, 0, 0, 0.15),
-                inset 0 2px 4px rgba(0, 0, 0, 0.4),
-                inset 0 -2px 4px rgba(255, 255, 255, 0.05);
-        }
-
-        .btn-skeu::after {
-            content: '';
-            position: absolute;
-            inset: -8px;
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.05);
-            pointer-events: none;
-            box-shadow:
-                0 0 30px 10px rgba(168, 85, 247, 0.15),
-                0 0 50px 20px rgba(59, 130, 246, 0.1),
-                0 0 70px 30px rgba(251, 146, 60, 0.08);
+            display: inline-block;
+            font-family: 'Pixelify Sans', 'JetBrains Mono', monospace;
         }
 
         .btn-skeu::before {
-            content: '';
-            position: absolute;
-            inset: -12px;
-            border-radius: 28px;
-            background: linear-gradient(
-                135deg,
-                rgba(168, 85, 247, 0.4),
-                rgba(59, 130, 246, 0.4),
-                rgba(251, 146, 60, 0.3),
-                rgba(234, 179, 8, 0.3)
-            );
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            --inset: -15px;
+            content: "";
+            display: block;
+            background: conic-gradient(from var(--rotation), purple, blue, green, yellow, orange, red);
             filter: blur(20px);
+            opacity: 1;
+            position: absolute;
+            inset: 10px;
+            border-radius: calc(var(--rad) + calc(var(--inset) * -1));
+            z-index: -2;
+            animation: rotate 5s linear infinite;
+        }
+
+        .btn-skeu::after {
+            --inset: -15px;
+            content: "";
+            display: block;
+            background: linear-gradient(
+                to bottom,
+                rgb(255 255 255 / 0.5) 0%,
+                rgb(255 255 255 / 0.5) 2px,
+                rgb(100 100 100 / 0.1) 30%,
+                rgb(100 100 100 / 0.1) 70%,
+                rgb(255 255 255 / 0.5) 99%,
+                rgb(255 255 255 / 0.5) 100%
+            );
+            position: absolute;
+            inset: -1.5px;
+            border-radius: calc(var(--rad) + calc(var(--inset) * -1));
             z-index: -1;
         }
 
-        .btn-skeu:hover::before {
+        .btn-skeu:active::before {
+            animation-play-state: paused;
             opacity: 1;
+            scale: 0.9;
+            filter: blur(10px);
         }
 
-        .btn-skeu:hover::after {
-            box-shadow:
-                0 0 40px 15px rgba(168, 85, 247, 0.25),
-                0 0 60px 25px rgba(59, 130, 246, 0.2),
-                0 0 80px 35px rgba(251, 146, 60, 0.15);
+        .btn-skeu:active .btn-cap {
+            scale: 0.93;
         }
 
-        .btn-skeu:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 12px 32px rgba(0, 0, 0, 0.25),
-                0 6px 16px rgba(0, 0, 0, 0.18),
-                inset 0 2px 4px rgba(0, 0, 0, 0.5),
-                inset 0 -2px 4px rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.95);
+        .btn-cap {
+            display: inline-block;
+            background: linear-gradient(to bottom, #424242, #343434);
+            border-radius: var(--rad);
+            font-size: 1rem;
+            color: #fff;
+            padding: 15px 20px;
+            border: none;
+            border-top: #5b5b5bff solid 1px;
+            border-bottom: #282828ff solid 1px;
+            box-shadow: 0 8px 10px rgb(0 0 0 / 0.3);
+            position: relative;
+            transition: scale 0.1s ease-in-out;
         }
 
-        .btn-skeu:active {
-            transform: translateY(0);
-            box-shadow:
-                0 4px 12px rgba(0, 0, 0, 0.2),
-                inset 0 3px 6px rgba(0, 0, 0, 0.6),
-                inset 0 -1px 2px rgba(255, 255, 255, 0.03);
+        .btn-text {
+            border-radius: 50px;
+            background: linear-gradient(to bottom, #2d2d2dff, #424242);
+            padding: 12px 30px;
+            display: block;
+        }
+
+        @keyframes rotate {
+            to {
+                --rotation: 360deg;
+            }
         }
 
         /* Card Component */
@@ -292,23 +302,6 @@
             flex-wrap: wrap;
             gap: 16px;
             margin-bottom: 32px;
-        }
-
-        .btn-skeu.btn-sm {
-            padding: 10px 20px;
-            font-size: 0.875rem;
-            border-radius: 12px;
-        }
-
-        .btn-skeu.btn-icon {
-            padding: 14px;
-            aspect-ratio: 1;
-            border-radius: 14px;
-        }
-
-        .btn-skeu.btn-secondary {
-            background: linear-gradient(145deg, #27272a, #1c1c1f);
-            color: #e4e4e7;
         }
 
         /* Toggle Component */
@@ -502,36 +495,41 @@
                 <h3>Primary Buttons</h3>
                 <div class="btn-group">
                     <button class="btn-skeu">
-                        <span>+</span>
-                        <span>Add to cart</span>
+                        <span class="btn-cap">
+                            <span class="btn-text">+ Add to cart</span>
+                        </span>
                     </button>
                     <button class="btn-skeu">
-                        <span>⚡</span>
-                        <span>Quick Sync</span>
+                        <span class="btn-cap">
+                            <span class="btn-text">⚡ Quick Sync</span>
+                        </span>
                     </button>
                     <button class="btn-skeu">
-                        <span>🔍</span>
-                        <span>Search Players</span>
+                        <span class="btn-cap">
+                            <span class="btn-text">🔍 Search Players</span>
+                        </span>
                     </button>
                 </div>
             </div>
 
             <div class="demo-section">
-                <h3>Button Sizes</h3>
+                <h3>More Buttons</h3>
                 <div class="btn-group">
-                    <button class="btn-skeu btn-sm">Small Button</button>
-                    <button class="btn-skeu">Default Button</button>
-                    <button class="btn-skeu btn-icon">📊</button>
-                    <button class="btn-skeu btn-icon">🔄</button>
-                    <button class="btn-skeu btn-icon">⚙️</button>
-                </div>
-            </div>
-
-            <div class="demo-section">
-                <h3>Button Variations</h3>
-                <div class="btn-group">
-                    <button class="btn-skeu">Primary</button>
-                    <button class="btn-skeu btn-secondary">Secondary</button>
+                    <button class="btn-skeu">
+                        <span class="btn-cap">
+                            <span class="btn-text">📊 View Stats</span>
+                        </span>
+                    </button>
+                    <button class="btn-skeu">
+                        <span class="btn-cap">
+                            <span class="btn-text">🔄 Refresh Data</span>
+                        </span>
+                    </button>
+                    <button class="btn-skeu">
+                        <span class="btn-cap">
+                            <span class="btn-text">⚙️ Settings</span>
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
