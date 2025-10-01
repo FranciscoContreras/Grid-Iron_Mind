@@ -148,6 +148,7 @@ function initTabs() {
 
 // Players Tab
 async function loadPlayers() {
+    console.log('[loadPlayers] Starting...');
     showLoading('playersLoading');
     hideError('playersError');
 
@@ -164,17 +165,24 @@ async function loadPlayers() {
         const cacheKey = `players_${JSON.stringify(params)}`;
         let result = cache.get(cacheKey);
 
+        console.log('[loadPlayers] Cache result:', result ? 'HIT' : 'MISS');
+
         if (!result) {
+            console.log('[loadPlayers] Fetching from API...');
             result = await apiCall('/api/v1/players', params);
             cache.set(cacheKey, result);
         }
 
+        console.log('[loadPlayers] Got players:', result.data.data?.length);
         state.players = result.data.data;
         state.totalPlayers = result.data.meta.total || 0;
 
+        console.log('[loadPlayers] Rendering...');
         renderPlayers();
         updatePagination();
+        console.log('[loadPlayers] Done!');
     } catch (error) {
+        console.error('[loadPlayers] Error:', error);
         showError('playersError', `Failed to load players: ${error.message}`);
     } finally {
         hideLoading('playersLoading');
@@ -182,7 +190,12 @@ async function loadPlayers() {
 }
 
 function renderPlayers() {
+    console.log('[renderPlayers] Starting with', state.players?.length, 'players');
     const tbody = document.getElementById('playersTableBody');
+    if (!tbody) {
+        console.error('[renderPlayers] tbody element not found!');
+        return;
+    }
     tbody.innerHTML = '';
 
     let filteredPlayers = state.players;
@@ -194,6 +207,8 @@ function renderPlayers() {
             p.name.toLowerCase().includes(search)
         );
     }
+
+    console.log('[renderPlayers] Filtered to', filteredPlayers?.length, 'players');
 
     if (filteredPlayers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px;">No players found</td></tr>';
