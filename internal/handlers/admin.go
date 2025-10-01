@@ -206,12 +206,18 @@ func (h *AdminHandler) HandleSyncHistoricalGames(w http.ResponseWriter, r *http.
 
 	log.Printf("Admin endpoint: Historical games sync requested for season %d", yearStr.Year)
 
-	ctx := r.Context()
-
-	// Run sync in background for long operations
+	// Run sync in background for long operations with background context
+	// Use background context to prevent cancellation when HTTP request ends
 	go func() {
+		ctx := context.Background()
 		if err := h.ingestionService.SyncHistoricalGames(ctx, yearStr.Year); err != nil {
 			log.Printf("Historical games sync failed: %v", err)
+		} else {
+			log.Printf("Historical games sync completed successfully for season %d", yearStr.Year)
+			// Invalidate games cache on success
+			if err := cache.DeletePattern(ctx, cache.InvalidateGamesCache()); err != nil {
+				log.Printf("Failed to invalidate games cache: %v", err)
+			}
 		}
 	}()
 
@@ -242,12 +248,17 @@ func (h *AdminHandler) HandleSyncMultipleSeasons(w http.ResponseWriter, r *http.
 
 	log.Printf("Admin endpoint: Multi-season sync requested from %d to %d", reqBody.StartYear, reqBody.EndYear)
 
-	ctx := r.Context()
-
-	// Run sync in background
+	// Run sync in background with background context
 	go func() {
+		ctx := context.Background()
 		if err := h.ingestionService.SyncMultipleSeasons(ctx, reqBody.StartYear, reqBody.EndYear); err != nil {
 			log.Printf("Multi-season sync failed: %v", err)
+		} else {
+			log.Printf("Multi-season sync completed successfully")
+			// Invalidate games cache on success
+			if err := cache.DeletePattern(ctx, cache.InvalidateGamesCache()); err != nil {
+				log.Printf("Failed to invalidate games cache: %v", err)
+			}
 		}
 	}()
 
