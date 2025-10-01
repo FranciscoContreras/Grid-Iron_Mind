@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skeuomorphic UI Demo - Grid Iron Mind</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Pixelify+Sans:wght@400..700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400..700&display=swap');
 
         @property --rotation {
             syntax: "<angle>";
@@ -37,7 +37,7 @@
         }
 
         body {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Outfit', sans-serif;
             background: var(--bg-main);
             color: var(--text-primary);
             min-height: 100vh;
@@ -56,18 +56,20 @@
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            background: linear-gradient(135deg, #18181b 0%, #3b82f6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: -0.02em;
         }
 
         .header p {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-weight: 400;
         }
 
         /* Skeuomorphic Button - Hero Style */
@@ -159,16 +161,17 @@
 
         /* Card Component */
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            background: rgb(255 255 255 / 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
             padding: 32px;
             margin-bottom: 32px;
             box-shadow:
-                0 2px 8px var(--shadow-sm),
-                0 4px 16px var(--shadow-md);
+                0 4px 12px rgba(0, 0, 0, 0.06),
+                0 2px 6px rgba(0, 0, 0, 0.04);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .card::before {
@@ -178,12 +181,19 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
         }
 
         .card h2 {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 600;
             margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .card h3 {
+            font-size: 1.125rem;
+            font-weight: 500;
             color: var(--text-primary);
         }
 
@@ -205,25 +215,28 @@
         .input-skeu {
             width: 100%;
             padding: 14px 18px;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Outfit', sans-serif;
             font-size: 0.95rem;
+            font-weight: 400;
             color: var(--text-primary);
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: rgb(255 255 255 / 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 14px;
             outline: none;
             transition: all 0.3s ease;
             box-shadow:
-                inset 0 1px 3px rgba(0, 0, 0, 0.08),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+                0 2px 4px rgba(0, 0, 0, 0.04),
+                inset 0 1px 2px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
         }
 
         .input-skeu:focus {
             border-color: var(--accent);
             box-shadow:
-                inset 0 1px 3px rgba(0, 0, 0, 0.08),
-                0 0 0 3px rgba(59, 130, 246, 0.1),
-                0 0 20px rgba(59, 130, 246, 0.15);
+                0 2px 4px rgba(0, 0, 0, 0.04),
+                inset 0 1px 2px rgba(0, 0, 0, 0.04),
+                0 0 0 4px rgba(59, 130, 246, 0.15),
+                0 0 24px rgba(59, 130, 246, 0.2);
         }
 
         .input-skeu::placeholder {
@@ -235,12 +248,13 @@
         .select-skeu {
             width: 100%;
             padding: 14px 18px;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Outfit', sans-serif;
             font-size: 0.95rem;
+            font-weight: 400;
             color: var(--text-primary);
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: rgb(255 255 255 / 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 14px;
             outline: none;
             cursor: pointer;
             appearance: none;
@@ -249,17 +263,19 @@
             background-position: right 18px center;
             padding-right: 45px;
             box-shadow:
-                inset 0 1px 3px rgba(0, 0, 0, 0.08),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+                0 2px 4px rgba(0, 0, 0, 0.04),
+                inset 0 1px 2px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
 
         .select-skeu:focus {
             border-color: var(--accent);
             box-shadow:
-                inset 0 1px 3px rgba(0, 0, 0, 0.08),
-                0 0 0 3px rgba(59, 130, 246, 0.1),
-                0 0 20px rgba(59, 130, 246, 0.15);
+                0 2px 4px rgba(0, 0, 0, 0.04),
+                inset 0 1px 2px rgba(0, 0, 0, 0.04),
+                0 0 0 4px rgba(59, 130, 246, 0.15),
+                0 0 24px rgba(59, 130, 246, 0.2);
         }
 
         /* Stats Grid */
@@ -271,18 +287,19 @@
         }
 
         .stat-card {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 20px;
+            background: rgb(255 255 255 / 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 16px;
+            padding: 24px;
             box-shadow:
-                inset 0 1px 3px rgba(0, 0, 0, 0.06),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+                0 2px 8px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .stat-label {
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -290,7 +307,7 @@
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: var(--accent);
             line-height: 1;
@@ -315,12 +332,12 @@
             position: relative;
             width: 52px;
             height: 28px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
         }
 
         .toggle::after {
@@ -330,22 +347,23 @@
             left: 3px;
             width: 20px;
             height: 20px;
-            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            background: linear-gradient(145deg, #ffffff, #fafafa);
             border-radius: 10px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
         }
 
         .toggle.active {
             background: var(--accent);
             box-shadow:
-                inset 0 1px 3px rgba(0, 0, 0, 0.2),
-                0 0 20px rgba(59, 130, 246, 0.2);
+                inset 0 1px 2px rgba(0, 0, 0, 0.15),
+                0 0 16px rgba(59, 130, 246, 0.3);
         }
 
         .toggle.active::after {
             left: 27px;
-            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         /* Progress Bar */
