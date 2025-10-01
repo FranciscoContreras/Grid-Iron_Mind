@@ -316,10 +316,42 @@ async function viewPlayerDetails(playerId) {
         `;
         modal.classList.add('active');
 
-        // Now fetch career stats
+        // Now fetch career stats and team history
         try {
             const careerResult = await apiCall(`/api/v1/players/${playerId}/career`);
             const careerData = careerResult.data;
+
+            // Team History Section
+            let teamHistoryHTML = '';
+            if (careerData.team_history && careerData.team_history.length > 0) {
+                teamHistoryHTML = `
+                    <h3 style="margin-top: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                        🏈 Team History
+                    </h3>
+                    <div style="margin: 15px 0;">
+                        <table class="data-table" style="font-size: 14px;">
+                            <thead>
+                                <tr>
+                                    <th>Team</th>
+                                    <th>Position</th>
+                                    <th>Years</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${careerData.team_history.map(history => `
+                                    <tr style="${history.is_current ? 'background-color: rgba(76, 175, 80, 0.1); font-weight: bold;' : ''}">
+                                        <td>${history.team_name || 'N/A'}</td>
+                                        <td>${history.position || 'N/A'}</td>
+                                        <td>${history.season_start || 'N/A'} - ${history.season_end || 'Present'}</td>
+                                        <td>${history.is_current ? '✓ Current' : 'Former'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
 
             if (careerData.career_stats && careerData.career_stats.length > 0) {
                 const currentYear = new Date().getFullYear();
@@ -490,7 +522,7 @@ async function viewPlayerDetails(playerId) {
             console.error('Failed to load injuries:', error);
         }
 
-        // Update the modal with loaded career stats and injuries
+        // Update the modal with loaded career stats, team history, and injuries
         detailsContainer.innerHTML = `
             <div style="line-height: 2;">
                 <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
@@ -505,6 +537,7 @@ async function viewPlayerDetails(playerId) {
                 <p><strong>Draft:</strong> ${player.draft_year ? `${player.draft_year} - Round ${player.draft_round}, Pick ${player.draft_pick}` : 'N/A'}</p>
                 ${injuryHTML}
             </div>
+            ${teamHistoryHTML}
             ${careerHTML}
         `;
     } catch (error) {
