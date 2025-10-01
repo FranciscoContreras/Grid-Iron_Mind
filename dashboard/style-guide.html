@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style Guide - Grid Iron Mind Design System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400..700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #fafafa;
+            --bg-card: #ffffff;
+            --bg-input: #f5f5f5;
+            --text-primary: #18181b;
+            --text-secondary: #71717a;
+            --border: #e4e4e7;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .section h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.875rem;
+        }
+
+        .section p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .code-block {
+            background: #18181b;
+            color: #fafafa;
+            padding: 24px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .color-card {
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .color-swatch {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .color-card h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .color-card code {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            background: var(--bg-input);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .do-dont-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .do-card, .dont-card {
+            padding: 24px;
+            border-radius: 12px;
+            border: 2px solid;
+        }
+
+        .do-card {
+            border-color: #18181b;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .dont-card {
+            border-color: var(--border);
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .do-card h5::before {
+            content: "✓ ";
+            font-weight: bold;
+        }
+
+        .dont-card h5::before {
+            content: "✗ ";
+            font-weight: bold;
+        }
+
+        .do-card h5 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .dont-card h5 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .note {
+            background: rgba(0, 0, 0, 0.04);
+            border-left: 4px solid var(--text-primary);
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table th {
+            background: rgba(0, 0, 0, 0.02);
+            font-weight: 600;
+        }
+
+        table code {
+            background: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .toc {
+            background: rgba(0, 0, 0, 0.02);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 60px;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 12px;
+        }
+
+        .toc a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏈 Grid Iron Mind Design System</h1>
+            <p>Comprehensive Style Guide & Documentation</p>
+        </div>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#philosophy">1. Design Philosophy</a></li>
+                <li><a href="#colors">2. Color System</a></li>
+                <li><a href="#typography">3. Typography</a></li>
+                <li><a href="#buttons">4. Buttons</a></li>
+                <li><a href="#forms">5. Forms & Inputs</a></li>
+                <li><a href="#cards">6. Cards & Containers</a></li>
+                <li><a href="#spacing">7. Spacing & Layout</a></li>
+                <li><a href="#shadows">8. Shadows & Depth</a></li>
+                <li><a href="#team-colors">9. Team Color Guidelines</a></li>
+                <li><a href="#best-practices">10. Best Practices</a></li>
+            </ul>
+        </div>
+
+        <!-- Design Philosophy -->
+        <div class="section" id="philosophy">
+            <h2>1. Design Philosophy</h2>
+            <p>The Grid Iron Mind design system is built on three core principles:</p>
+
+            <h3>Monochrome First</h3>
+            <p>The entire interface uses a monochromatic palette of black, white, and grays. Color is introduced <strong>only when contextually meaningful</strong>:</p>
+            <ul>
+                <li>Team-specific pages display team colors</li>
+                <li>Special call-to-action buttons use rainbow animation</li>
+                <li>Default state = no color</li>
+            </ul>
+
+            <h3>Glassmorphism & Depth</h3>
+            <p>Components use semi-transparent backgrounds with backdrop blur to create a layered, modern aesthetic:</p>
+            <ul>
+                <li>Cards: 80% opacity with blur(10px)</li>
+                <li>Inputs: 80% opacity with blur(10px)</li>
+                <li>Stat cards: 60% opacity with blur(10px)</li>
+            </ul>
+
+            <h3>Pixel-Perfect Buttons</h3>
+            <p>Buttons use a unique skeuomorphic design with animated conic gradients. They're the visual centerpiece of interactions.</p>
+        </div>
+
+        <!-- Colors -->
+        <div class="section" id="colors">
+            <h2>2. Color System</h2>
+
+            <h3>Base Palette</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #fafafa;"></div>
+                    <h5>Background Main</h5>
+                    <code>#fafafa</code>
+                    <code>--bg-main</code>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #ffffff; border: 2px solid #e4e4e7;"></div>
+                    <h5>Background Card</h5>
+                    <code>#ffffff</code>
+                    <code>--bg-card</code>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #f5f5f5;"></div>
+                    <h5>Background Input</h5>
+                    <code>#f5f5f5</code>
+                    <code>--bg-input</code>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #18181b;"></div>
+                    <h5>Text Primary</h5>
+                    <code>#18181b</code>
+                    <code>--text-primary</code>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #71717a;"></div>
+                    <h5>Text Secondary</h5>
+                    <code>#71717a</code>
+                    <code>--text-secondary</code>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #e4e4e7;"></div>
+                    <h5>Border</h5>
+                    <code>#e4e4e7</code>
+                    <code>--border</code>
+                </div>
+            </div>
+
+            <div class="code-block"><pre>:root {
+    --bg-main: #fafafa;
+    --bg-card: #ffffff;
+    --bg-input: #f5f5f5;
+    --text-primary: #18181b;
+    --text-secondary: #71717a;
+    --border: #e4e4e7;
+}</pre></div>
+
+            <div class="note">
+                <strong>Important:</strong> Never use blue, green, red, or any colors for generic UI elements. Colors are reserved for contextual use only (teams, special CTAs).
+            </div>
+        </div>
+
+        <!-- Typography -->
+        <div class="section" id="typography">
+            <h2>3. Typography</h2>
+
+            <h3>Font Families</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usage</th>
+                        <th>Font</th>
+                        <th>Import</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Body, Inputs, Labels, UI</td>
+                        <td><strong>Outfit</strong> (300, 400, 500, 600, 700)</td>
+                        <td><code>google.com/specimen/Outfit</code></td>
+                    </tr>
+                    <tr>
+                        <td>Buttons Only</td>
+                        <td><strong>Pixelify Sans</strong> (400-700)</td>
+                        <td><code>google.com/specimen/Pixelify+Sans</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Type Scale</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Element</th>
+                        <th>Size</th>
+                        <th>Weight</th>
+                        <th>Usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>H1</td>
+                        <td><code>3rem</code> (48px)</td>
+                        <td><code>700</code></td>
+                        <td>Page titles</td>
+                    </tr>
+                    <tr>
+                        <td>H2</td>
+                        <td><code>1.75rem</code> (28px)</td>
+                        <td><code>600</code></td>
+                        <td>Section headers</td>
+                    </tr>
+                    <tr>
+                        <td>H3</td>
+                        <td><code>1.125rem</code> (18px)</td>
+                        <td><code>500</code></td>
+                        <td>Sub-sections</td>
+                    </tr>
+                    <tr>
+                        <td>Body</td>
+                        <td><code>1rem</code> (16px)</td>
+                        <td><code>400</code></td>
+                        <td>Default text</td>
+                    </tr>
+                    <tr>
+                        <td>Small</td>
+                        <td><code>0.875rem</code> (14px)</td>
+                        <td><code>400</code></td>
+                        <td>Captions, labels</td>
+                    </tr>
+                    <tr>
+                        <td>Stat Values</td>
+                        <td><code>2.5rem</code> (40px)</td>
+                        <td><code>700</code></td>
+                        <td>Large numbers</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-block"><pre>/* Typography Example */
+body {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+button {
+    font-family: 'Pixelify Sans', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+}</pre></div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="section" id="buttons">
+            <h2>4. Buttons</h2>
+
+            <h3>Button Anatomy</h3>
+            <p>Buttons use a 3-layer structure with animated conic gradients:</p>
+            <ol>
+                <li><strong>Outer frame:</strong> White semi-transparent with gradient overlay</li>
+                <li><strong>Cap layer:</strong> Dark gray gradient with borders</li>
+                <li><strong>Inner text:</strong> Black rounded pill</li>
+            </ol>
+
+            <div class="code-block"><pre>&lt;button class="btn-skeu"&gt;
+    &lt;span class="btn-cap"&gt;
+        &lt;span class="btn-text"&gt;Button Text&lt;/span&gt;
+    &lt;/span&gt;
+&lt;/button&gt;</pre></div>
+
+            <h3>Button Variants</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variant</th>
+                        <th>Class</th>
+                        <th>When to Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Default</td>
+                        <td><code>.btn-skeu</code></td>
+                        <td>General actions (no glow)</td>
+                    </tr>
+                    <tr>
+                        <td>Rainbow</td>
+                        <td><code>.btn-skeu .btn-rainbow</code></td>
+                        <td>Primary CTAs (Add to Cart, Subscribe)</td>
+                    </tr>
+                    <tr>
+                        <td>Team Colored</td>
+                        <td><code>.btn-skeu .btn-team-chiefs</code></td>
+                        <td>Team-specific pages only</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>CSS Variables for Colors</h3>
+            <div class="code-block"><pre>/* Default: No glow */
+.btn-skeu {
+    --glow-color-1: transparent;
+    --glow-color-2: transparent;
+    /* ... */
+}
+
+/* Rainbow: Special CTA */
+.btn-skeu.btn-rainbow {
+    --glow-color-1: purple;
+    --glow-color-2: blue;
+    --glow-color-3: green;
+    --glow-color-4: yellow;
+    --glow-color-5: orange;
+    --glow-color-6: red;
+}
+
+/* Team: Chiefs example */
+.btn-skeu.btn-team-chiefs {
+    --glow-color-1: #E31837;
+    --glow-color-2: #FFB81C;
+    --glow-color-3: #E31837;
+    --glow-color-4: #FFB81C;
+    --glow-color-5: #E31837;
+    --glow-color-6: #FFB81C;
+}</pre></div>
+
+            <h4>Size & Spacing</h4>
+            <ul>
+                <li>Inset: 10px</li>
+                <li>Border radius: 14px</li>
+                <li>Cap padding: 10px 16px</li>
+                <li>Text padding: 8px 20px</li>
+                <li>Font size: 0.875rem</li>
+            </ul>
+        </div>
+
+        <!-- Forms -->
+        <div class="section" id="forms">
+            <h2>5. Forms & Inputs</h2>
+
+            <h3>Input Fields</h3>
+            <div class="code-block"><pre>.input-skeu {
+    width: 100%;
+    padding: 14px 18px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    background: rgb(255 255 255 / 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 14px;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        inset 0 1px 2px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(10px);
+}
+
+.input-skeu:focus {
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        inset 0 1px 2px rgba(0, 0, 0, 0.04),
+        0 0 0 4px rgba(0, 0, 0, 0.08),
+        0 0 24px rgba(0, 0, 0, 0.06);
+}</pre></div>
+
+            <h3>Labels</h3>
+            <div class="code-block"><pre>label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}</pre></div>
+
+            <div class="note">
+                <strong>Key Points:</strong>
+                <ul>
+                    <li>Focus states use black glow, not blue</li>
+                    <li>All inputs have backdrop-filter: blur(10px)</li>
+                    <li>Use Outfit font, not Pixelify Sans</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="section" id="cards">
+            <h2>6. Cards & Containers</h2>
+
+            <h3>Card Component</h3>
+            <div class="code-block"><pre>.card {
+    background: rgb(255 255 255 / 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.06),
+        0 2px 6px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(10px);
+}</pre></div>
+
+            <h3>Stat Cards</h3>
+            <div class="code-block"><pre>.stat-card {
+    background: rgb(255 255 255 / 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}</pre></div>
+
+            <h4>Opacity Guidelines</h4>
+            <ul>
+                <li>Main cards: 80% (0.8 alpha)</li>
+                <li>Stat cards: 60% (0.6 alpha)</li>
+                <li>Inputs: 80% (0.8 alpha)</li>
+                <li>Buttons frame: 30% (0.3 alpha)</li>
+            </ul>
+        </div>
+
+        <!-- Spacing -->
+        <div class="section" id="spacing">
+            <h2>7. Spacing & Layout</h2>
+
+            <h3>Spacing Scale</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th>Usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>XS</td>
+                        <td><code>8px</code></td>
+                        <td>Between related elements</td>
+                    </tr>
+                    <tr>
+                        <td>SM</td>
+                        <td><code>16px</code></td>
+                        <td>Component internal spacing</td>
+                    </tr>
+                    <tr>
+                        <td>MD</td>
+                        <td><code>24px</code></td>
+                        <td>Section spacing</td>
+                    </tr>
+                    <tr>
+                        <td>LG</td>
+                        <td><code>32px</code></td>
+                        <td>Card padding, major sections</td>
+                    </tr>
+                    <tr>
+                        <td>XL</td>
+                        <td><code>60px</code></td>
+                        <td>Page sections</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Border Radius</h3>
+            <ul>
+                <li>Small elements (inputs, badges): 12-14px</li>
+                <li>Medium elements (stat cards): 16px</li>
+                <li>Large elements (cards): 24px</li>
+            </ul>
+        </div>
+
+        <!-- Shadows -->
+        <div class="section" id="shadows">
+            <h2>8. Shadows & Depth</h2>
+
+            <h3>Shadow Scale</h3>
+            <div class="code-block"><pre>/* Soft shadow for cards */
+box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+
+/* Button shadow */
+box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+/* Inset (inputs, stat cards) */
+box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+
+/* Focus glow (monochrome!) */
+box-shadow:
+    0 0 0 4px rgba(0, 0, 0, 0.08),
+    0 0 24px rgba(0, 0, 0, 0.06);</pre></div>
+
+            <div class="note">
+                <strong>Critical:</strong> All shadows use black (rgba(0, 0, 0)) with low opacity (0.04-0.08). Never use colored shadows except on team-colored buttons.
+            </div>
+        </div>
+
+        <!-- Team Colors -->
+        <div class="section" id="team-colors">
+            <h2>9. Team Color Guidelines</h2>
+
+            <h3>When to Use Team Colors</h3>
+            <div class="do-dont-grid">
+                <div class="do-card">
+                    <h5>Do Use Team Colors</h5>
+                    <ul>
+                        <li>Team detail pages</li>
+                        <li>Player cards on team pages</li>
+                        <li>Team-specific actions (View Roster)</li>
+                        <li>Game pages (both team colors)</li>
+                    </ul>
+                </div>
+                <div class="dont-card">
+                    <h5>Don't Use Team Colors</h5>
+                    <ul>
+                        <li>Global navigation</li>
+                        <li>Search/filter interfaces</li>
+                        <li>Generic stat displays</li>
+                        <li>Forms and inputs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Example Team Implementations</h3>
+            <div class="code-block"><pre>/* Kansas City Chiefs */
+.btn-team-chiefs {
+    --glow-color-1: #E31837; /* Red */
+    --glow-color-2: #FFB81C; /* Gold */
+    --glow-color-3: #E31837;
+    --glow-color-4: #FFB81C;
+    --glow-color-5: #E31837;
+    --glow-color-6: #FFB81C;
+}
+
+/* San Francisco 49ers */
+.btn-team-49ers {
+    --glow-color-1: #AA0000; /* Red */
+    --glow-color-2: #B3995D; /* Gold */
+    /* ... */
+}
+
+/* Dallas Cowboys */
+.btn-team-cowboys {
+    --glow-color-1: #041E42; /* Navy */
+    --glow-color-2: #869397; /* Silver */
+    /* ... */
+}</pre></div>
+
+            <p>Create similar classes for all 32 NFL teams, using each team's official primary and secondary colors.</p>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="section" id="best-practices">
+            <h2>10. Best Practices</h2>
+
+            <h3>General Guidelines</h3>
+            <div class="do-dont-grid">
+                <div class="do-card">
+                    <h5>Do</h5>
+                    <ul>
+                        <li>Use monochrome by default</li>
+                        <li>Apply backdrop-filter: blur(10px) to translucent elements</li>
+                        <li>Use Outfit for all text except buttons</li>
+                        <li>Keep shadows soft (0.04-0.08 opacity)</li>
+                        <li>Add color only when contextually meaningful</li>
+                        <li>Use CSS variables for maintainability</li>
+                    </ul>
+                </div>
+                <div class="dont-card">
+                    <h5>Don't</h5>
+                    <ul>
+                        <li>Add blue/green/red to generic UI</li>
+                        <li>Use colored shadows except on colored buttons</li>
+                        <li>Mix font families (no Comic Sans!)</li>
+                        <li>Use hard shadows or heavy drop shadows</li>
+                        <li>Apply team colors outside team context</li>
+                        <li>Forget the 3-layer button structure</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Accessibility</h3>
+            <ul>
+                <li>Ensure 4.5:1 contrast ratio for body text</li>
+                <li>Use 3:1 for large text (18px+)</li>
+                <li>Add focus indicators on all interactive elements</li>
+                <li>Don't rely on color alone to convey meaning</li>
+            </ul>
+
+            <h3>Performance</h3>
+            <ul>
+                <li>Use backdrop-filter sparingly (can impact performance)</li>
+                <li>Minimize animation complexity</li>
+                <li>Consider reducing blur radius on mobile</li>
+            </ul>
+
+            <h3>Component Checklist</h3>
+            <p>Before creating a new component, verify:</p>
+            <ol>
+                <li>✓ Uses monochrome color scheme</li>
+                <li>✓ Uses Outfit font (not Pixelify Sans, unless button)</li>
+                <li>✓ Has appropriate backdrop-filter if translucent</li>
+                <li>✓ Shadows use black with low opacity</li>
+                <li>✓ Border radius matches scale (12-24px)</li>
+                <li>✓ Spacing uses standard scale (8, 16, 24, 32px)</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; padding: 60px 20px; border-top: 2px solid var(--border); margin-top: 80px;">
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Grid Iron Mind Design System v1.0
+            </p>
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                Questions? Contact the design team or use the AI Style Agent for automated consistency checks.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

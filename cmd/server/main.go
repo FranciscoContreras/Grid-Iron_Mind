@@ -64,6 +64,7 @@ func main() {
 	adminHandler := handlers.NewAdminHandler(cfg.WeatherAPIKey)
 	weatherHandler := handlers.NewWeatherHandler(weather.NewClient(cfg.WeatherAPIKey))
 	gardenHandler := handlers.NewGardenHandler(cfg)
+	styleAgentHandler := handlers.NewStyleAgentHandler()
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -128,6 +129,12 @@ func main() {
 	mux.HandleFunc("/api-docs.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./dashboard/api-docs.html")
 	})
+
+	// Style Agent endpoints
+	mux.HandleFunc("/api/v1/style/check", applyMiddleware(styleAgentHandler.HandleStyleCheck))
+	mux.HandleFunc("/api/v1/style/rules", applyMiddleware(styleAgentHandler.HandleStyleRules))
+	mux.HandleFunc("/api/v1/style/example", applyMiddleware(styleAgentHandler.HandleStyleExample))
+	mux.HandleFunc("/style-guide.html", styleAgentHandler.HandleStyleGuide)
 
 	// Serve dashboard static files
 	fs := http.FileServer(http.Dir("./dashboard"))
