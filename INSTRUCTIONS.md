@@ -1,4 +1,4 @@
-# Grid Iron Mind API - Instructions
+1. Grid Iron Mind API - Instructions
 
 A comprehensive NFL data API providing real-time and historical statistics, player information, team data, game schedules, injury reports, and AI-powered insights.
 
@@ -31,6 +31,7 @@ curl https://nfl.wearemachina.com/api/v1/health
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -44,6 +45,7 @@ curl https://nfl.wearemachina.com/api/v1/health
 ### API Documentation
 
 View the interactive API documentation:
+
 ```
 https://nfl.wearemachina.com/api-docs.html
 ```
@@ -55,6 +57,7 @@ https://nfl.wearemachina.com/api-docs.html
 ### Public Endpoints
 
 Most endpoints are **publicly accessible** and do not require authentication:
+
 - Teams, players, games, stats, injuries, weather
 
 ### AI Endpoints
@@ -64,6 +67,7 @@ AI-powered endpoints require an **API key** via the `X-API-Key` header.
 #### Generate an API Key
 
 **Standard API Key** (rate limited):
+
 ```bash
 curl -X POST https://nfl.wearemachina.com/api/v1/admin/keys/generate \
   -H "Content-Type: application/json" \
@@ -74,6 +78,7 @@ curl -X POST https://nfl.wearemachina.com/api/v1/admin/keys/generate \
 ```
 
 **Unlimited API Key** (no rate limits):
+
 ```bash
 curl -X POST https://nfl.wearemachina.com/api/v1/admin/keys/generate \
   -H "Content-Type: application/json" \
@@ -84,6 +89,7 @@ curl -X POST https://nfl.wearemachina.com/api/v1/admin/keys/generate \
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -118,16 +124,19 @@ curl -X POST https://nfl.wearemachina.com/api/v1/ai/query \
 ### Teams
 
 #### List All Teams
+
 ```bash
 GET /api/v1/teams
 ```
 
 **Example:**
+
 ```bash
 curl https://nfl.wearemachina.com/api/v1/teams
 ```
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -150,36 +159,43 @@ curl https://nfl.wearemachina.com/api/v1/teams
 ```
 
 #### Get Single Team
+
 ```bash
 GET /api/v1/teams/{id}
 ```
 
 **Example:**
+
 ```bash
 curl https://nfl.wearemachina.com/api/v1/teams/550e8400-e29b-41d4-a716-446655440000
 ```
 
 #### Get Team Roster
+
 ```bash
 GET /api/v1/teams/{id}/players
 ```
 
 **Example:**
+
 ```bash
 curl https://nfl.wearemachina.com/api/v1/teams/550e8400-e29b-41d4-a716-446655440000/players
 ```
 
 #### Get Team Injuries
+
 ```bash
 GET /api/v1/teams/{id}/injuries
 ```
 
 **Example:**
+
 ```bash
 curl https://nfl.wearemachina.com/api/v1/teams/550e8400-e29b-41d4-a716-446655440000/injuries
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -208,11 +224,13 @@ curl https://nfl.wearemachina.com/api/v1/teams/550e8400-e29b-41d4-a716-446655440
 ### Players
 
 #### List Players (with filters)
+
 ```bash
 GET /api/v1/players?limit={limit}&offset={offset}&position={position}&team={team_id}&status={status}
 ```
 
 **Query Parameters:**
+
 - `limit` (default: 50, max: 100) - Number of results
 - `offset` (default: 0) - Pagination offset
 - `position` - Filter by position (QB, RB, WR, TE, etc.)
@@ -220,6 +238,7 @@ GET /api/v1/players?limit={limit}&offset={offset}&position={position}&team={team
 - `status` - Filter by status (active, injured, suspended)
 
 **Example:**
+
 ```bash
 # Get all quarterbacks
 curl "https://nfl.wearemachina.com/api/v1/players?position=QB&limit=20"
@@ -229,6 +248,7 @@ curl "https://nfl.wearemachina.com/api/v1/players?team=550e8400-e29b-41d4-a716-4
 ```
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -256,21 +276,25 @@ curl "https://nfl.wearemachina.com/api/v1/players?team=550e8400-e29b-41d4-a716-4
 ```
 
 #### Get Player Details
+
 ```bash
 GET /api/v1/players/{id}
 ```
 
 #### Get Player Career Stats
+
 ```bash
 GET /api/v1/players/{id}/career
 ```
 
 **Example:**
+
 ```bash
 curl https://nfl.wearemachina.com/api/v1/players/550e8400-e29b-41d4-a716-446655440000/career
 ```
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -288,16 +312,19 @@ curl https://nfl.wearemachina.com/api/v1/players/550e8400-e29b-41d4-a716-4466554
 ```
 
 #### Get Player Team History
+
 ```bash
 GET /api/v1/players/{id}/history
 ```
 
 #### Get Player Injuries
+
 ```bash
 GET /api/v1/players/{id}/injuries
 ```
 
 **Example:**
+
 ```bash
 curl https://nfl.wearemachina.com/api/v1/players/550e8400-e29b-41d4-a716-446655440000/injuries
 ```
@@ -307,22 +334,26 @@ curl https://nfl.wearemachina.com/api/v1/players/550e8400-e29b-41d4-a716-4466554
 ### Games
 
 #### List Games
+
 ```bash
 GET /api/v1/games?season={year}&week={week}&team={team_id}
 ```
 
 **Example:**
+
 ```bash
 # Get all games for week 1 of 2024 season
 curl "https://nfl.wearemachina.com/api/v1/games?season=2024&week=1"
 ```
 
 #### Get Game Details
+
 ```bash
 GET /api/v1/games/{id}
 ```
 
 #### Get Game Stats
+
 ```bash
 GET /api/v1/stats/game/{id}
 ```
@@ -332,11 +363,13 @@ GET /api/v1/stats/game/{id}
 ### Stats
 
 #### Get League Leaders
+
 ```bash
 GET /api/v1/stats/leaders?category={category}&limit={limit}&season={year}
 ```
 
 **Categories:**
+
 - `passing` - Passing yards
 - `rushing` - Rushing yards
 - `receiving` - Receiving yards
@@ -345,6 +378,7 @@ GET /api/v1/stats/leaders?category={category}&limit={limit}&season={year}
 - `sacks` - Sacks
 
 **Example:**
+
 ```bash
 # Top 10 passers
 curl "https://nfl.wearemachina.com/api/v1/stats/leaders?category=passing&limit=10"
@@ -358,21 +392,25 @@ curl "https://nfl.wearemachina.com/api/v1/stats/leaders?category=rushing&season=
 ### Weather
 
 #### Get Current Weather
+
 ```bash
 GET /api/v1/weather/current?location={city}
 ```
 
 **Example:**
+
 ```bash
 curl "https://nfl.wearemachina.com/api/v1/weather/current?location=Buffalo,NY"
 ```
 
 #### Get Weather Forecast
+
 ```bash
 GET /api/v1/weather/forecast?location={city}&days={days}
 ```
 
 #### Get Historical Weather
+
 ```bash
 GET /api/v1/weather/historical?location={city}&date={YYYY-MM-DD}
 ```
@@ -384,22 +422,26 @@ GET /api/v1/weather/historical?location={city}&date={YYYY-MM-DD}
 All AI endpoints require the `X-API-Key` header.
 
 ### Game Prediction
+
 ```bash
 POST /api/v1/ai/predict/game/{game_id}
 ```
 
 **Example:**
+
 ```bash
 curl -X POST https://nfl.wearemachina.com/api/v1/ai/predict/game/550e8400-e29b-41d4-a716-446655440000 \
   -H "X-API-Key: gim_your_api_key"
 ```
 
 ### Player Performance Prediction
+
 ```bash
 POST /api/v1/ai/predict/player/{player_id}
 ```
 
 **Request Body:**
+
 ```json
 {
   "game_id": "uuid",
@@ -408,11 +450,13 @@ POST /api/v1/ai/predict/player/{player_id}
 ```
 
 ### Player Insights
+
 ```bash
 POST /api/v1/ai/insights/player/{player_id}
 ```
 
 **Example:**
+
 ```bash
 curl -X POST https://nfl.wearemachina.com/api/v1/ai/insights/player/550e8400-e29b-41d4-a716-446655440000 \
   -H "Content-Type: application/json" \
@@ -424,11 +468,13 @@ curl -X POST https://nfl.wearemachina.com/api/v1/ai/insights/player/550e8400-e29
 ```
 
 ### Natural Language Query
+
 ```bash
 POST /api/v1/ai/query
 ```
 
 **Request Body:**
+
 ```json
 {
   "query": "Who are the top 5 quarterbacks this season by passing yards?"
@@ -436,6 +482,7 @@ POST /api/v1/ai/query
 ```
 
 **Example:**
+
 ```bash
 curl -X POST https://nfl.wearemachina.com/api/v1/ai/query \
   -H "Content-Type: application/json" \
@@ -454,31 +501,37 @@ curl -X POST https://nfl.wearemachina.com/api/v1/ai/query \
 These endpoints trigger background jobs to sync data from NFL sources.
 
 #### Sync Teams
+
 ```bash
 POST /api/v1/admin/sync/teams
 ```
 
 #### Sync All Rosters
+
 ```bash
 POST /api/v1/admin/sync/rosters
 ```
 
 #### Sync Current Games
+
 ```bash
 POST /api/v1/admin/sync/games
 ```
 
 #### Sync Injury Reports
+
 ```bash
 POST /api/v1/admin/sync/injuries
 ```
 
 **Example:**
+
 ```bash
 curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/injuries
 ```
 
 **Response:**
+
 ```json
 {
   "data": {
@@ -489,16 +542,19 @@ curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/injuries
 ```
 
 #### Full Sync (Teams → Rosters → Games)
+
 ```bash
 POST /api/v1/admin/sync/full
 ```
 
 #### Sync Historical Season
+
 ```bash
 POST /api/v1/admin/sync/historical/season
 ```
 
 **Request Body:**
+
 ```json
 {
   "year": 2023
@@ -506,11 +562,13 @@ POST /api/v1/admin/sync/historical/season
 ```
 
 #### Sync Multiple Seasons
+
 ```bash
 POST /api/v1/admin/sync/historical/seasons
 ```
 
 **Request Body:**
+
 ```json
 {
   "start_year": 2020,
@@ -519,11 +577,13 @@ POST /api/v1/admin/sync/historical/seasons
 ```
 
 #### Sync NFLverse Player Stats
+
 ```bash
 POST /api/v1/admin/sync/nflverse/stats
 ```
 
 **Request Body:**
+
 ```json
 {
   "season": 2024
@@ -531,11 +591,13 @@ POST /api/v1/admin/sync/nflverse/stats
 ```
 
 #### Sync NFLverse Schedule
+
 ```bash
 POST /api/v1/admin/sync/nflverse/schedule
 ```
 
 **Request Body:**
+
 ```json
 {
   "season": 2024
@@ -543,11 +605,13 @@ POST /api/v1/admin/sync/nflverse/schedule
 ```
 
 #### Sync NFLverse Next Gen Stats
+
 ```bash
 POST /api/v1/admin/sync/nflverse/nextgen
 ```
 
 **Request Body:**
+
 ```json
 {
   "season": 2024,
@@ -558,11 +622,13 @@ POST /api/v1/admin/sync/nflverse/nextgen
 **Stat Types:** `passing`, `rushing`, `receiving`
 
 #### Enrich Games with Weather Data
+
 ```bash
 POST /api/v1/admin/sync/weather
 ```
 
 **Request Body:**
+
 ```json
 {
   "season": 2024
@@ -570,11 +636,13 @@ POST /api/v1/admin/sync/weather
 ```
 
 #### Sync Team Stats
+
 ```bash
 POST /api/v1/admin/sync/team-stats
 ```
 
 **Request Body:**
+
 ```json
 {
   "season": 2024,
@@ -589,6 +657,7 @@ POST /api/v1/admin/sync/team-stats
 All endpoints return JSON in a consistent format:
 
 ### Success Response
+
 ```json
 {
   "data": {
@@ -604,6 +673,7 @@ All endpoints return JSON in a consistent format:
 ```
 
 ### Error Response
+
 ```json
 {
   "error": {
@@ -620,16 +690,17 @@ All endpoints return JSON in a consistent format:
 
 ### HTTP Status Codes
 
-| Code | Meaning |
-|------|---------|
-| 200 | Success |
-| 400 | Bad Request - Invalid parameters |
-| 401 | Unauthorized - Missing or invalid API key |
-| 404 | Not Found - Resource doesn't exist |
-| 405 | Method Not Allowed - Wrong HTTP method |
-| 429 | Too Many Requests - Rate limit exceeded |
-| 500 | Internal Server Error |
-| 503 | Service Unavailable - Database connection failed |
+
+| Code | Meaning                                          |
+| ---- | ------------------------------------------------ |
+| 200  | Success                                          |
+| 400  | Bad Request - Invalid parameters                 |
+| 401  | Unauthorized - Missing or invalid API key        |
+| 404  | Not Found - Resource doesn't exist               |
+| 405  | Method Not Allowed - Wrong HTTP method           |
+| 429  | Too Many Requests - Rate limit exceeded          |
+| 500  | Internal Server Error                            |
+| 503  | Service Unavailable - Database connection failed |
 
 ### Common Error Codes
 
@@ -646,6 +717,7 @@ All endpoints return JSON in a consistent format:
 ## Rate Limits
 
 ### Standard Endpoints (Public)
+
 - **Rate Limit:** 100 requests per minute per IP
 - **Headers:**
   - `X-RateLimit-Limit` - Max requests per window
@@ -653,10 +725,12 @@ All endpoints return JSON in a consistent format:
   - `X-RateLimit-Reset` - Time when limit resets
 
 ### AI Endpoints (Standard API Key)
+
 - **Rate Limit:** 10 requests per minute
 - Stricter limits due to computational cost
 
 ### AI Endpoints (Unlimited API Key)
+
 - **Rate Limit:** No limits
 - For production applications with high volume
 
@@ -739,6 +813,7 @@ curl -X POST "$API_BASE/admin/sync/nflverse/stats" \
 ## Support
 
 For issues, feature requests, or questions:
+
 - **GitHub:** [gridironmind repository]
 - **API Status:** Check `/api/v1/health` endpoint
 - **Documentation:** https://nfl.wearemachina.com/api-docs.html
@@ -748,6 +823,7 @@ For issues, feature requests, or questions:
 ## Changelog
 
 ### v1.0.0 (2025-09-30)
+
 - ✅ Complete team metadata (32 teams)
 - ✅ Player career statistics (2010-2024, 2,257 records)
 - ✅ Injury tracking system

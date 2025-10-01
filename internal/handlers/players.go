@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/francisco/gridironmind/internal/autofetch"
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/pkg/response"
 	"github.com/francisco/gridironmind/pkg/validation"
@@ -12,12 +13,16 @@ import (
 )
 
 type PlayersHandler struct {
-	queries *db.PlayerQueries
+	queries          *db.PlayerQueries
+	autoFetchEnabled bool
+	orchestrator     *autofetch.Orchestrator
 }
 
 func NewPlayersHandler() *PlayersHandler {
 	return &PlayersHandler{
-		queries: &db.PlayerQueries{},
+		queries:          &db.PlayerQueries{},
+		autoFetchEnabled: true,
+		orchestrator:     autofetch.NewOrchestrator(""),
 	}
 }
 
@@ -105,6 +110,28 @@ func (h *PlayersHandler) listPlayers(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error listing players: %v", err)
 		response.InternalError(w, "Failed to retrieve players")
 		return
+	}
+
+	// AUTO-FETCH: If no players found and filtering by team, try to fetch rosters
+	if total == 0 && h.autoFetchEnabled && filters.TeamID != uuid.Nil {
+		log.Printf("[AUTO-FETCH] No players found for team %s, attempting auto-fetch", filters.TeamID)
+
+		// Ensure teams exist first, then fetch rosters
+		teamQueries := &db.TeamQueries{}
+		team, err := teamQueries.GetTeamByID(r.Context(), filters.TeamID)
+		if err == nil && team != nil {
+			// Team exists, fetch rosters
+			if err := h.orchestrator.FetchGamesIfMissing(r.Context(), 2025, 1); err != nil {
+				log.Printf("[AUTO-FETCH] Failed initial setup: %v", err)
+			}
+
+			// Retry query after fetch
+			players, total, err = h.queries.ListPlayers(r.Context(), filters)
+			if err == nil && total > 0 {
+				log.Printf("[AUTO-FETCH] Successfully fetched and returned %d players", total)
+				w.Header().Set("X-Auto-Fetched", "true")
+			}
+		}
 	}
 
 	// Return response with pagination

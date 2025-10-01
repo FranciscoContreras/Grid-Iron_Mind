@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/francisco/gridironmind/internal/autofetch"
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/internal/models"
 	"github.com/francisco/gridironmind/pkg/response"
@@ -14,12 +15,16 @@ import (
 )
 
 type StatsHandler struct {
-	queries *db.StatsQueries
+	queries          *db.StatsQueries
+	autoFetchEnabled bool
+	orchestrator     *autofetch.Orchestrator
 }
 
 func NewStatsHandler() *StatsHandler {
 	return &StatsHandler{
-		queries: &db.StatsQueries{},
+		queries:          &db.StatsQueries{},
+		autoFetchEnabled: true,
+		orchestrator:     autofetch.NewOrchestrator(""),
 	}
 }
 
@@ -47,6 +52,23 @@ func (h *StatsHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error getting game stats for %s: %v", gameID, err)
 		response.Error(w, http.StatusInternalServerError, "DATABASE_ERROR", "Failed to retrieve game stats")
 		return
+	}
+
+	// AUTO-FETCH: If no stats found for game, try to fetch them
+	if len(stats) == 0 && h.autoFetchEnabled {
+		log.Printf("[AUTO-FETCH] No stats found for game %s, attempting auto-fetch", gameID)
+
+		if err := h.orchestrator.FetchStatsIfMissing(r.Context(), gameID); err != nil {
+			log.Printf("[AUTO-FETCH] Failed to fetch stats for game %s: %v", gameID, err)
+			// Continue with empty result
+		} else {
+			// Retry query after fetch
+			stats, err = h.queries.GetGameStats(r.Context(), gameID)
+			if err == nil && len(stats) > 0 {
+				log.Printf("[AUTO-FETCH] Successfully fetched and returned %d stats", len(stats))
+				w.Header().Set("X-Auto-Fetched", "true")
+			}
+		}
 	}
 
 	response.Success(w, stats)

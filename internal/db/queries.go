@@ -121,8 +121,45 @@ func (q *PlayerQueries) GetPlayerByID(ctx context.Context, id uuid.UUID) (*model
 	return &p, nil
 }
 
+// GetByNFLID retrieves a player by their NFL ID
+func (q *PlayerQueries) GetByNFLID(ctx context.Context, nflID int) (*models.Player, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT p.id, p.nfl_id, p.name, p.position, p.team_id, p.jersey_number,
+		       p.height_inches, p.weight_pounds, p.birth_date, p.college,
+		       p.draft_year, p.draft_round, p.draft_pick, p.status,
+		       p.created_at, p.updated_at
+		FROM players p
+		WHERE p.nfl_id = $1
+	`
+
+	var p models.Player
+	err := pool.QueryRow(ctx, query, nflID).Scan(
+		&p.ID, &p.NFLID, &p.Name, &p.Position, &p.TeamID, &p.JerseyNumber,
+		&p.HeightInches, &p.WeightPounds, &p.BirthDate, &p.College,
+		&p.DraftYear, &p.DraftRound, &p.DraftPick, &p.Status,
+		&p.CreatedAt, &p.UpdatedAt,
+	)
+
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to get player: %w", err)
+	}
+
+	return &p, nil
+}
+
 // TeamQueries handles all team-related database operations
 type TeamQueries struct{}
+
+// List retrieves all teams
+func (q *TeamQueries) List(ctx context.Context) ([]models.Team, error) {
+	return q.ListTeams(ctx)
+}
 
 // ListTeams retrieves all teams
 func (q *TeamQueries) ListTeams(ctx context.Context) ([]models.Team, error) {
@@ -172,6 +209,34 @@ func (q *TeamQueries) GetTeamByID(ctx context.Context, id uuid.UUID) (*models.Te
 
 	var t models.Team
 	err := pool.QueryRow(ctx, query, id).Scan(
+		&t.ID, &t.NFLID, &t.Name, &t.Abbreviation, &t.City,
+		&t.Conference, &t.Division, &t.Stadium, &t.CreatedAt, &t.UpdatedAt,
+	)
+
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to get team: %w", err)
+	}
+
+	return &t, nil
+}
+
+// GetByNFLID retrieves a team by their NFL ID
+func (q *TeamQueries) GetByNFLID(ctx context.Context, nflID int) (*models.Team, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT id, nfl_id, name, abbreviation, city, conference, division,
+		       stadium, created_at, updated_at
+		FROM teams
+		WHERE nfl_id = $1
+	`
+
+	var t models.Team
+	err := pool.QueryRow(ctx, query, nflID).Scan(
 		&t.ID, &t.NFLID, &t.Name, &t.Abbreviation, &t.City,
 		&t.Conference, &t.Division, &t.Stadium, &t.CreatedAt, &t.UpdatedAt,
 	)

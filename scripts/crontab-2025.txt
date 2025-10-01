@@ -1,0 +1,36 @@
+# Grid Iron Mind - 2025 Season Automated Sync Schedule
+#
+# To install this crontab:
+# 1. Edit the PROJECT_PATH below to match your installation
+# 2. Run: crontab scripts/crontab-2025.txt
+#
+# Or add these lines to your existing crontab with: crontab -e
+
+# Set environment
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+PROJECT_PATH=/Users/francisco/Documents/Projects/Apps/gridironmind
+
+# ============================================
+# 2025 SEASON SYNC SCHEDULE
+# ============================================
+
+# Every hour during game days (Sunday 1pm-11pm ET, Monday 8pm-11pm ET)
+# Sync games and stats
+0 13-23 * * 0 cd $PROJECT_PATH && ./scripts/sync-2025-schedule.sh >> logs/sync-2025.log 2>&1
+0 20-23 * * 1 cd $PROJECT_PATH && ./scripts/sync-2025-schedule.sh >> logs/sync-2025.log 2>&1
+
+# Monday morning (9am) - Full roster refresh
+0 9 * * 1 cd $PROJECT_PATH && ./bin/sync2025 update >> logs/sync-2025.log 2>&1
+
+# Tuesday-Saturday (6am) - Daily update
+0 6 * * 2-6 cd $PROJECT_PATH && ./bin/sync2025 update >> logs/sync-2025.log 2>&1
+
+# Daily injury reports (3pm ET)
+0 15 * * * cd $PROJECT_PATH && ./bin/sync2025 injuries >> logs/sync-2025.log 2>&1
+
+# ============================================
+# ALTERNATIVE: Simple hourly update
+# Uncomment this if you prefer simpler scheduling
+# ============================================
+# 0 * * * * cd $PROJECT_PATH && ./bin/sync2025 update >> logs/sync-2025.log 2>&1

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/francisco/gridironmind/internal/autofetch"
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/internal/models"
 	"github.com/francisco/gridironmind/pkg/response"
@@ -14,12 +15,16 @@ import (
 )
 
 type GamesHandler struct {
-	queries *db.GameQueries
+	queries          *db.GameQueries
+	autoFetchEnabled bool
+	orchestrator     *autofetch.Orchestrator
 }
 
 func NewGamesHandler() *GamesHandler {
 	return &GamesHandler{
-		queries: &db.GameQueries{},
+		queries:          &db.GameQueries{},
+		autoFetchEnabled: true,
+		orchestrator:     autofetch.NewOrchestrator(""), // Weather API key can be injected if needed
 	}
 }
 
@@ -97,6 +102,45 @@ func (h *GamesHandler) listGames(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error listing games: %v", err)
 		response.Error(w, http.StatusInternalServerError, "DATABASE_ERROR", "Failed to retrieve games")
 		return
+	}
+
+	// AUTO-FETCH: If no games found and filters include season/week, try to fetch
+	if total == 0 && h.autoFetchEnabled && filters.Season > 0 {
+		log.Printf("[AUTO-FETCH] No games found for season %d week %d, attempting auto-fetch", filters.Season, filters.Week)
+
+		// Determine week to fetch
+		weekToFetch := filters.Week
+		if weekToFetch == 0 {
+			// Fetch all games for the season
+			if err := h.orchestrator.FetchAllSeasonGames(r.Context(), filters.Season); err != nil {
+				log.Printf("[AUTO-FETCH] Failed to fetch season %d games: %v", filters.Season, err)
+				// Continue with empty result, don't fail the request
+			} else {
+				// Retry query after fetch
+				games, total, err = h.queries.ListGames(r.Context(), filters)
+				if err != nil {
+					log.Printf("Error listing games after auto-fetch: %v", err)
+				} else {
+					log.Printf("[AUTO-FETCH] Successfully fetched and returned %d games", total)
+					w.Header().Set("X-Auto-Fetched", "true")
+				}
+			}
+		} else {
+			// Fetch specific week
+			if err := h.orchestrator.FetchGamesIfMissing(r.Context(), filters.Season, weekToFetch); err != nil {
+				log.Printf("[AUTO-FETCH] Failed to fetch season %d week %d: %v", filters.Season, weekToFetch, err)
+				// Continue with empty result
+			} else {
+				// Retry query after fetch
+				games, total, err = h.queries.ListGames(r.Context(), filters)
+				if err != nil {
+					log.Printf("Error listing games after auto-fetch: %v", err)
+				} else {
+					log.Printf("[AUTO-FETCH] Successfully fetched and returned %d games", total)
+					w.Header().Set("X-Auto-Fetched", "true")
+				}
+			}
+		}
 	}
 
 	response.SuccessWithPagination(w, games, total, filters.Limit, filters.Offset)
