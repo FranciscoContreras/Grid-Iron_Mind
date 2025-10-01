@@ -319,7 +319,7 @@ async function viewPlayerDetails(playerId) {
         // Now fetch career stats
         try {
             const careerResult = await apiCall(`/api/v1/players/${playerId}/career`);
-            const careerData = careerResult.data.data;
+            const careerData = careerResult.data;
 
             if (careerData.career_stats && careerData.career_stats.length > 0) {
                 const currentYear = new Date().getFullYear();
