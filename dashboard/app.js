@@ -129,6 +129,13 @@ function initTabs() {
                     content.classList.add('active');
                 }
             });
+
+            // Load data for the selected tab if not already loaded
+            if (tabName === 'teams' && state.teams.length === 0) {
+                loadTeams();
+            } else if (tabName === 'games') {
+                loadGames();
+            }
         });
     });
 }
