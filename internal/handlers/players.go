@@ -52,6 +52,10 @@ func (h *PlayersHandler) HandlePlayers(w http.ResponseWriter, r *http.Request) {
 		// Get player injuries
 		injuryHandler := NewInjuryHandler()
 		injuryHandler.HandlePlayerInjuries(w, r)
+	} else if strings.Contains(path, "/vs-defense/") {
+		// Get player vs defense stats
+		defensiveHandler := NewDefensiveHandler()
+		defensiveHandler.HandlePlayerVsDefense(w, r)
 	} else {
 		// Get single player by ID
 		h.getPlayer(w, r, path)

@@ -42,13 +42,17 @@ func (h *TeamsHandler) HandleTeams(w http.ResponseWriter, r *http.Request) {
 		// List all teams
 		h.listTeams(w, r)
 	} else {
-		// Check if requesting team players or injuries
+		// Check if requesting team players, injuries, or defensive stats
 		parts := strings.Split(path, "/")
-		if len(parts) == 2 && parts[1] == "players" {
+		if len(parts) >= 2 && parts[1] == "players" {
 			h.getTeamPlayers(w, r, parts[0])
-		} else if len(parts) == 2 && parts[1] == "injuries" {
+		} else if len(parts) >= 2 && parts[1] == "injuries" {
 			injuryHandler := NewInjuryHandler()
 			injuryHandler.HandleTeamInjuries(w, r)
+		} else if len(parts) >= 3 && parts[1] == "defense" && parts[2] == "stats" {
+			// Route to defensive stats handler
+			defensiveHandler := NewDefensiveHandler()
+			defensiveHandler.HandleTeamDefenseStats(w, r)
 		} else {
 			// Get single team by ID
 			h.getTeam(w, r, path)

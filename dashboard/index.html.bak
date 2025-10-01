@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grid Iron Mind - Dashboard</title>
-    <link rel="stylesheet" href="styles.css?v=3.0">
+    <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
     <div class="container">
@@ -13,38 +13,61 @@
             <div class="header-content">
                 <h1>🏈 Grid Iron Mind</h1>
                 <div class="header-status">
-                    <span class="status-indicator connected" id="statusIndicator">
+                    <span class="status-indicator" id="statusIndicator">
                         <span class="status-dot"></span>
-                        <span id="statusText">Connected</span>
+                        <span id="statusText">Disconnected</span>
                     </span>
-                    <span class="status-indicator" id="responseTime">48ms</span>
+                    <span class="response-time" id="responseTime">--ms</span>
                 </div>
             </div>
         </header>
 
         <!-- Navigation Tabs -->
-        <nav class="navigation">
-            <div class="tabs">
-                <button class="tab active" data-tab="players">Players</button>
-                <button class="tab" data-tab="teams">Teams</button>
-                <button class="tab" data-tab="games">Games</button>
-                <button class="tab" data-tab="career">Career Stats</button>
-                <button class="tab" data-tab="weather">Weather</button>
-                <button class="tab" data-tab="fantasy">Fantasy</button>
-                <button class="tab" data-tab="admin">Admin</button>
-                <button class="tab" data-tab="api-test">API Test</button>
-            </div>
+        <nav class="tabs">
+            <button class="tab active" data-tab="players">
+                <span class="btn-cap">
+                    <span class="btn-text">Players</span>
+                </span>
+            </button>
+            <button class="tab" data-tab="teams">
+                <span class="btn-cap">
+                    <span class="btn-text">Teams</span>
+                </span>
+            </button>
+            <button class="tab" data-tab="games">
+                <span class="btn-cap">
+                    <span class="btn-text">Games</span>
+                </span>
+            </button>
+            <button class="tab" data-tab="stats">
+                <span class="btn-cap">
+                    <span class="btn-text">Stats</span>
+                </span>
+            </button>
+            <button class="tab" data-tab="admin">
+                <span class="btn-cap">
+                    <span class="btn-text">Admin</span>
+                </span>
+            </button>
+            <a href="/docs.html" class="tab" style="text-decoration: none;">
+                <span class="btn-cap">
+                    <span class="btn-text">📚 API Docs</span>
+                </span>
+            </a>
         </nav>
 
         <!-- Tab Content -->
         <main class="content">
             <!-- Players Tab -->
             <section id="players-tab" class="tab-content active">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Players</h2>
-                        <button class="btn-refresh" id="refreshPlayers">↻ Refresh</button>
-                    </div>
+                <div class="section-header">
+                    <h2>Players</h2>
+                    <button class="btn-refresh" id="refreshPlayers">
+                        <span class="btn-cap">
+                            <span class="btn-text">↻ Refresh</span>
+                        </span>
+                    </button>
+                </div>
 
                 <div class="filters">
                     <input type="text" id="playerSearch" placeholder="Search by name..." class="input">
@@ -73,10 +96,7 @@
                     </select>
                 </div>
 
-                <div class="loading" id="playersLoading" style="display: none;">
-                    <div class="spinner"></div>
-                    <span class="loading-text">Loading players...</span>
-                </div>
+                <div class="loading" id="playersLoading">Loading...</div>
                 <div class="error" id="playersError" style="display: none;"></div>
 
                 <div class="table-container">
@@ -99,240 +119,201 @@
                     </table>
                 </div>
 
-                    <div class="pagination">
-                        <span class="pagination-info" id="playersPageInfo">Page 1</span>
-                        <div class="pagination-controls">
-                            <button class="btn" id="prevPlayers" disabled>← Previous</button>
-                            <button class="btn" id="nextPlayers">Next →</button>
-                        </div>
-                    </div>
+                <div class="pagination">
+                    <button class="btn" id="prevPlayers" disabled>← Previous</button>
+                    <span id="playersPageInfo">Page 1</span>
+                    <button class="btn" id="nextPlayers">Next →</button>
                 </div>
             </section>
 
             <!-- Teams Tab -->
             <section id="teams-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Teams</h2>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn" id="backToTeams" style="display: none;">← Back to Teams</button>
-                            <button class="btn-refresh" id="refreshTeams">↻ Refresh</button>
-                        </div>
+                <div class="section-header">
+                    <h2>Teams</h2>
+                    <button class="btn-refresh" id="refreshTeams">
+                        <span class="btn-cap">
+                            <span class="btn-text">↻ Refresh</span>
+                        </span>
+                    </button>
+                    <button class="btn" id="backToTeams" style="display: none;">← Back to Teams</button>
+                </div>
+
+                <!-- Breadcrumb Navigation -->
+                <div class="breadcrumb" id="teamBreadcrumb" style="display: none;">
+                    <span class="breadcrumb-item" data-level="teams">Teams</span>
+                </div>
+
+                <div class="loading" id="teamsLoading">Loading...</div>
+                <div class="error" id="teamsError" style="display: none;"></div>
+
+                <!-- Teams Grid (Level 1) -->
+                <div class="teams-grid" id="teamsGrid"></div>
+
+                <!-- Team Detail View (Level 2) -->
+                <div id="teamDetailView" style="display: none;">
+                    <div class="team-header">
+                        <h2 id="teamDetailName"></h2>
+                        <p id="teamDetailInfo"></p>
                     </div>
 
-                    <!-- Breadcrumb Navigation -->
-                    <div class="breadcrumb" id="teamBreadcrumb" style="display: none; margin-bottom: 16px; padding: 8px 16px; background: rgba(0, 0, 0, 0.02); border-radius: 12px; font-size: 14px; color: var(--gray-600);">
-                        <span class="breadcrumb-item" data-level="teams" style="cursor: pointer;">Teams</span>
+                    <div class="team-section">
+                        <h3>📅 Games History</h3>
+                        <div class="filters">
+                            <input type="number" id="teamGamesSeason" placeholder="Season" class="input" value="2024">
+                            <button class="btn" id="loadTeamGames">Load Games</button>
+                        </div>
+                        <div class="loading" id="teamGamesLoading" style="display: none;">Loading...</div>
+                        <div id="teamGamesList"></div>
                     </div>
 
-                    <div class="loading" id="teamsLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading teams...</span>
+                    <div class="team-section">
+                        <h3>👥 Current Roster</h3>
+                        <div class="loading" id="teamRosterLoading" style="display: none;">Loading...</div>
+                        <div id="teamRosterList"></div>
                     </div>
-                    <div class="error" id="teamsError" style="display: none;"></div>
+                </div>
 
-                    <!-- Teams Grid (Level 1) -->
-                    <div class="cards-grid" id="teamsGrid"></div>
-
-                    <!-- Team Detail View (Level 2) -->
-                    <div id="teamDetailView" style="display: none;">
-                        <div style="margin-bottom: 32px;">
-                            <h3 id="teamDetailName" style="font-size: 24px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="teamDetailInfo" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📅 Games History</h4>
-                            <div class="filters" style="margin-bottom: 16px;">
-                                <div class="filter-group">
-                                    <label class="filter-label">Season</label>
-                                    <input type="number" id="teamGamesSeason" placeholder="Season" class="input" value="2024">
-                                </div>
-                                <button class="btn-primary" id="loadTeamGames">Load Games</button>
-                            </div>
-                            <div class="loading" id="teamGamesLoading" style="display: none;">
-                                <div class="spinner"></div>
-                                <span class="loading-text">Loading games...</span>
-                            </div>
-                            <div id="teamGamesList"></div>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">👥 Current Roster</h4>
-                            <div class="loading" id="teamRosterLoading" style="display: none;">
-                                <div class="spinner"></div>
-                                <span class="loading-text">Loading roster...</span>
-                            </div>
-                            <div id="teamRosterList"></div>
-                        </div>
+                <!-- Game Detail View (Level 3) -->
+                <div id="gameDetailView" style="display: none;">
+                    <div class="game-header">
+                        <h2 id="gameDetailTitle"></h2>
+                        <p id="gameDetailInfo"></p>
                     </div>
 
-                    <!-- Game Detail View (Level 3) -->
-                    <div id="gameDetailView" style="display: none;">
-                        <div style="margin-bottom: 32px;">
-                            <h3 id="gameDetailTitle" style="font-size: 24px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="gameDetailInfo" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">🌡️ Game Conditions</h4>
-                            <div id="gameWeatherDetails"></div>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📊 Team Statistics</h4>
-                            <div class="loading" id="gamePlayersLoading" style="display: none;">
-                                <div class="spinner"></div>
-                                <span class="loading-text">Loading statistics...</span>
-                            </div>
-                            <div id="gamePlayersList"></div>
-                        </div>
+                    <div class="game-weather-info">
+                        <h3>🌡️ Game Conditions</h3>
+                        <div id="gameWeatherDetails"></div>
                     </div>
 
-                    <!-- Player Historical View (Level 4) -->
-                    <div id="playerHistoricalView" style="display: none;">
-                        <div style="margin-bottom: 32px;">
-                            <h3 id="playerHistoricalName" style="font-size: 24px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="playerHistoricalInfo" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <div class="loading" id="playerHistoricalLoading" style="display: none;">
-                            <div class="spinner"></div>
-                            <span class="loading-text">Loading player data...</span>
-                        </div>
-                        <div id="playerHistoricalData"></div>
+                    <div class="game-section">
+                        <h3>📊 Team Statistics</h3>
+                        <div class="loading" id="gamePlayersLoading" style="display: none;">Loading...</div>
+                        <div id="gamePlayersList"></div>
                     </div>
+                </div>
+
+                <!-- Player Historical View (Level 4) -->
+                <div id="playerHistoricalView" style="display: none;">
+                    <div class="player-header">
+                        <h2 id="playerHistoricalName"></h2>
+                        <p id="playerHistoricalInfo"></p>
+                    </div>
+
+                    <div class="loading" id="playerHistoricalLoading" style="display: none;">Loading...</div>
+                    <div id="playerHistoricalData"></div>
                 </div>
             </section>
 
             <!-- Games Tab -->
             <section id="games-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Games & Schedule</h2>
-                        <button class="btn-refresh" id="refreshGames">↻ Refresh</button>
-                    </div>
+                <div class="section-header">
+                    <h2>Games & Schedule</h2>
+                    <button class="btn-refresh" id="refreshGames">
+                        <span class="btn-cap">
+                            <span class="btn-text">↻ Refresh</span>
+                        </span>
+                    </button>
+                </div>
 
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label class="filter-label">Season</label>
-                            <input type="number" id="seasonFilter" placeholder="2024" class="input" value="2024">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Week</label>
-                            <input type="number" id="weekFilter" placeholder="1-18" class="input" min="1" max="18">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Status</label>
-                            <select id="gameStatusFilter" class="select">
-                                <option value="">All Status</option>
-                                <option value="scheduled">Scheduled</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="final">Final</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="filters">
+                    <input type="number" id="seasonFilter" placeholder="Season (e.g., 2024)" class="input" value="2024">
+                    <input type="number" id="weekFilter" placeholder="Week (1-18)" class="input" min="1" max="18">
+                    <select id="gameStatusFilter" class="select">
+                        <option value="">All Status</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="final">Final</option>
+                    </select>
+                </div>
 
-                    <div class="loading" id="gamesLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading games...</span>
-                    </div>
-                    <div class="error" id="gamesError" style="display: none;"></div>
+                <div class="loading" id="gamesLoading" style="display: none;">Loading...</div>
+                <div class="error" id="gamesError" style="display: none;"></div>
 
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Away Team</th>
-                                    <th>Score</th>
-                                    <th>Home Team</th>
-                                    <th>Status</th>
-                                    <th>Weather</th>
-                                    <th>Venue</th>
-                                </tr>
-                            </thead>
-                            <tbody id="gamesTableBody">
-                                <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gray-500);">Select filters and click Refresh</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Away Team</th>
+                                <th>Score</th>
+                                <th>Home Team</th>
+                                <th>Status</th>
+                                <th>Weather</th>
+                                <th>Venue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gamesTableBody">
+                            <tr><td colspan="7" style="text-align: center; padding: 20px;">Select filters and click Refresh</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
             <!-- Career Stats Tab -->
             <section id="career-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Player Career Statistics</h2>
+                <div class="section-header">
+                    <h2>Player Career Statistics</h2>
+                </div>
+
+                <div class="form-group">
+                    <label>Player ID (UUID)</label>
+                    <input type="text" id="careerPlayerId" class="input" placeholder="Enter player UUID">
+                    <button class="btn btn-primary" id="loadCareerStats">Load Career Stats</button>
+                </div>
+
+                <div class="loading" id="careerLoading" style="display: none;">Loading...</div>
+                <div class="error" id="careerError" style="display: none;"></div>
+
+                <div id="careerStatsContainer" style="display: none;">
+                    <div class="stats-summary">
+                        <h3 id="careerPlayerName"></h3>
+                        <p id="careerSummary"></p>
                     </div>
 
-                    <div class="filters" style="margin-bottom: 24px;">
-                        <div class="filter-group" style="flex: 2;">
-                            <label class="filter-label">Player ID (UUID)</label>
-                            <input type="text" id="careerPlayerId" class="input" placeholder="Enter player UUID">
-                        </div>
-                        <button class="btn-primary" id="loadCareerStats" style="align-self: flex-end;">Load Career Stats</button>
+                    <h4>Team History</h4>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Team</th>
+                                    <th>Position</th>
+                                    <th>Seasons</th>
+                                    <th>Current</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teamHistoryBody"></tbody>
+                        </table>
                     </div>
 
-                    <div class="loading" id="careerLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading career stats...</span>
-                    </div>
-                    <div class="error" id="careerError" style="display: none;"></div>
-
-                    <div id="careerStatsContainer" style="display: none;">
-                        <div style="margin-bottom: 32px; padding: 20px; background: rgba(0, 122, 255, 0.05); border-radius: 16px; border: 1px solid rgba(0, 122, 255, 0.1);">
-                            <h3 id="careerPlayerName" style="font-size: 18px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="careerSummary" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Team History</h4>
-                        <div class="table-container" style="margin-bottom: 32px;">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Team</th>
-                                        <th>Position</th>
-                                        <th>Seasons</th>
-                                        <th>Current</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="teamHistoryBody"></tbody>
-                            </table>
-                        </div>
-
-                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Season-by-Season Stats</h4>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Season</th>
-                                        <th>Team</th>
-                                        <th>GP</th>
-                                        <th>Pass Yds</th>
-                                        <th>Pass TD</th>
-                                        <th>Rush Yds</th>
-                                        <th>Rush TD</th>
-                                        <th>Rec</th>
-                                        <th>Rec Yds</th>
-                                        <th>Rec TD</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="careerStatsBody"></tbody>
-                            </table>
-                        </div>
+                    <h4>Season-by-Season Stats</h4>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Season</th>
+                                    <th>Team</th>
+                                    <th>GP</th>
+                                    <th>Pass Yds</th>
+                                    <th>Pass TD</th>
+                                    <th>Rush Yds</th>
+                                    <th>Rush TD</th>
+                                    <th>Rec</th>
+                                    <th>Rec Yds</th>
+                                    <th>Rec TD</th>
+                                </tr>
+                            </thead>
+                            <tbody id="careerStatsBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
             <!-- Weather Analysis Tab -->
             <section id="weather-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Weather Impact Analysis</h2>
-                        <button class="btn-refresh" id="refreshWeather">↻ Refresh</button>
-                    </div>
+                <div class="section-header">
+                    <h2>Weather Impact Analysis</h2>
+                    <button class="btn-refresh" id="refreshWeather">↻ Refresh</button>
+                </div>
 
                 <div class="filters">
                     <input type="number" id="weatherSeason" placeholder="Season (e.g., 2024)" class="input" value="2024">
@@ -399,16 +380,14 @@
                         </tbody>
                     </table>
                 </div>
-                </div>
             </section>
 
             <!-- Fantasy Stats Tab -->
             <section id="fantasy-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Fantasy Football Stats</h2>
-                        <button class="btn-refresh" id="refreshFantasy">↻ Refresh</button>
-                    </div>
+                <div class="section-header">
+                    <h2>Fantasy Football Stats</h2>
+                    <button class="btn-refresh" id="refreshFantasy">↻ Refresh</button>
+                </div>
 
                 <div class="filters">
                     <input type="number" id="fantasySeason" placeholder="Season" class="input" value="2024">
@@ -456,12 +435,10 @@
                         </table>
                     </div>
                 </div>
-                </div>
             </section>
 
             <!-- Admin Sync Tab -->
             <section id="admin-tab" class="tab-content">
-                <div class="content-card">
                 <div class="section-header">
                     <h2>Admin Data Synchronization</h2>
                 </div>
@@ -571,14 +548,12 @@
                         Quick sync runs: Teams → Rosters → Historical Games (2020-2024) → NFLverse Stats → Weather Data
                     </p>
                 </div>
-                </div>
             </section>
 
             <!-- API Testing Tab -->
             <section id="api-test-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">API Testing</h2>
+                <div class="section-header">
+                    <h2>API Testing</h2>
                 </div>
 
                 <div class="api-test-form">
@@ -630,7 +605,6 @@
                     </div>
                     <pre id="apiResponseBody" class="response-body">No request executed yet</pre>
                 </div>
-                </div>
             </section>
         </main>
 
@@ -644,6 +618,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=3.2"></script>
+    <script src="app.js"></script>
 </body>
 </html>
