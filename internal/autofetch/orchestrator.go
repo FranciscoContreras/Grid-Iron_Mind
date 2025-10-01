@@ -137,7 +137,7 @@ func (o *Orchestrator) FetchPlayerIfMissing(ctx context.Context, nflID int) (*mo
 	}
 
 	// Sync rosters (will fetch all players)
-	if err := o.ingestionService.SyncRosters(ctx); err != nil {
+	if err := o.ingestionService.SyncAllRosters(ctx); err != nil {
 		log.Printf("[AUTO-FETCH] Failed to sync rosters: %v", err)
 		return nil, err
 	}
@@ -197,13 +197,13 @@ func (o *Orchestrator) FetchStatsIfMissing(ctx context.Context, gameID uuid.UUID
 
 	// Get game to determine season
 	gameQueries := &db.GameQueries{}
-	game, err := gameQueries.GetByID(ctx, gameID)
+	game, err := gameQueries.GetGameByID(ctx, gameID)
 	if err != nil {
 		return fmt.Errorf("game not found: %w", err)
 	}
 
 	// Sync stats from NFLverse
-	if err := o.ingestionService.SyncPlayerStats(ctx, game.Season); err != nil {
+	if err := o.ingestionService.SyncNFLversePlayerStats(ctx, game.SeasonYear); err != nil {
 		log.Printf("[AUTO-FETCH] Failed to sync player stats: %v", err)
 		return err
 	}
