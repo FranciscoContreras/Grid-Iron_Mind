@@ -63,6 +63,7 @@ func main() {
 	aiHandler := handlers.NewAIHandler(cfg)
 	adminHandler := handlers.NewAdminHandler(cfg.WeatherAPIKey)
 	weatherHandler := handlers.NewWeatherHandler(weather.NewClient(cfg.WeatherAPIKey))
+	gardenHandler := handlers.NewGardenHandler(cfg)
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -104,6 +105,13 @@ func main() {
 
 	// Injury sync endpoint
 	mux.HandleFunc("/api/v1/admin/sync/injuries", applyMiddleware(adminHandler.HandleSyncInjuries))
+
+	// AI Data Garden endpoints (require AI service)
+	mux.HandleFunc("/api/v1/garden/health", applyMiddleware(gardenHandler.HandleGarden))
+	mux.HandleFunc("/api/v1/garden/query", applyAIMiddleware(gardenHandler.HandleGarden))
+	mux.HandleFunc("/api/v1/garden/enrich/player/", applyAIMiddleware(gardenHandler.HandleGarden))
+	mux.HandleFunc("/api/v1/garden/schedule", applyMiddleware(gardenHandler.HandleGarden))
+	mux.HandleFunc("/api/v1/garden/status", applyMiddleware(gardenHandler.HandleGarden))
 
 	// Weather API endpoints
 	mux.HandleFunc("/api/v1/weather/current", applyMiddleware(weatherHandler.HandleCurrentWeather))
