@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"time"
@@ -21,6 +22,17 @@ func Connect(cfg Config) error {
 	opt, err := redis.ParseURL(cfg.RedisURL)
 	if err != nil {
 		return fmt.Errorf("failed to parse Redis URL: %w", err)
+	}
+
+	// Configure TLS for Heroku Redis (skip hostname verification)
+	// Heroku Redis uses SSL but the certificate hostname may not match the actual endpoint
+	if opt.TLSConfig != nil {
+		opt.TLSConfig.InsecureSkipVerify = true
+	} else if len(cfg.RedisURL) > 8 && cfg.RedisURL[:8] == "rediss://" {
+		// If using rediss:// protocol but TLSConfig not set, create one
+		opt.TLSConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
 	}
 
 	client = redis.NewClient(opt)
