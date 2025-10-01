@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Iron Mind - API Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .docs-nav {
+            position: sticky;
+            top: 20px;
+            background: var(--bg-primary);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .docs-nav ul {
+            list-style: none;
+        }
+
+        .docs-nav li {
+            margin: 8px 0;
+        }
+
+        .docs-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .docs-nav a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .docs-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .docs-content {
+            background: var(--bg-primary);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .docs-section {
+            margin-bottom: 50px;
+        }
+
+        .docs-section h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .docs-section h3 {
+            color: var(--text-primary);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid var(--primary);
+        }
+
+        body.dark-mode .alert-success {
+            background: #155724;
+            color: #d4edda;
+        }
+
+        body.dark-mode .alert-warning {
+            background: #856404;
+            color: #fff3cd;
+        }
+
+        body.dark-mode .alert-danger {
+            background: #721c24;
+            color: #f8d7da;
+        }
+
+        body.dark-mode .alert-info {
+            background: #0c5460;
+            color: #d1ecf1;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .do-dont-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .do-card, .dont-card {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .do-card {
+            background: #d4edda;
+            border-left: 4px solid var(--success);
+        }
+
+        .dont-card {
+            background: #f8d7da;
+            border-left: 4px solid var(--danger);
+        }
+
+        body.dark-mode .do-card {
+            background: #155724;
+        }
+
+        body.dark-mode .dont-card {
+            background: #721c24;
+        }
+
+        .do-card h4::before {
+            content: "✅ ";
+        }
+
+        .dont-card h4::before {
+            content: "❌ ";
+        }
+
+        .endpoint-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .badge-get {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-post {
+            background: #007bff;
+            color: white;
+        }
+
+        .badge-public {
+            background: #6c757d;
+            color: white;
+        }
+
+        .badge-auth {
+            background: #ffc107;
+            color: #000;
+        }
+
+        @media (max-width: 968px) {
+            .docs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .docs-nav {
+                position: relative;
+                top: 0;
+            }
+
+            .do-dont-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🏈 Grid Iron Mind - API Documentation</h1>
+                <div class="header-status">
+                    <a href="/" class="btn">← Dashboard</a>
+                    <button class="btn-icon" id="darkModeToggle" title="Toggle dark mode">🌙</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Documentation Grid -->
+        <div class="docs-grid">
+            <!-- Navigation Sidebar -->
+            <nav class="docs-nav">
+                <h3>Contents</h3>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#authentication">Authentication</a></li>
+                    <li><a href="#rate-limiting">Rate Limiting</a></li>
+                    <li><a href="#endpoints">API Endpoints</a></li>
+                    <li><a href="#ai-garden">🌱 AI Data Garden</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><a href="#dos-donts">Do's & Don'ts</a></li>
+                    <li><a href="#examples">Code Examples</a></li>
+                    <li><a href="#errors">Error Handling</a></li>
+                    <li><a href="#performance">Performance Tips</a></li>
+                </ul>
+            </nav>
+
+            <!-- Documentation Content -->
+            <div class="docs-content">
+                <!-- Overview Section -->
+                <section id="overview" class="docs-section">
+                    <h2>📖 Overview</h2>
+                    <p>Grid Iron Mind is a high-performance NFL data API providing real-time and historical statistics, player information, team data, game schedules, injury reports, and AI-powered insights.</p>
+
+                    <div class="alert alert-info">
+                        <strong>Production API:</strong> <code>https://nfl.wearemachina.com/api/v1</code>
+                    </div>
+
+                    <h3>Key Features</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>⚡ Sub-200ms Response Times</h4>
+                            <p>Optimized database queries with aggressive Redis caching for lightning-fast responses.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🤖 AI-Powered Insights</h4>
+                            <p>Natural language queries, predictions, and intelligent data analysis powered by Grok AI and Claude.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🌱 Self-Healing Data</h4>
+                            <p>AI Data Garden automatically maintains data quality, fills gaps, and optimizes sync schedules.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📊 Comprehensive Data</h4>
+                            <p>Players, teams, games, stats, injuries, weather conditions, and historical data back to 2020.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Getting Started Section -->
+                <section id="getting-started" class="docs-section">
+                    <h2>🚀 Getting Started</h2>
+
+                    <h3>1. Make Your First Request</h3>
+                    <p>No API key needed for public endpoints:</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>curl https://nfl.wearemachina.com/api/v1/teams</pre>
+                    </div>
+
+                    <h3>2. Get an API Key (For AI Features)</h3>
+                    <p>Generate an API key for AI-powered endpoints:</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>curl -X POST https://nfl.wearemachina.com/api/v1/admin/keys/generate \
+  -H "Content-Type: application/json" \
+  -d '{"unlimited": false}'</pre>
+                    </div>
+
+                    <h3>3. Response Format</h3>
+                    <p>All responses follow a consistent JSON structure:</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>{
+  "data": {...},
+  "meta": {
+    "timestamp": "2025-10-01T12:00:00Z",
+    "total": 100,
+    "limit": 50,
+    "offset": 0
+  }
+}</pre>
+                    </div>
+                </section>
+
+                <!-- Authentication Section -->
+                <section id="authentication" class="docs-section">
+                    <h2>🔐 Authentication</h2>
+
+                    <h3>Public Endpoints (No Auth Required)</h3>
+                    <ul>
+                        <li>Players: <code>/api/v1/players</code></li>
+                        <li>Teams: <code>/api/v1/teams</code></li>
+                        <li>Games: <code>/api/v1/games</code></li>
+                        <li>Stats: <code>/api/v1/stats/leaders</code></li>
+                        <li>Garden Status: <code>/api/v1/garden/status</code></li>
+                        <li>Health Check: <code>/api/v1/garden/health</code> (GET)</li>
+                    </ul>
+
+                    <h3>Protected Endpoints (API Key Required)</h3>
+                    <ul>
+                        <li>AI Predictions: <code>/api/v1/ai/*</code></li>
+                        <li>Natural Language Query: <code>/api/v1/garden/query</code></li>
+                        <li>Player Enrichment: <code>/api/v1/garden/enrich/player/*</code></li>
+                    </ul>
+
+                    <h3>Using API Keys</h3>
+                    <p>Include your API key in the request header:</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre># Method 1: X-API-Key header
+curl https://nfl.wearemachina.com/api/v1/ai/query \
+  -H "X-API-Key: your-api-key-here"
+
+# Method 2: Authorization Bearer token
+curl https://nfl.wearemachina.com/api/v1/ai/query \
+  -H "Authorization: Bearer your-api-key-here"</pre>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <strong>⚠️ Never expose API keys:</strong> Do not commit keys to version control or share them publicly. Use environment variables.
+                    </div>
+                </section>
+
+                <!-- Rate Limiting Section -->
+                <section id="rate-limiting" class="docs-section">
+                    <h2>⏱️ Rate Limiting</h2>
+
+                    <h3>Rate Limits by Endpoint Type</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint Type</th>
+                                <th>Rate Limit</th>
+                                <th>Reset Window</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Public Endpoints</td>
+                                <td>100 requests/minute</td>
+                                <td>1 minute</td>
+                            </tr>
+                            <tr>
+                                <td>AI Endpoints</td>
+                                <td>10 requests/minute</td>
+                                <td>1 minute</td>
+                            </tr>
+                            <tr>
+                                <td>Unlimited API Key</td>
+                                <td>No limit</td>
+                                <td>N/A</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Rate Limit Response Headers</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1633024800
+
+# When limit exceeded (429 Too Many Requests):
+Retry-After: 60</pre>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Best Practice:</strong> Implement exponential backoff when receiving 429 responses. Wait for the Retry-After seconds before retrying.
+                    </div>
+                </section>
+
+                <!-- Endpoints Section -->
+                <section id="endpoints" class="docs-section">
+                    <h2>📡 API Endpoints</h2>
+
+                    <h3>Players</h3>
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/players</code></p>
+                        <p>List players with optional filters: <code>?position=QB&status=active&limit=50</code></p>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/players/:id</code></p>
+                        <p>Get single player details by UUID.</p>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/players/:id/career</code></p>
+                        <p>Get player career statistics and team history.</p>
+                    </div>
+
+                    <h3>Teams</h3>
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/teams</code></p>
+                        <p>List all 32 NFL teams with stadium information.</p>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/teams/:id/players</code></p>
+                        <p>Get current team roster.</p>
+                    </div>
+
+                    <h3>Games</h3>
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/games</code></p>
+                        <p>List games with filters: <code>?season=2025&week=5&status=final</code></p>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/games/:id</code></p>
+                        <p>Get game details including weather and venue information.</p>
+                    </div>
+
+                    <h3>Statistics</h3>
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/stats/leaders</code></p>
+                        <p>Get stat leaders: <code>?stat_type=passing_yards&season=2025</code></p>
+                    </div>
+
+                    <div class="endpoint-card">
+                        <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/stats/game/:gameID</code></p>
+                        <p>Get player statistics for a specific game.</p>
+                    </div>
+                </section>
+
+                <!-- AI Data Garden Section -->
+                <section id="ai-garden" class="docs-section">
+                    <h2>🌱 AI Data Garden</h2>
+                    <p>The AI Data Garden is a self-maintaining, intelligent data ecosystem that uses AI to monitor health, fill gaps, and optimize data quality automatically.</p>
+
+                    <div class="alert alert-success">
+                        <strong>✨ What Makes It Special:</strong> Your database maintains itself! AI continuously monitors data quality, fixes issues automatically, enriches records with missing information, and adapts sync schedules based on game days and usage patterns.
+                    </div>
+
+                    <h3>🌡️ Health Monitoring</h3>
+                    <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/garden/health</code></p>
+                    <p>AI analyzes database health and identifies issues (staleness, gaps, anomalies).</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>curl https://nfl.wearemachina.com/api/v1/garden/health</pre>
+                    </div>
+
+                    <p><span class="endpoint-badge badge-post">POST</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/garden/health</code></p>
+                    <p>Run health check WITH auto-healing (fixes low-risk issues automatically).</p>
+
+                    <h3>💬 Natural Language Queries 🔥</h3>
+                    <p><span class="endpoint-badge badge-post">POST</span><span class="endpoint-badge badge-auth">AUTH</span><code>/api/v1/garden/query</code></p>
+                    <p>Query database using plain English - AI converts to SQL, executes safely, and provides insights.</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>curl -X POST https://nfl.wearemachina.com/api/v1/garden/query \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-key" \
+  -d '{
+    "query": "Who are the top 5 rushing leaders this season?"
+  }'
+
+# Response includes:
+# - Generated SQL query
+# - Results
+# - AI insights and explanation
+# - Safety validation
+# - Which AI provider was used (Grok/Claude)</pre>
+                    </div>
+
+                    <h3>Example Queries</h3>
+                    <ul>
+                        <li>"Show me all QBs with over 300 passing yards last week"</li>
+                        <li>"Which teams have the most injuries right now?"</li>
+                        <li>"Top 10 receivers by fantasy points this season"</li>
+                        <li>"Games between Chiefs and Bills in 2024"</li>
+                        <li>"Players on the Cowboys roster"</li>
+                    </ul>
+
+                    <div class="alert alert-warning">
+                        <strong>Safety First:</strong> All queries are validated by AI. Dangerous operations (DROP, DELETE, UPDATE) are automatically blocked. Only SELECT statements allowed.
+                    </div>
+
+                    <h3>✨ Data Enrichment</h3>
+                    <p><span class="endpoint-badge badge-post">POST</span><span class="endpoint-badge badge-auth">AUTH</span><code>/api/v1/garden/enrich/player/:id</code></p>
+                    <p>AI enriches player data with missing info, generates tags, creates summaries, and finds similar players.</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>curl -X POST https://nfl.wearemachina.com/api/v1/garden/enrich/player/{uuid} \
+  -H "X-API-Key: your-key"
+
+# Returns:
+# - Missing field suggestions (college, draft info, etc.)
+# - Confidence scores (0.0 - 1.0)
+# - Generated tags (e.g., "deep-threat", "wr1", "elite-speed")
+# - AI-written player summary
+# - Comparable players</pre>
+                    </div>
+
+                    <h3>📅 Smart Sync Scheduling</h3>
+                    <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/garden/schedule</code></p>
+                    <p>AI generates intelligent sync plan based on current context (game day, time, season phase).</p>
+
+                    <h3>🔍 Garden Status</h3>
+                    <p><span class="endpoint-badge badge-get">GET</span><span class="endpoint-badge badge-public">PUBLIC</span><code>/api/v1/garden/status</code></p>
+                    <p>Get overall AI Data Garden system status and capabilities.</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>curl https://nfl.wearemachina.com/api/v1/garden/status
+
+# Returns:
+# - AI enabled status
+# - Active AI provider (Grok/Claude)
+# - Data counts (players, games, injuries)
+# - Last update times
+# - Available garden features</pre>
+                    </div>
+
+                    <h3>🤖 Multi-AI Provider System</h3>
+                    <p>The Garden uses <strong>Grok AI</strong> (xAI) as primary provider with <strong>Claude 3.5 Sonnet</strong> as automatic fallback. If one fails, the other takes over seamlessly.</p>
+                </section>
+
+                <!-- Best Practices Section -->
+                <section id="best-practices" class="docs-section">
+                    <h2>✅ Best Practices</h2>
+
+                    <h3>1. Use Pagination</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre># Good: Request specific page
+/api/v1/players?limit=50&offset=0
+
+# Bad: Request all records
+/api/v1/players?limit=10000</pre>
+                    </div>
+                    <p>Default limit: 50, Max limit: 100 per request.</p>
+
+                    <h3>2. Cache Responses Client-Side</h3>
+                    <p>API responses include caching headers. Teams data changes infrequently - cache for 1 hour.</p>
+
+                    <h3>3. Filter Server-Side</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre># Good: Filter on server
+/api/v1/players?position=QB&status=active
+
+# Bad: Fetch all and filter client-side
+/api/v1/players (then filter in JavaScript)</pre>
+                    </div>
+
+                    <h3>4. Respect Rate Limits</h3>
+                    <p>Implement exponential backoff when receiving 429 responses:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>async function fetchWithRetry(url, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    const response = await fetch(url);
+
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After') || 60;
+      await sleep(retryAfter * 1000);
+      continue;
+    }
+
+    return response;
+  }
+}</pre>
+                    </div>
+
+                    <h3>5. Monitor Response Times</h3>
+                    <p>Check <code>X-Cache</code> headers to understand cache hits/misses. First request may be slower (database query), subsequent requests fast (cached).</p>
+
+                    <h3>6. Use Natural Language Queries Wisely</h3>
+                    <p>Be specific with timeframes and metrics:</p>
+                    <ul>
+                        <li>✅ Good: "Top 5 rushing leaders this season"</li>
+                        <li>❌ Bad: "Good players" (too vague)</li>
+                    </ul>
+
+                    <h3>7. Handle Errors Gracefully</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>try {
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error('API Error:', data.error.code, data.error.message);
+    // Show user-friendly error message
+    return;
+  }
+
+  // Process data
+} catch (error) {
+  console.error('Network Error:', error);
+  // Show connection error message
+}</pre>
+                    </div>
+
+                    <h3>8. Batch Requests Efficiently</h3>
+                    <p>If you need multiple player details, use filters instead of individual requests:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre># Good: Single request
+/api/v1/teams/:teamId/players
+
+# Bad: 53 individual requests
+/api/v1/players/:id (for each player)</pre>
+                    </div>
+                </section>
+
+                <!-- Do's and Don'ts Section -->
+                <section id="dos-donts" class="docs-section">
+                    <h2>⚖️ Do's & Don'ts</h2>
+
+                    <div class="do-dont-grid">
+                        <div class="do-card">
+                            <h4>DO: Cache responses client-side</h4>
+                            <p>Team data rarely changes. Cache for 1 hour to reduce API calls.</p>
+                        </div>
+                        <div class="dont-card">
+                            <h4>DON'T: Hammer the API</h4>
+                            <p>Don't make rapid-fire requests. Respect rate limits and cache responses.</p>
+                        </div>
+                    </div>
+
+                    <div class="do-dont-grid">
+                        <div class="do-card">
+                            <h4>DO: Use query parameters</h4>
+                            <p>Filter, paginate, and limit results server-side for better performance.</p>
+                        </div>
+                        <div class="dont-card">
+                            <h4>DON'T: Fetch everything</h4>
+                            <p>Don't request all data and filter client-side. Use API filters instead.</p>
+                        </div>
+                    </div>
+
+                    <div class="do-dont-grid">
+                        <div class="do-card">
+                            <h4>DO: Check X-Cache headers</h4>
+                            <p>Monitor cache HIT/MISS to understand performance patterns.</p>
+                        </div>
+                        <div class="dont-card">
+                            <h4>DON'T: Ignore errors</h4>
+                            <p>Always handle errors gracefully. Check response.ok before processing.</p>
+                        </div>
+                    </div>
+
+                    <div class="do-dont-grid">
+                        <div class="do-card">
+                            <h4>DO: Store API keys securely</h4>
+                            <p>Use environment variables. Never commit keys to version control.</p>
+                        </div>
+                        <div class="dont-card">
+                            <h4>DON'T: Expose API keys</h4>
+                            <p>Never hardcode keys in client-side code or share them publicly.</p>
+                        </div>
+                    </div>
+
+                    <div class="do-dont-grid">
+                        <div class="do-card">
+                            <h4>DO: Use semantic queries</h4>
+                            <p>Natural language queries work best when specific (timeframe, metrics).</p>
+                        </div>
+                        <div class="dont-card">
+                            <h4>DON'T: Try SQL injection</h4>
+                            <p>AI validates all natural queries. Dangerous operations are blocked.</p>
+                        </div>
+                    </div>
+
+                    <div class="do-dont-grid">
+                        <div class="do-card">
+                            <h4>DO: Implement exponential backoff</h4>
+                            <p>When receiving 429, wait and retry with increasing delays.</p>
+                        </div>
+                        <div class="dont-card">
+                            <h4>DON'T: Retry immediately</h4>
+                            <p>Don't spam retry on 429 errors. Wait for Retry-After duration.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Code Examples Section -->
+                <section id="examples" class="docs-section">
+                    <h2>💻 Code Examples</h2>
+
+                    <h3>JavaScript / Node.js</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>// Fetch players with pagination
+async function getPlayers(page = 1, position = '') {
+  const limit = 50;
+  const offset = (page - 1) * limit;
+
+  const params = new URLSearchParams({ limit, offset });
+  if (position) params.append('position', position);
+
+  const response = await fetch(
+    `https://nfl.wearemachina.com/api/v1/players?${params}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+// Natural language query
+async function askGarden(question, apiKey) {
+  const response = await fetch(
+    'https://nfl.wearemachina.com/api/v1/garden/query',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey
+      },
+      body: JSON.stringify({ query: question })
+    }
+  );
+
+  const data = await response.json();
+
+  return {
+    results: data.data.results,
+    insights: data.data.insights,
+    sql: data.data.sql,
+    provider: data.data.ai_provider
+  };
+}
+
+// Usage
+const players = await getPlayers(1, 'QB');
+console.log(`Found ${players.data.meta.total} quarterbacks`);
+
+const answer = await askGarden('Top 5 rushing leaders', 'your-key');
+console.log(answer.insights);</pre>
+                    </div>
+
+                    <h3>Python</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>import requests
+
+API_BASE = "https://nfl.wearemachina.com/api/v1"
+
+def get_teams():
+    """Fetch all NFL teams"""
+    response = requests.get(f"{API_BASE}/teams")
+    response.raise_for_status()
+    return response.json()["data"]
+
+def ask_garden(query, api_key):
+    """Query database using natural language"""
+    headers = {
+        "Content-Type": "application/json",
+        "X-API-Key": api_key
+    }
+
+    payload = {"query": query}
+
+    response = requests.post(
+        f"{API_BASE}/garden/query",
+        headers=headers,
+        json=payload
+    )
+    response.raise_for_status()
+
+    data = response.json()["data"]
+
+    return {
+        "results": data["results"],
+        "insights": data["insights"],
+        "sql": data["sql"],
+        "provider": data["ai_provider"]
+    }
+
+# Usage
+teams = get_teams()
+print(f"Loaded {len(teams)} teams")
+
+answer = ask_garden("Top QBs by passing yards", "your-key")
+print(f"AI used: {answer['provider']}")
+print(answer["insights"])</pre>
+                    </div>
+
+                    <h3>cURL</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre># Get games for week 5 of 2025 season
+curl "https://nfl.wearemachina.com/api/v1/games?season=2025&week=5"
+
+# Get player career stats
+curl "https://nfl.wearemachina.com/api/v1/players/{uuid}/career"
+
+# Natural language query with AI
+curl -X POST "https://nfl.wearemachina.com/api/v1/garden/query" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-key" \
+  -d '{"query": "Which teams have the most injuries?"}'
+
+# Check garden health with auto-heal
+curl -X POST "https://nfl.wearemachina.com/api/v1/garden/health"</pre>
+                    </div>
+                </section>
+
+                <!-- Error Handling Section -->
+                <section id="errors" class="docs-section">
+                    <h2>⚠️ Error Handling</h2>
+
+                    <h3>Error Response Format</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre>{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Player not found",
+    "status": 404
+  }
+}</pre>
+                    </div>
+
+                    <h3>Common HTTP Status Codes</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Meaning</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>200</td>
+                                <td>Success</td>
+                                <td>Request succeeded, process response.</td>
+                            </tr>
+                            <tr>
+                                <td>400</td>
+                                <td>Bad Request</td>
+                                <td>Invalid parameters. Check query/body format.</td>
+                            </tr>
+                            <tr>
+                                <td>401</td>
+                                <td>Unauthorized</td>
+                                <td>Missing or invalid API key. Check authentication.</td>
+                            </tr>
+                            <tr>
+                                <td>404</td>
+                                <td>Not Found</td>
+                                <td>Resource doesn't exist. Verify ID/endpoint.</td>
+                            </tr>
+                            <tr>
+                                <td>429</td>
+                                <td>Too Many Requests</td>
+                                <td>Rate limit exceeded. Wait Retry-After seconds.</td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td>Internal Server Error</td>
+                                <td>Server error. Retry after a few seconds.</td>
+                            </tr>
+                            <tr>
+                                <td>503</td>
+                                <td>Service Unavailable</td>
+                                <td>Service temporarily down. Retry with backoff.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Error Codes</h3>
+                    <ul>
+                        <li><code>BAD_REQUEST</code> - Invalid request parameters</li>
+                        <li><code>UNAUTHORIZED</code> - Authentication failed</li>
+                        <li><code>NOT_FOUND</code> - Resource not found</li>
+                        <li><code>METHOD_NOT_ALLOWED</code> - HTTP method not supported</li>
+                        <li><code>TOO_MANY_REQUESTS</code> - Rate limit exceeded</li>
+                        <li><code>AI_UNAVAILABLE</code> - AI service not configured</li>
+                        <li><code>UNSAFE_QUERY</code> - Natural query contains dangerous operations</li>
+                        <li><code>INTERNAL_ERROR</code> - Server error</li>
+                    </ul>
+                </section>
+
+                <!-- Performance Tips Section -->
+                <section id="performance" class="docs-section">
+                    <h2>⚡ Performance Tips</h2>
+
+                    <h3>1. Leverage Caching</h3>
+                    <p>API uses aggressive Redis caching with these TTLs:</p>
+                    <ul>
+                        <li>Teams: 1 hour (rarely change)</li>
+                        <li>Players: 15 minutes</li>
+                        <li>Games: 5 minutes (live updates)</li>
+                        <li>Stats: 5 minutes</li>
+                        <li>AI Predictions: 15-30 minutes</li>
+                    </ul>
+                    <p>Check <code>X-Cache: HIT/MISS</code> header to monitor cache performance.</p>
+
+                    <h3>2. Request Only What You Need</h3>
+                    <ul>
+                        <li>Use pagination: <code>?limit=50&offset=0</code></li>
+                        <li>Filter server-side: <code>?position=QB&status=active</code></li>
+                        <li>Request specific fields when available</li>
+                    </ul>
+
+                    <h3>3. Batch Related Requests</h3>
+                    <p>Instead of multiple individual requests, use collection endpoints:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre># Good: Single request for team roster
+GET /api/v1/teams/:id/players
+
+# Bad: 53 individual player requests
+GET /api/v1/players/:id (x53)</pre>
+                    </div>
+
+                    <h3>4. Monitor Response Times</h3>
+                    <p>Typical response times:</p>
+                    <ul>
+                        <li>Cached responses: 10-50ms</li>
+                        <li>Database queries: 50-200ms</li>
+                        <li>AI queries: 1-5 seconds</li>
+                    </ul>
+
+                    <h3>5. Use Auto-Fetch Wisely</h3>
+                    <p>First request for missing data triggers auto-fetch (2-10s). Subsequent requests are fast (cached).</p>
+
+                    <h3>6. Optimize Natural Language Queries</h3>
+                    <p>Be specific to reduce query complexity:</p>
+                    <ul>
+                        <li>✅ "Top 10 QBs by passing yards in 2025"</li>
+                        <li>❌ "Show me all player stats" (too broad)</li>
+                    </ul>
+
+                    <div class="alert alert-info">
+                        <strong>Pro Tip:</strong> Use the Garden health endpoint to check data freshness before making large queries. Stale data will be flagged by AI.
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <section class="docs-section">
+                    <hr>
+                    <p style="text-align: center; color: var(--text-secondary); margin-top: 40px;">
+                        <strong>Grid Iron Mind API</strong> | Production: <code>https://nfl.wearemachina.com/api/v1</code><br>
+                        🌱 Powered by AI Data Garden | Grok AI + Claude 3.5 Sonnet<br>
+                        <a href="/" style="color: var(--primary);">← Back to Dashboard</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode toggle
+        function initDarkMode() {
+            const toggle = document.getElementById('darkModeToggle');
+            const isDark = localStorage.getItem('darkMode') === 'true';
+
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                toggle.textContent = '☀️';
+            }
+
+            toggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDarkNow = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDarkNow);
+                toggle.textContent = isDarkNow ? '☀️' : '🌙';
+            });
+        }
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('.docs-nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').slice(1);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initDarkMode);
+    </script>
+</body>
+</html>
