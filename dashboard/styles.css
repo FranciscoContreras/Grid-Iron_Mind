@@ -1,12 +1,5 @@
 /* Import Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600;700&display=swap');
-
-/* CSS Properties for Animation */
-@property --glow-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400..700&display=swap');
 
 :root {
     /* Monochrome Color System */
@@ -124,13 +117,21 @@ body {
     font-weight: 500;
 }
 
-/* Button System - Skeuomorphic Design */
+/* CSS Property for Animation */
+@property --rotation {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+
+/* Button System - Skeuomorphic 3-Layer Design */
 .btn-skeu,
 .tab,
 .btn,
 .btn-primary,
-.btn-refresh,
-.btn-icon {
+.btn-refresh {
+    --inset: 10px;
+    --rad: 14px;
     --glow-color-1: transparent;
     --glow-color-2: transparent;
     --glow-color-3: transparent;
@@ -138,100 +139,124 @@ body {
     --glow-color-5: transparent;
     --glow-color-6: transparent;
 
-    position: relative;
-    padding: 10px 20px;
-    background: linear-gradient(145deg, rgb(230 230 230), rgb(210 210 210));
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: 'Outfit', sans-serif;
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-    box-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.06),
-        0 4px 8px rgba(0, 0, 0, 0.04),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.1),
-        inset 0 2px 0 rgba(255, 255, 255, 0.8);
-}
-
-.btn-skeu:hover,
-.tab:hover,
-.btn:hover,
-.btn-refresh:hover,
-.btn-icon:hover {
-    transform: translateY(-1px);
-    box-shadow:
-        0 4px 8px rgba(0, 0, 0, 0.08),
-        0 6px 12px rgba(0, 0, 0, 0.06),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.12),
-        inset 0 2px 0 rgba(255, 255, 255, 0.9);
-}
-
-.btn-skeu:active,
-.tab:active,
-.btn:active {
-    transform: translateY(1px);
-    box-shadow:
-        inset 0 2px 4px rgba(0, 0, 0, 0.12),
-        inset 0 1px 2px rgba(0, 0, 0, 0.08);
-}
-
-.btn-skeu:disabled,
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Button with Rainbow Glow */
-.btn-skeu.btn-rainbow,
-.btn-primary,
-.btn-refresh {
-    --glow-color-1: rgb(138, 43, 226);
-    --glow-color-2: rgb(75, 0, 130);
-    --glow-color-3: rgb(0, 0, 255);
-    --glow-color-4: rgb(0, 255, 0);
-    --glow-color-5: rgb(255, 255, 0);
-    --glow-color-6: rgb(255, 127, 0);
-
-    background: rgb(0, 0, 0);
-    color: rgb(255, 255, 255);
+    background: rgb(255 255 255 / 0.3);
+    padding: var(--inset);
+    border-radius: calc(var(--rad) + var(--inset));
     border: none;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.12),
-        0 2px 6px rgba(0, 0, 0, 0.08);
+    position: relative;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Pixelify Sans', monospace;
+    transition: all 0.2s ease;
 }
 
-.btn-skeu.btn-rainbow::before,
+.btn-skeu::before,
+.tab::before,
+.btn::before,
 .btn-primary::before,
 .btn-refresh::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 12px;
-    padding: 2px;
+    --inset: -10px;
+    content: "";
+    display: block;
     background: conic-gradient(
-        from var(--glow-angle),
+        from var(--rotation),
         var(--glow-color-1),
         var(--glow-color-2),
         var(--glow-color-3),
         var(--glow-color-4),
         var(--glow-color-5),
-        var(--glow-color-6),
-        var(--glow-color-1)
+        var(--glow-color-6)
     );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: rotate-glow 4s linear infinite;
-    pointer-events: none;
+    filter: blur(15px);
+    opacity: 1;
+    position: absolute;
+    inset: 8px;
+    border-radius: calc(var(--rad) + calc(var(--inset) * -1));
+    z-index: -2;
+    animation: rotate 5s linear infinite;
 }
 
-@keyframes rotate-glow {
-    0% { --glow-angle: 0deg; }
-    100% { --glow-angle: 360deg; }
+.btn-skeu::after,
+.tab::after,
+.btn::after,
+.btn-primary::after,
+.btn-refresh::after {
+    --inset: -10px;
+    content: "";
+    display: block;
+    background: linear-gradient(
+        to bottom,
+        rgb(255 255 255 / 0.5) 0%,
+        rgb(255 255 255 / 0.5) 2px,
+        rgb(100 100 100 / 0.1) 30%,
+        rgb(100 100 100 / 0.1) 70%,
+        rgb(255 255 255 / 0.5) 99%,
+        rgb(255 255 255 / 0.5) 100%
+    );
+    position: absolute;
+    inset: -1.5px;
+    border-radius: calc(var(--rad) + calc(var(--inset) * -1));
+    z-index: -1;
+}
+
+.btn-skeu:active::before,
+.tab:active::before,
+.btn:active::before,
+.btn-primary:active::before,
+.btn-refresh:active::before {
+    animation-play-state: paused;
+    opacity: 1;
+    scale: 0.9;
+    filter: blur(8px);
+}
+
+.btn-skeu:active .btn-cap,
+.tab:active .btn-cap,
+.btn:active .btn-cap,
+.btn-primary:active .btn-cap,
+.btn-refresh:active .btn-cap {
+    scale: 0.93;
+}
+
+.btn-cap {
+    display: inline-block;
+    background: linear-gradient(to bottom, #424242, #343434);
+    border-radius: var(--rad);
+    font-size: 0.875rem;
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-top: #5b5b5bff solid 1px;
+    border-bottom: #282828ff solid 1px;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.25);
+    position: relative;
+    transition: scale 0.1s ease-in-out;
+}
+
+.btn-text {
+    border-radius: 50px;
+    background: linear-gradient(to bottom, #2d2d2dff, #424242);
+    padding: 8px 20px;
+    display: block;
+}
+
+/* Rainbow glow for primary actions */
+.btn-skeu.btn-rainbow,
+.btn-primary,
+.btn-refresh,
+.tab.active {
+    --glow-color-1: purple;
+    --glow-color-2: blue;
+    --glow-color-3: green;
+    --glow-color-4: yellow;
+    --glow-color-5: orange;
+    --glow-color-6: red;
+}
+
+@keyframes rotate {
+    0% { --rotation: 0deg; }
+    100% { --rotation: 360deg; }
 }
 
 .btn-icon {
@@ -239,6 +264,14 @@ body {
     background: var(--bg-secondary);
     font-size: 18px;
     min-width: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+}
+
+.btn-icon:hover {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 /* Tabs */
