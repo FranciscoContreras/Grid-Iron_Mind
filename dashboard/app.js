@@ -541,7 +541,13 @@ async function viewPlayerDetails(playerId) {
             ${careerHTML}
         `;
     } catch (error) {
-        alert('Failed to load player details: ' + error.message);
+        console.error('Failed to load player details:', error);
+        detailsContainer.innerHTML = `
+            <div style="padding: 40px; text-align: center;">
+                <p style="color: var(--accent-red); margin-bottom: 8px;">⚠️ Failed to load player details</p>
+                <p style="color: var(--gray-600); font-size: 14px;">${error.message}</p>
+            </div>
+        `;
     }
 }
 
@@ -665,7 +671,13 @@ async function viewTeamDetail(teamId, teamName, teamData) {
         const players = rosterResult.data.data || [];
         renderTeamRoster(players);
     } catch (error) {
-        alert('Failed to load team details: ' + error.message);
+        console.error('Failed to load team details:', error);
+        document.getElementById('teamDetailView').innerHTML = `
+            <div style="padding: 40px; text-align: center;">
+                <p style="color: var(--accent-red); margin-bottom: 8px;">⚠️ Failed to load team details</p>
+                <p style="color: var(--gray-600); font-size: 14px;">${error.message}</p>
+            </div>
+        `;
     }
 }
 
