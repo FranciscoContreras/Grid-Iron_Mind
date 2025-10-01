@@ -29,11 +29,7 @@
             --shadow-sm: rgba(0, 0, 0, 0.08);
             --shadow-md: rgba(0, 0, 0, 0.12);
             --shadow-lg: rgba(0, 0, 0, 0.16);
-            --glow-blue: rgba(59, 130, 246, 0.3);
-            --glow-purple: rgba(168, 85, 247, 0.25);
-            --glow-orange: rgba(251, 146, 60, 0.2);
-            --glow-yellow: rgba(234, 179, 8, 0.15);
-            --accent: #3b82f6;
+            --accent: #18181b;
         }
 
         body {
@@ -59,10 +55,7 @@
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, #18181b 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
             letter-spacing: -0.02em;
         }
 
@@ -283,12 +276,12 @@
         }
 
         .input-skeu:focus {
-            border-color: var(--accent);
+            border-color: rgba(0, 0, 0, 0.2);
             box-shadow:
                 0 2px 4px rgba(0, 0, 0, 0.04),
                 inset 0 1px 2px rgba(0, 0, 0, 0.04),
-                0 0 0 4px rgba(59, 130, 246, 0.15),
-                0 0 24px rgba(59, 130, 246, 0.2);
+                0 0 0 4px rgba(0, 0, 0, 0.08),
+                0 0 24px rgba(0, 0, 0, 0.06);
         }
 
         .input-skeu::placeholder {
@@ -322,12 +315,12 @@
         }
 
         .select-skeu:focus {
-            border-color: var(--accent);
+            border-color: rgba(0, 0, 0, 0.2);
             box-shadow:
                 0 2px 4px rgba(0, 0, 0, 0.04),
                 inset 0 1px 2px rgba(0, 0, 0, 0.04),
-                0 0 0 4px rgba(59, 130, 246, 0.15),
-                0 0 24px rgba(59, 130, 246, 0.2);
+                0 0 0 4px rgba(0, 0, 0, 0.08),
+                0 0 24px rgba(0, 0, 0, 0.06);
         }
 
         /* Stats Grid */
@@ -361,7 +354,7 @@
         .stat-value {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--text-primary);
             line-height: 1;
         }
 
@@ -406,10 +399,10 @@
         }
 
         .toggle.active {
-            background: var(--accent);
+            background: var(--text-primary);
             box-shadow:
                 inset 0 1px 2px rgba(0, 0, 0, 0.15),
-                0 0 16px rgba(59, 130, 246, 0.3);
+                0 0 16px rgba(0, 0, 0, 0.2);
         }
 
         .toggle.active::after {
@@ -435,8 +428,8 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), #7c3aed);
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(90deg, #3a3a3d, #18181b);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             transition: width 0.5s ease;
             position: relative;
             overflow: hidden;
@@ -516,15 +509,15 @@
         }
 
         .badge.badge-success {
-            color: #22c55e;
-            border-color: rgba(34, 197, 94, 0.3);
-            background: rgba(34, 197, 94, 0.1);
+            color: var(--text-primary);
+            border-color: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.06);
         }
 
         .badge.badge-warning {
-            color: #f59e0b;
-            border-color: rgba(245, 158, 11, 0.3);
-            background: rgba(245, 158, 11, 0.1);
+            color: var(--text-primary);
+            border-color: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.06);
         }
 
         .grid-2 {
