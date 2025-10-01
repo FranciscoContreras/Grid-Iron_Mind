@@ -47,7 +47,8 @@ Grid Iron Mind is a high-performance NFL data API providing:
 - **Auto-Fetch System**: Automatically retrieves missing data on-demand
 - **Multi-Provider AI**: Claude 3.5 Sonnet and Grok with automatic fallback
 - **Aggressive Caching**: Redis-backed caching with endpoint-specific TTLs
-- **Comprehensive Data**: 2020-2025 seasons with ongoing updates
+- **Comprehensive Data**: Complete 2025-2026 season (272 games, all 18 weeks)
+- **Live Updates**: Real-time scores and statistics during game days
 
 ---
 
