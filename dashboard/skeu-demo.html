@@ -14,18 +14,19 @@
         }
 
         :root {
-            --bg-main: #0a0a0b;
-            --bg-card: #1a1a1c;
-            --bg-input: #121214;
-            --text-primary: #e4e4e7;
-            --text-secondary: #a1a1aa;
-            --border: #27272a;
-            --shadow-sm: rgba(0, 0, 0, 0.5);
-            --shadow-lg: rgba(0, 0, 0, 0.8);
-            --glow-blue: rgba(59, 130, 246, 0.5);
-            --glow-purple: rgba(168, 85, 247, 0.4);
-            --glow-orange: rgba(251, 146, 60, 0.3);
-            --glow-yellow: rgba(234, 179, 8, 0.2);
+            --bg-main: #fafafa;
+            --bg-card: #ffffff;
+            --bg-input: #f5f5f5;
+            --text-primary: #18181b;
+            --text-secondary: #71717a;
+            --border: #e4e4e7;
+            --shadow-sm: rgba(0, 0, 0, 0.08);
+            --shadow-md: rgba(0, 0, 0, 0.12);
+            --shadow-lg: rgba(0, 0, 0, 0.16);
+            --glow-blue: rgba(59, 130, 246, 0.3);
+            --glow-purple: rgba(168, 85, 247, 0.25);
+            --glow-orange: rgba(251, 146, 60, 0.2);
+            --glow-yellow: rgba(234, 179, 8, 0.15);
             --accent: #3b82f6;
         }
 
@@ -73,19 +74,18 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 1rem;
             font-weight: 600;
-            color: var(--text-primary);
-            background: linear-gradient(145deg, #2a2a2d, #1a1a1c);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fafafa;
+            background: linear-gradient(145deg, #1a1a1c, #0a0a0b);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow:
-                0 4px 12px var(--shadow-sm),
-                0 8px 24px var(--shadow-lg),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-                inset 2px 2px 8px rgba(0, 0, 0, 0.8),
-                inset -2px -2px 8px rgba(255, 255, 255, 0.05);
+                0 2px 8px rgba(0, 0, 0, 0.15),
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 1px 1px 4px rgba(0, 0, 0, 0.6),
+                inset -1px -1px 4px rgba(255, 255, 255, 0.03);
         }
 
         .btn-skeu::before {
@@ -114,36 +114,34 @@
         }
 
         .btn-skeu:hover {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             box-shadow:
-                0 6px 16px var(--shadow-sm),
-                0 12px 32px var(--shadow-lg),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-                inset 2px 2px 10px rgba(0, 0, 0, 0.9),
-                inset -2px -2px 10px rgba(255, 255, 255, 0.08);
+                0 4px 12px rgba(0, 0, 0, 0.2),
+                0 6px 20px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 1px 1px 5px rgba(0, 0, 0, 0.7),
+                inset -1px -1px 5px rgba(255, 255, 255, 0.04);
         }
 
         .btn-skeu:active {
             transform: translateY(0);
             box-shadow:
-                0 2px 8px var(--shadow-sm),
-                inset 0 2px 4px rgba(0, 0, 0, 0.6),
-                inset 3px 3px 12px rgba(0, 0, 0, 0.95),
-                inset -1px -1px 6px rgba(255, 255, 255, 0.03);
+                0 1px 4px rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(0, 0, 0, 0.4),
+                inset 2px 2px 6px rgba(0, 0, 0, 0.8),
+                inset -1px -1px 4px rgba(255, 255, 255, 0.02);
         }
 
         /* Card Component */
         .card {
-            background: linear-gradient(145deg, #1e1e21, #16161a);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 20px;
             padding: 32px;
             margin-bottom: 32px;
             box-shadow:
-                0 4px 16px var(--shadow-sm),
-                0 8px 32px var(--shadow-lg),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                0 2px 8px var(--shadow-sm),
+                0 4px 16px var(--shadow-md);
             position: relative;
             overflow: hidden;
         }
@@ -155,7 +153,7 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
         }
 
         .card h2 {
@@ -191,16 +189,16 @@
             outline: none;
             transition: all 0.3s ease;
             box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.6),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+                inset 0 1px 3px rgba(0, 0, 0, 0.08),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.5);
         }
 
         .input-skeu:focus {
             border-color: var(--accent);
             box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.6),
+                inset 0 1px 3px rgba(0, 0, 0, 0.08),
                 0 0 0 3px rgba(59, 130, 246, 0.1),
-                0 0 20px rgba(59, 130, 246, 0.2);
+                0 0 20px rgba(59, 130, 246, 0.15);
         }
 
         .input-skeu::placeholder {
@@ -221,22 +219,22 @@
             outline: none;
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 18px center;
             padding-right: 45px;
             box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.6),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+                inset 0 1px 3px rgba(0, 0, 0, 0.08),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.5);
             transition: all 0.3s ease;
         }
 
         .select-skeu:focus {
             border-color: var(--accent);
             box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.6),
+                inset 0 1px 3px rgba(0, 0, 0, 0.08),
                 0 0 0 3px rgba(59, 130, 246, 0.1),
-                0 0 20px rgba(59, 130, 246, 0.2);
+                0 0 20px rgba(59, 130, 246, 0.15);
         }
 
         /* Stats Grid */
@@ -253,8 +251,8 @@
             border-radius: 14px;
             padding: 20px;
             box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.6),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+                inset 0 1px 3px rgba(0, 0, 0, 0.06),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .stat-label {
@@ -294,8 +292,8 @@
         }
 
         .btn-skeu.btn-secondary {
-            background: linear-gradient(145deg, #26262a, #1c1c1f);
-            color: var(--text-secondary);
+            background: linear-gradient(145deg, #27272a, #1c1c1f);
+            color: #e4e4e7;
         }
 
         /* Toggle Component */
@@ -314,7 +312,7 @@
             border-radius: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
         }
 
         .toggle::after {
@@ -324,22 +322,22 @@
             left: 3px;
             width: 20px;
             height: 20px;
-            background: linear-gradient(145deg, #3a3a3d, #2a2a2d);
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
             border-radius: 10px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
         }
 
         .toggle.active {
             background: var(--accent);
             box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.3),
-                0 0 20px rgba(59, 130, 246, 0.3);
+                inset 0 1px 3px rgba(0, 0, 0, 0.2),
+                0 0 20px rgba(59, 130, 246, 0.2);
         }
 
         .toggle.active::after {
             left: 27px;
-            background: linear-gradient(145deg, #ffffff, #e4e4e7);
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
         }
 
         /* Progress Bar */
@@ -354,13 +352,13 @@
             border: 1px solid var(--border);
             border-radius: 6px;
             overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--glow-purple));
-            box-shadow: 0 0 20px var(--glow-blue);
+            background: linear-gradient(90deg, var(--accent), #7c3aed);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
             transition: width 0.5s ease;
             position: relative;
             overflow: hidden;
@@ -387,9 +385,7 @@
             border: 1px solid var(--border);
             border-radius: 14px;
             overflow: hidden;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                0 4px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 2px 8px var(--shadow-sm);
         }
 
         .table-skeu {
@@ -399,7 +395,7 @@
 
         .table-skeu thead {
             background: var(--bg-input);
-            box-shadow: inset 0 -1px 0 var(--border);
+            border-bottom: 1px solid var(--border);
         }
 
         .table-skeu th {
@@ -424,7 +420,7 @@
         }
 
         .table-skeu tbody tr:hover {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(0, 0, 0, 0.02);
         }
 
         /* Badge */
@@ -438,7 +434,7 @@
             background: var(--bg-input);
             border: 1px solid var(--border);
             color: var(--text-secondary);
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         .badge.badge-success {
