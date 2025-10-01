@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grid Iron Mind - Dashboard</title>
-    <link rel="stylesheet" href="styles.css?v=2.0">
+    <link rel="stylesheet" href="styles.css?v=3.0">
 </head>
 <body>
     <div class="container">
@@ -13,71 +13,38 @@
             <div class="header-content">
                 <h1>🏈 Grid Iron Mind</h1>
                 <div class="header-status">
-                    <span class="status-indicator" id="statusIndicator">
+                    <span class="status-indicator connected" id="statusIndicator">
                         <span class="status-dot"></span>
-                        <span id="statusText">Disconnected</span>
+                        <span id="statusText">Connected</span>
                     </span>
-                    <span class="response-time" id="responseTime">--ms</span>
+                    <span class="status-indicator" id="responseTime">48ms</span>
                 </div>
             </div>
         </header>
 
         <!-- Navigation Tabs -->
-        <nav class="tabs">
-            <button class="tab active" data-tab="players">
-                <span class="btn-cap">
-                    <span class="btn-text">Players</span>
-                </span>
-            </button>
-            <button class="tab" data-tab="teams">
-                <span class="btn-cap">
-                    <span class="btn-text">Teams</span>
-                </span>
-            </button>
-            <button class="tab" data-tab="games">
-                <span class="btn-cap">
-                    <span class="btn-text">Games</span>
-                </span>
-            </button>
-            <button class="tab" data-tab="career">
-                <span class="btn-cap">
-                    <span class="btn-text">Career Stats</span>
-                </span>
-            </button>
-            <button class="tab" data-tab="weather">
-                <span class="btn-cap">
-                    <span class="btn-text">Weather</span>
-                </span>
-            </button>
-            <button class="tab" data-tab="fantasy">
-                <span class="btn-cap">
-                    <span class="btn-text">Fantasy</span>
-                </span>
-            </button>
-            <button class="tab" data-tab="admin">
-                <span class="btn-cap">
-                    <span class="btn-text">Admin</span>
-                </span>
-            </button>
-            <button class="tab" data-tab="api-test">
-                <span class="btn-cap">
-                    <span class="btn-text">API Test</span>
-                </span>
-            </button>
+        <nav class="navigation">
+            <div class="tabs">
+                <button class="tab active" data-tab="players">Players</button>
+                <button class="tab" data-tab="teams">Teams</button>
+                <button class="tab" data-tab="games">Games</button>
+                <button class="tab" data-tab="career">Career Stats</button>
+                <button class="tab" data-tab="weather">Weather</button>
+                <button class="tab" data-tab="fantasy">Fantasy</button>
+                <button class="tab" data-tab="admin">Admin</button>
+                <button class="tab" data-tab="api-test">API Test</button>
+            </div>
         </nav>
 
         <!-- Tab Content -->
         <main class="content">
             <!-- Players Tab -->
             <section id="players-tab" class="tab-content active">
-                <div class="section-header">
-                    <h2>Players</h2>
-                    <button class="btn-refresh" id="refreshPlayers">
-                        <span class="btn-cap">
-                            <span class="btn-text">↻ Refresh</span>
-                        </span>
-                    </button>
-                </div>
+                <div class="content-card">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Players</h2>
+                        <button class="btn-refresh" id="refreshPlayers">↻ Refresh</button>
+                    </div>
 
                 <div class="filters">
                     <input type="text" id="playerSearch" placeholder="Search by name..." class="input">
@@ -129,24 +96,26 @@
                     </table>
                 </div>
 
-                <div class="pagination">
-                    <button class="btn" id="prevPlayers" disabled>← Previous</button>
-                    <span id="playersPageInfo">Page 1</span>
-                    <button class="btn" id="nextPlayers">Next →</button>
+                    <div class="pagination">
+                        <span class="pagination-info" id="playersPageInfo">Page 1</span>
+                        <div class="pagination-controls">
+                            <button class="btn" id="prevPlayers" disabled>← Previous</button>
+                            <button class="btn" id="nextPlayers">Next →</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Teams Tab -->
             <section id="teams-tab" class="tab-content">
-                <div class="section-header">
-                    <h2>Teams</h2>
-                    <button class="btn-refresh" id="refreshTeams">
-                        <span class="btn-cap">
-                            <span class="btn-text">↻ Refresh</span>
-                        </span>
-                    </button>
-                    <button class="btn" id="backToTeams" style="display: none;">← Back to Teams</button>
-                </div>
+                <div class="content-card">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Teams</h2>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn" id="backToTeams" style="display: none;">← Back to Teams</button>
+                            <button class="btn-refresh" id="refreshTeams">↻ Refresh</button>
+                        </div>
+                    </div>
 
                 <!-- Breadcrumb Navigation -->
                 <div class="breadcrumb" id="teamBreadcrumb" style="display: none;">
@@ -216,14 +185,11 @@
 
             <!-- Games Tab -->
             <section id="games-tab" class="tab-content">
-                <div class="section-header">
-                    <h2>Games & Schedule</h2>
-                    <button class="btn-refresh" id="refreshGames">
-                        <span class="btn-cap">
-                            <span class="btn-text">↻ Refresh</span>
-                        </span>
-                    </button>
-                </div>
+                <div class="content-card">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Games & Schedule</h2>
+                        <button class="btn-refresh" id="refreshGames">↻ Refresh</button>
+                    </div>
 
                 <div class="filters">
                     <input type="number" id="seasonFilter" placeholder="Season (e.g., 2024)" class="input" value="2024">
@@ -322,7 +288,7 @@
             <section id="weather-tab" class="tab-content">
                 <div class="section-header">
                     <h2>Weather Impact Analysis</h2>
-                    <button class="btn-refresh" id="refreshWeather"><span class="btn-cap"><span class="btn-text">↻ Refresh</span></span></button>
+                    <button class="btn-refresh" id="refreshWeather">↻ Refresh</button>
                 </div>
 
                 <div class="filters">
@@ -396,7 +362,7 @@
             <section id="fantasy-tab" class="tab-content">
                 <div class="section-header">
                     <h2>Fantasy Football Stats</h2>
-                    <button class="btn-refresh" id="refreshFantasy"><span class="btn-cap"><span class="btn-text">↻ Refresh</span></span></button>
+                    <button class="btn-refresh" id="refreshFantasy">↻ Refresh</button>
                 </div>
 
                 <div class="filters">
