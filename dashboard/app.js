@@ -174,8 +174,8 @@ async function loadPlayers() {
         }
 
         console.log('[loadPlayers] Got players:', result.data.data?.length);
-        state.players = result.data.data;
-        state.totalPlayers = result.data.meta.total || 0;
+        state.players = result.data.data || [];
+        state.totalPlayers = result.data.meta?.total || 0;
 
         console.log('[loadPlayers] Rendering...');
         renderPlayers();
@@ -197,6 +197,12 @@ function renderPlayers() {
         return;
     }
     tbody.innerHTML = '';
+
+    // Ensure players is an array
+    if (!Array.isArray(state.players)) {
+        console.error('[renderPlayers] state.players is not an array:', state.players);
+        state.players = [];
+    }
 
     let filteredPlayers = state.players;
 
