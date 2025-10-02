@@ -1916,8 +1916,8 @@ async function loadStatsLeaders() {
                     <td><strong>${idx + 1}</strong></td>
                     <td>${escapeHtml(leader.player_name || 'Unknown')}</td>
                     <td><span class="badge">${escapeHtml(leader.position || '')}</span></td>
-                    <td>${escapeHtml(leader.team_abbreviation || 'N/A')}</td>
-                    <td><strong>${leader[category] || 0}</strong></td>
+                    <td>${escapeHtml(leader.team_abbr || 'N/A')}</td>
+                    <td><strong>${leader.total_stat || 0}</strong></td>
                     <td>${leader.games_played || 0}</td>
                 </tr>
             `).join('');
