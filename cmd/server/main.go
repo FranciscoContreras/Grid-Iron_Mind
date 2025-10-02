@@ -128,23 +128,49 @@ func main() {
 	// Generate API Key (POST)
 	mux.HandleFunc("/api/v1/admin/keys/generate", applyPOSTAdminMiddleware(adminHandler.HandleGenerateAPIKey))
 
+	// ========================================
+	// API v2 - Enhanced endpoints with new features
+	// ========================================
+	mux.HandleFunc("/api/v2/players", applyGETMiddleware(playersHandler.HandlePlayers))
+	mux.HandleFunc("/api/v2/players/", applyGETMiddleware(playersHandler.HandlePlayers))
+	mux.HandleFunc("/api/v2/teams", applyGETMiddleware(teamsHandler.HandleTeams))
+	mux.HandleFunc("/api/v2/teams/", applyGETMiddleware(teamsHandler.HandleTeams))
+	mux.HandleFunc("/api/v2/games", applyGETMiddleware(gamesHandler.HandleGames))
+	mux.HandleFunc("/api/v2/games/", applyGETMiddleware(gamesHandler.HandleGames))
+	mux.HandleFunc("/api/v2/stats/leaders", applyGETMiddleware(statsHandler.HandleStatsLeaders))
+	mux.HandleFunc("/api/v2/stats/game/", applyGETMiddleware(statsHandler.HandleGameStats))
+	mux.HandleFunc("/api/v2/standings", applyGETMiddleware(standingsHandler.HandleStandings))
+	mux.HandleFunc("/api/v2/defense/rankings", applyGETMiddleware(defensiveHandler.HandleDefensiveRankings))
+	mux.HandleFunc("/api/v2/weather/current", applyGETMiddleware(weatherHandler.HandleCurrentWeather))
+	mux.HandleFunc("/api/v2/weather/historical", applyGETMiddleware(weatherHandler.HandleHistoricalWeather))
+	mux.HandleFunc("/api/v2/weather/forecast", applyGETMiddleware(weatherHandler.HandleForecastWeather))
+
 	// Health check endpoints (GET)
 	mux.HandleFunc("/health", applyGETMiddleware(healthCheck))
 	mux.HandleFunc("/api/v1/health", applyGETMiddleware(healthCheck))
+	mux.HandleFunc("/api/v2/health", applyGETMiddleware(healthCheck))
 
 	// Metrics endpoints (GET)
 	mux.HandleFunc("/api/v1/metrics/database", applyGETMiddleware(metricsHandler.HandleDatabaseMetrics))
 	mux.HandleFunc("/api/v1/metrics/health", applyGETMiddleware(metricsHandler.HandleHealthMetrics))
+	mux.HandleFunc("/api/v2/metrics/database", applyGETMiddleware(metricsHandler.HandleDatabaseMetrics))
+	mux.HandleFunc("/api/v2/metrics/health", applyGETMiddleware(metricsHandler.HandleHealthMetrics))
 
 	// API Documentation endpoints
 	mux.HandleFunc("/api-docs.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./dashboard/api-docs.html")
 	})
+	mux.HandleFunc("/api-v2-docs.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./dashboard/api-v2-docs.html")
+	})
+	mux.HandleFunc("/docs", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/api-v2-docs.html", http.StatusMovedPermanently)
+	})
 	mux.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/api-docs.html", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/api-v2-docs.html", http.StatusMovedPermanently)
 	})
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/api-docs.html", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/api-v2-docs.html", http.StatusMovedPermanently)
 	})
 
 	// Dashboard redirect
