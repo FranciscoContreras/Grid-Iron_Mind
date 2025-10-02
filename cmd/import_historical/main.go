@@ -56,7 +56,12 @@ func main() {
 
 	// Initialize database connection
 	ctx := context.Background()
-	if err := db.Connect(ctx, cfg); err != nil {
+	dbConfig := db.Config{
+		DatabaseURL: cfg.DatabaseURL,
+		MaxConns:    cfg.DBMaxConns,
+		MinConns:    cfg.DBMinConns,
+	}
+	if err := db.Connect(ctx, dbConfig); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	defer db.Close()
