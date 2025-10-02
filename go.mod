@@ -1,6 +1,6 @@
 module github.com/francisco/gridironmind
 
-// +heroku install ./cmd/server
+// +heroku install ./cmd/server ./cmd/import_historical
 
 go 1.21
 
