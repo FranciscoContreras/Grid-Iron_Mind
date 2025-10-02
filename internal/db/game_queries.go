@@ -252,17 +252,17 @@ func (q *StatsQueries) GetStatsLeaders(ctx context.Context, category string, sea
 	var statColumn string
 	switch category {
 	case "passing_yards":
-		statColumn = "SUM(passing_yards) as total_stat, SUM(passing_touchdowns) as touchdowns, SUM(passing_interceptions) as interceptions"
+		statColumn = "SUM(passing_yards) as total_stat, SUM(passing_tds) as touchdowns, SUM(interceptions_thrown) as interceptions"
 	case "passing_touchdowns":
-		statColumn = "SUM(passing_touchdowns) as total_stat, SUM(passing_yards) as yards, SUM(passing_interceptions) as interceptions"
+		statColumn = "SUM(passing_tds) as total_stat, SUM(passing_yards) as yards, SUM(interceptions_thrown) as interceptions"
 	case "rushing_yards":
-		statColumn = "SUM(rushing_yards) as total_stat, SUM(rushing_touchdowns) as touchdowns, SUM(rushing_attempts) as attempts"
+		statColumn = "SUM(rushing_yards) as total_stat, SUM(rushing_tds) as touchdowns, SUM(attempts) as attempts"
 	case "rushing_touchdowns":
-		statColumn = "SUM(rushing_touchdowns) as total_stat, SUM(rushing_yards) as yards, SUM(rushing_attempts) as attempts"
+		statColumn = "SUM(rushing_tds) as total_stat, SUM(rushing_yards) as yards, SUM(attempts) as attempts"
 	case "receiving_yards":
-		statColumn = "SUM(receiving_yards) as total_stat, SUM(receiving_touchdowns) as touchdowns, SUM(receiving_receptions) as receptions"
+		statColumn = "SUM(receiving_yards) as total_stat, SUM(receiving_tds) as touchdowns, SUM(receptions) as receptions"
 	case "receiving_touchdowns":
-		statColumn = "SUM(receiving_touchdowns) as total_stat, SUM(receiving_yards) as yards, SUM(receiving_receptions) as receptions"
+		statColumn = "SUM(receiving_tds) as total_stat, SUM(receiving_yards) as yards, SUM(receptions) as receptions"
 	default:
 		return nil, fmt.Errorf("invalid category: %s", category)
 	}
@@ -273,15 +273,15 @@ func (q *StatsQueries) GetStatsLeaders(ctx context.Context, category string, sea
 			p.name as player_name,
 			p.position,
 			p.jersey_number,
-			gs.team_id,
+			p.team_id,
 			t.abbreviation as team_abbr,
 			%s,
 			COUNT(*) as games_played
 		FROM game_stats gs
 		JOIN players p ON gs.player_id = p.id
-		JOIN teams t ON gs.team_id = t.id
+		JOIN teams t ON p.team_id = t.id
 		WHERE gs.season = $1
-		GROUP BY gs.player_id, p.name, p.position, p.jersey_number, gs.team_id, t.abbreviation
+		GROUP BY gs.player_id, p.name, p.position, p.jersey_number, p.team_id, t.abbreviation
 		ORDER BY total_stat DESC
 		LIMIT $2
 	`, statColumn)
