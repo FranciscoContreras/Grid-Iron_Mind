@@ -61,10 +61,8 @@ func main() {
 	gamesHandler := handlers.NewGamesHandler()
 	statsHandler := handlers.NewStatsHandler()
 	defensiveHandler := handlers.NewDefensiveHandler()
-	aiHandler := handlers.NewAIHandler(cfg)
 	adminHandler := handlers.NewAdminHandler(cfg.WeatherAPIKey)
 	weatherHandler := handlers.NewWeatherHandler(weather.NewClient(cfg.WeatherAPIKey))
-	gardenHandler := handlers.NewGardenHandler(cfg)
 	styleAgentHandler := handlers.NewStyleAgentHandler()
 
 	// Setup router
@@ -83,47 +81,34 @@ func main() {
 	// Defensive stats endpoints
 	mux.HandleFunc("/api/v1/defense/rankings", applyMiddleware(defensiveHandler.HandleDefensiveRankings))
 
-	// AI endpoints (require API key and stricter rate limiting)
-	mux.HandleFunc("/api/v1/ai/predict/game/", applyAIMiddleware(aiHandler.HandlePredictGame))
-	mux.HandleFunc("/api/v1/ai/predict/player/", applyAIMiddleware(aiHandler.HandlePredictPlayer))
-	mux.HandleFunc("/api/v1/ai/insights/player/", applyAIMiddleware(aiHandler.HandleAnalyzePlayer))
-	mux.HandleFunc("/api/v1/ai/query", applyAIMiddleware(aiHandler.HandleAIQuery))
-
-	// Admin endpoints for data ingestion
-	mux.HandleFunc("/api/v1/admin/sync/teams", applyMiddleware(adminHandler.HandleSyncTeams))
-	mux.HandleFunc("/api/v1/admin/sync/rosters", applyMiddleware(adminHandler.HandleSyncRosters))
-	mux.HandleFunc("/api/v1/admin/sync/games", applyMiddleware(adminHandler.HandleSyncGames))
-	mux.HandleFunc("/api/v1/admin/sync/full", applyMiddleware(adminHandler.HandleFullSync))
-	mux.HandleFunc("/api/v1/admin/sync/historical/season", applyMiddleware(adminHandler.HandleSyncHistoricalGames))
-	mux.HandleFunc("/api/v1/admin/sync/historical/seasons", applyMiddleware(adminHandler.HandleSyncMultipleSeasons))
+	// Admin endpoints for data ingestion (require API key authentication)
+	mux.HandleFunc("/api/v1/admin/sync/teams", applyAdminMiddleware(adminHandler.HandleSyncTeams))
+	mux.HandleFunc("/api/v1/admin/sync/rosters", applyAdminMiddleware(adminHandler.HandleSyncRosters))
+	mux.HandleFunc("/api/v1/admin/sync/games", applyAdminMiddleware(adminHandler.HandleSyncGames))
+	mux.HandleFunc("/api/v1/admin/sync/full", applyAdminMiddleware(adminHandler.HandleFullSync))
+	mux.HandleFunc("/api/v1/admin/sync/historical/season", applyAdminMiddleware(adminHandler.HandleSyncHistoricalGames))
+	mux.HandleFunc("/api/v1/admin/sync/historical/seasons", applyAdminMiddleware(adminHandler.HandleSyncMultipleSeasons))
 
 	// NFLverse enrichment endpoints
-	mux.HandleFunc("/api/v1/admin/sync/nflverse/stats", applyMiddleware(adminHandler.HandleSyncNFLverseStats))
-	mux.HandleFunc("/api/v1/admin/sync/nflverse/schedule", applyMiddleware(adminHandler.HandleSyncNFLverseSchedule))
-	mux.HandleFunc("/api/v1/admin/sync/nflverse/nextgen", applyMiddleware(adminHandler.HandleSyncNFLverseNextGen))
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/stats", applyAdminMiddleware(adminHandler.HandleSyncNFLverseStats))
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/schedule", applyAdminMiddleware(adminHandler.HandleSyncNFLverseSchedule))
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/nextgen", applyAdminMiddleware(adminHandler.HandleSyncNFLverseNextGen))
 
 	// Weather enrichment endpoint
-	mux.HandleFunc("/api/v1/admin/sync/weather", applyMiddleware(adminHandler.HandleEnrichWeather))
+	mux.HandleFunc("/api/v1/admin/sync/weather", applyAdminMiddleware(adminHandler.HandleEnrichWeather))
 
 	// Team stats sync endpoint
-	mux.HandleFunc("/api/v1/admin/sync/team-stats", applyMiddleware(adminHandler.HandleSyncTeamStats))
+	mux.HandleFunc("/api/v1/admin/sync/team-stats", applyAdminMiddleware(adminHandler.HandleSyncTeamStats))
 
 	// Injury sync endpoint
-	mux.HandleFunc("/api/v1/admin/sync/injuries", applyMiddleware(adminHandler.HandleSyncInjuries))
-
-	// AI Data Garden endpoints (require AI service)
-	mux.HandleFunc("/api/v1/garden/health", applyMiddleware(gardenHandler.HandleGarden))
-	mux.HandleFunc("/api/v1/garden/query", applyAIMiddleware(gardenHandler.HandleGarden))
-	mux.HandleFunc("/api/v1/garden/enrich/player/", applyAIMiddleware(gardenHandler.HandleGarden))
-	mux.HandleFunc("/api/v1/garden/schedule", applyMiddleware(gardenHandler.HandleGarden))
-	mux.HandleFunc("/api/v1/garden/status", applyMiddleware(gardenHandler.HandleGarden))
+	mux.HandleFunc("/api/v1/admin/sync/injuries", applyAdminMiddleware(adminHandler.HandleSyncInjuries))
 
 	// Weather API endpoints
 	mux.HandleFunc("/api/v1/weather/current", applyMiddleware(weatherHandler.HandleCurrentWeather))
 	mux.HandleFunc("/api/v1/weather/historical", applyMiddleware(weatherHandler.HandleHistoricalWeather))
 	mux.HandleFunc("/api/v1/weather/forecast", applyMiddleware(weatherHandler.HandleForecastWeather))
 
-	mux.HandleFunc("/api/v1/admin/keys/generate", applyMiddleware(adminHandler.HandleGenerateAPIKey))
+	mux.HandleFunc("/api/v1/admin/keys/generate", applyAdminMiddleware(adminHandler.HandleGenerateAPIKey))
 
 	// Health check endpoint
 	mux.HandleFunc("/health", applyMiddleware(healthCheck))
@@ -199,12 +184,12 @@ func applyMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 	)
 }
 
-func applyAIMiddleware(handler http.HandlerFunc) http.HandlerFunc {
+func applyAdminMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 	return middleware.CORS(
 		middleware.LogRequest(
 			middleware.RecoverPanic(
-				middleware.APIKeyAuth(
-					middleware.StrictRateLimit(handler),
+				middleware.AdminAuth(
+					middleware.StandardRateLimit(handler),
 				),
 			),
 		),

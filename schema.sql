@@ -76,30 +76,6 @@ CREATE TABLE IF NOT EXISTS game_stats (
     UNIQUE(player_id, game_id)
 );
 
--- Predictions table (AI)
-CREATE TABLE IF NOT EXISTS predictions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    prediction_type TEXT NOT NULL,
-    entity_id UUID NOT NULL,
-    prediction_data JSONB NOT NULL,
-    confidence_score DECIMAL(3,2) CHECK (confidence_score >= 0 AND confidence_score <= 1),
-    generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    valid_until TIMESTAMP NOT NULL,
-    actual_outcome JSONB,
-    accuracy_score DECIMAL(3,2) CHECK (accuracy_score >= 0 AND accuracy_score <= 1)
-);
-
--- AI Analysis table
-CREATE TABLE IF NOT EXISTS ai_analysis (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    analysis_type TEXT NOT NULL,
-    subject_ids JSONB NOT NULL,
-    analysis_result JSONB NOT NULL,
-    metadata JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP NOT NULL
-);
-
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_players_nfl_id ON players(nfl_id);
 CREATE INDEX IF NOT EXISTS idx_players_team_id ON players(team_id);
@@ -110,11 +86,6 @@ CREATE INDEX IF NOT EXISTS idx_game_stats_game_id ON game_stats(game_id);
 CREATE INDEX IF NOT EXISTS idx_game_stats_season ON game_stats(season);
 CREATE INDEX IF NOT EXISTS idx_games_game_date ON games(game_date);
 CREATE INDEX IF NOT EXISTS idx_games_season_week ON games(season, week);
-CREATE INDEX IF NOT EXISTS idx_predictions_entity_id ON predictions(entity_id);
-CREATE INDEX IF NOT EXISTS idx_predictions_type ON predictions(prediction_type);
-CREATE INDEX IF NOT EXISTS idx_predictions_valid_until ON predictions(valid_until);
-CREATE INDEX IF NOT EXISTS idx_ai_analysis_type ON ai_analysis(analysis_type);
-CREATE INDEX IF NOT EXISTS idx_ai_analysis_expires_at ON ai_analysis(expires_at);
 
 -- Sample test data for development
 -- Kansas City Chiefs
