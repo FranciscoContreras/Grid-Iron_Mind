@@ -1,0 +1,2 @@
+# Rust formatting config for Heroku builds
+edition = "2021"

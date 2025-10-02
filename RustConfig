@@ -1,0 +1,8 @@
+# Rust buildpack configuration for Heroku
+# This tells Heroku where to find the Rust project
+
+# Location of Cargo.toml relative to repo root
+RUST_CARGO_BUILD_FLAGS="--release --manifest-path=nfl-data-pipeline/Cargo.toml"
+
+# Skip caching for faster deploys (optional)
+# RUST_SKIP_BUILD_CACHE=1

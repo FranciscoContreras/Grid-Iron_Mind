@@ -1,0 +1,27 @@
+# NFL Data Pipeline - Automated Sync Schedule for 2025 Season
+# Add these lines to your crontab with: crontab -e
+
+# Path to your project
+# IMPORTANT: Update this path to match your system
+PROJECT_PATH=/Users/francisco/Documents/Projects/Apps/gridironmind/nfl-data-pipeline
+
+# Daily sync at 3 AM (updates previous day's games)
+0 3 * * * cd $PROJECT_PATH && ./target/release/nfl-data-pipeline --mode update >> sync.log 2>&1
+
+# Game day live updates (Thursday 8 PM - 11 PM)
+0 20-23 * * 4 cd $PROJECT_PATH && ./target/release/nfl-data-pipeline --mode live >> sync.log 2>&1
+
+# Game day live updates (Sunday 1 PM - 11 PM)
+0 13-23 * * 0 cd $PROJECT_PATH && ./target/release/nfl-data-pipeline --mode live >> sync.log 2>&1
+
+# Game day live updates (Monday 8 PM - 11 PM)
+0 20-23 * * 1 cd $PROJECT_PATH && ./target/release/nfl-data-pipeline --mode live >> sync.log 2>&1
+
+# Weekly injury report sync (Wednesday mornings at 10 AM)
+0 10 * * 3 cd $PROJECT_PATH && ./target/release/nfl-data-pipeline --mode injuries >> sync.log 2>&1
+
+# Weekly player stats sync (Tuesday mornings at 5 AM)
+0 5 * * 2 cd $PROJECT_PATH && ./target/release/nfl-data-pipeline --mode stats >> sync.log 2>&1
+
+# Monthly full validation (first Sunday of month at 2 AM)
+0 2 1-7 * 0 cd $PROJECT_PATH && ./target/release/nfl-data-pipeline --mode validate >> sync.log 2>&1
