@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/francisco/gridironmind/internal/espn"
 	"github.com/google/uuid"
 )
 
@@ -104,18 +105,19 @@ func (s *Service) syncGameTeamStats(ctx context.Context, gameID uuid.UUID, nflGa
 
 // insertOrUpdateTeamStats inserts or updates team statistics for a game
 func (s *Service) insertOrUpdateTeamStats(ctx context.Context, gameID uuid.UUID, teamBox struct {
-	Team       interface{}
+	Team       espn.TeamInfo
 	Statistics []struct {
-		Name         string
-		DisplayValue string
-		Value        interface{}
-		Label        string
+		Name             string
+		DisplayValue     string
+		Value            interface{}
+		Label            string
+		Abbreviation     string
 	}
 }) error {
 	// Find team by ESPN ID
-	teamIDStr, ok := getTeamID(teamBox.Team)
-	if !ok {
-		return fmt.Errorf("failed to extract team ID from boxscore")
+	teamIDStr := teamBox.Team.ID
+	if teamIDStr == "" {
+		return fmt.Errorf("team ID is empty in boxscore")
 	}
 
 	nflTeamID, err := strconv.Atoi(teamIDStr)
