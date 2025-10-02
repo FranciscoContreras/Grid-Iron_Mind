@@ -750,25 +750,62 @@
                 <!-- Getting Started -->
                 <section id="getting-started" class="doc-section">
                     <h2>Getting Started</h2>
-                    <p>Welcome to the Grid Iron Mind UI System. This comprehensive design system provides everything you need to build beautiful, consistent, and accessible user interfaces.</p>
+                    <p>Welcome to the Grid Iron Mind UI System. This comprehensive design system provides everything you need to build beautiful, consistent, and accessible user interfaces with a soft white glass aesthetic.</p>
 
                     <div class="component-demo">
-                        <div class="demo-title">Installation</div>
-                        <div class="demo-description">Include the styles.css file in your HTML:</div>
+                        <div class="demo-title">Installation via CDN</div>
+                        <div class="demo-description">Include the UI System CSS in your HTML (easiest method):</div>
                         <div class="code-block-container">
                             <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-                            <pre class="code-block"><code>&lt;link rel="stylesheet" href="styles.css"&gt;</code></pre>
+                            <pre class="code-block"><code>&lt;link rel="stylesheet" href="https://nfl.wearemachina.com/ui-system.css"&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Installation via CSS Import</div>
+                        <div class="demo-description">Or import it in your existing CSS file:</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>@import url('https://nfl.wearemachina.com/ui-system.css');</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Download</div>
+                        <div class="demo-description">Download the CSS file directly:</div>
+                        <div class="demo-preview">
+                            <a href="https://nfl.wearemachina.com/ui-system.css" download class="btn-primary">Download ui-system.css</a>
                         </div>
                     </div>
 
                     <div class="component-demo">
                         <div class="demo-title">Quick Example</div>
+                        <div class="demo-description">After including the CSS, you can use any component:</div>
                         <div class="demo-preview">
-                            <button class="btn-primary">Primary Button</button>
+                            <button class="btn">Button</button>
+                            <button class="btn btn-primary">Primary Button</button>
+                            <span class="badge">Badge</span>
                         </div>
                         <div class="code-block-container">
                             <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-                            <pre class="code-block"><code>&lt;button class="btn-primary"&gt;Primary Button&lt;/button&gt;</code></pre>
+                            <pre class="code-block"><code>&lt;button class="btn"&gt;Button&lt;/button&gt;
+&lt;button class="btn btn-primary"&gt;Primary Button&lt;/button&gt;
+&lt;span class="badge"&gt;Badge&lt;/span&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Design Tokens</div>
+                        <div class="demo-description">The UI System uses CSS custom properties (variables) that you can customize:</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>:root {
+  --soft-white: #ffffff;
+  --soft-bg: #fafafa;
+  --soft-border: rgba(0, 0, 0, 0.06);
+  --soft-accent: rgba(100, 120, 255, 0.08);
+  /* ... more variables */
+}</code></pre>
                         </div>
                     </div>
                 </section>
