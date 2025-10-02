@@ -55,7 +55,12 @@ while true; do
     # Sleep between runs
     # During game hours: 5 minutes (frequent updates)
     # Off hours: 30 minutes (less frequent)
-    if ([ "$DAY" -eq 7 ] || [ "$DAY" -eq 1 ] || [ "$DAY" -eq 4 ]) && [ "$HOUR" -ge 13 ] && [ "$HOUR" -le 23 ]; then
+    if [ "$DAY" -eq 7 ] && [ "$HOUR" -ge 13 ] && [ "$HOUR" -le 23 ]; then
+        # Sunday game day (1 PM - 11 PM)
+        echo "⏱️  Sleeping 5 minutes (game day)..."
+        sleep 300  # 5 minutes
+    elif ([ "$DAY" -eq 1 ] || [ "$DAY" -eq 4 ]) && [ "$HOUR" -ge 20 ] && [ "$HOUR" -le 23 ]; then
+        # Monday/Thursday night football (8 PM - 11 PM)
         echo "⏱️  Sleeping 5 minutes (game day)..."
         sleep 300  # 5 minutes
     else

@@ -111,7 +111,10 @@ Before starting the worker, run one-time full import:
 
 ```bash
 # Import all historical data (2010-2025)
-heroku run "nfl-data-pipeline/target/release/nfl-data-pipeline --mode full --start-year 2010 --end-year 2025"
+heroku run:detached "target/release/nfl-data-pipeline --mode full --start-year 2010 --end-year 2025"
+
+# Monitor progress
+heroku logs --dyno run.XXXX --tail
 ```
 
 **Duration**: 30-60 minutes
