@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Grid Iron Mind Design System - Complete UI component library and documentation">
+    <meta name="author" content="Grid Iron Mind">
+    <title>Grid Iron Mind - UI System Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional Styles for Documentation Page */
+        .hero-section {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%);
+            color: white;
+            padding: 80px 32px;
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+
+        .hero-tags {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 24px;
+            height: calc(100vh - 48px);
+            overflow-y: auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-lg);
+        }
+
+        .sidebar h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--gray-700);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(0,0,0,0.04);
+            color: var(--gray-900);
+        }
+
+        .sidebar-nav a.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .doc-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .doc-section {
+            margin-bottom: 64px;
+            scroll-margin-top: 80px;
+        }
+
+        .doc-section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--gray-900);
+        }
+
+        .doc-section p {
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .component-demo {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .demo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--gray-900);
+        }
+
+        .demo-description {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 24px;
+        }
+
+        .demo-preview {
+            background: var(--gray-50);
+            border-radius: var(--radius-md);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .code-block-container {
+            position: relative;
+        }
+
+        .code-block {
+            background: var(--gray-900);
+            color: #e4e4e7;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .copy-code-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-code-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .copy-code-btn.copied {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .color-swatch {
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .color-preview {
+            height: 100px;
+            width: 100%;
+        }
+
+        .color-info {
+            padding: 12px;
+            background: white;
+        }
+
+        .color-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .color-value {
+            font-size: 12px;
+            color: var(--gray-500);
+            font-family: 'Monaco', monospace;
+        }
+
+        .typography-scale {
+            margin-bottom: 32px;
+        }
+
+        .type-example {
+            padding: 24px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+
+        .type-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .spacing-demo {
+            display: grid;
+            gap: 16px;
+        }
+
+        .spacing-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--gray-200);
+        }
+
+        .spacing-visual {
+            background: var(--accent-blue);
+            height: 40px;
+            border-radius: 4px;
+        }
+
+        .spacing-label {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .spacing-value {
+            color: var(--gray-500);
+            font-size: 14px;
+            font-family: 'Monaco', monospace;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .shadow-demo {
+            display: grid;
+            gap: 24px;
+        }
+
+        .shadow-item {
+            background: white;
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+
+        .shadow-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .shadow-value {
+            font-size: 12px;
+            color: var(--gray-500);
+            font-family: 'Monaco', monospace;
+        }
+
+        .live-editor {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .editor-panel {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        .editor-header {
+            background: var(--gray-50);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-200);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .editor-content {
+            padding: 16px;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            min-height: 300px;
+            border: none;
+            font-family: 'Monaco', monospace;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .editor-preview {
+            min-height: 300px;
+        }
+
+        .animation-demo {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 48px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .animation-box {
+            width: 100px;
+            height: 100px;
+            background: var(--accent-blue);
+            border-radius: var(--radius-md);
+            margin: 0 auto 24px;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Animation Classes */
+        .anim-fade-in { animation: fadeIn 0.5s ease; }
+        .anim-slide-up { animation: slideUp 0.3s ease; }
+        .anim-scale { animation: scale 0.3s ease; }
+        .anim-rotate { animation: rotate 0.5s ease; }
+        .anim-pulse { animation: pulse 2s infinite; }
+        .anim-bounce { animation: bounce 1s infinite; }
+        .anim-shake { animation: shake 0.5s ease; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes scale {
+            0% { transform: scale(0.8); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .control-panel {
+            background: var(--gray-50);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--gray-200);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: none;
+        }
+
+        .glassmorphism-showcase {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 48px;
+            border-radius: var(--radius-xl);
+            margin-bottom: 32px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            color: white;
+        }
+
+        .best-practices {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .practice-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .practice-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-green);
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+
+        .practice-icon.warning {
+            background: var(--accent-orange);
+        }
+
+        .practice-icon.error {
+            background: var(--accent-red);
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .badge-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .table-demo {
+            margin-bottom: 24px;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 48px;
+            height: 48px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background: var(--accent-blue-light);
+            transform: translateY(-4px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .doc-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                height: auto;
+                top: 0;
+                margin-bottom: 32px;
+            }
+
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .hero-content p {
+                font-size: 16px;
+            }
+
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .color-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Syntax Highlighting */
+        .hljs-tag { color: #e06c75; }
+        .hljs-attr { color: #d19a66; }
+        .hljs-string { color: #98c379; }
+        .hljs-selector-class { color: #61afef; }
+        .hljs-selector-id { color: #c678dd; }
+        .hljs-property { color: #56b6c2; }
+        .hljs-comment { color: #5c6370; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Grid Iron Mind UI System</h1>
+                <p>A complete, Apple-inspired design system for building beautiful, responsive applications with glassmorphism and ultra-minimal aesthetics.</p>
+                <div class="hero-tags">
+                    <span class="hero-tag">Glassmorphism</span>
+                    <span class="hero-tag">Responsive</span>
+                    <span class="hero-tag">Accessible</span>
+                    <span class="hero-tag">Production Ready</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Documentation Layout -->
+        <div class="doc-layout">
+            <!-- Sticky Sidebar Navigation -->
+            <aside class="sidebar">
+                <h3>Navigation</h3>
+                <nav>
+                    <ul class="sidebar-nav">
+                        <li><a href="#getting-started" class="active">Getting Started</a></li>
+                        <li><a href="#colors">Colors</a></li>
+                        <li><a href="#typography">Typography</a></li>
+                        <li><a href="#spacing">Spacing</a></li>
+                        <li><a href="#shadows">Shadows & Elevation</a></li>
+                        <li><a href="#buttons">Buttons</a></li>
+                        <li><a href="#forms">Form Elements</a></li>
+                        <li><a href="#cards">Cards</a></li>
+                        <li><a href="#badges">Badges & Tags</a></li>
+                        <li><a href="#alerts">Alerts</a></li>
+                        <li><a href="#modals">Modals</a></li>
+                        <li><a href="#tables">Tables</a></li>
+                        <li><a href="#navigation">Navigation</a></li>
+                        <li><a href="#loading">Loading States</a></li>
+                        <li><a href="#animations">Animations</a></li>
+                        <li><a href="#glassmorphism">Glassmorphism</a></li>
+                        <li><a href="#layouts">Layout Patterns</a></li>
+                        <li><a href="#live-editor">Live Code Editor</a></li>
+                        <li><a href="#best-practices">Best Practices</a></li>
+                        <li><a href="#accessibility">Accessibility</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Getting Started -->
+                <section id="getting-started" class="doc-section">
+                    <h2>Getting Started</h2>
+                    <p>Welcome to the Grid Iron Mind UI System. This comprehensive design system provides everything you need to build beautiful, consistent, and accessible user interfaces.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Installation</div>
+                        <div class="demo-description">Include the styles.css file in your HTML:</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;link rel="stylesheet" href="styles.css"&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Quick Example</div>
+                        <div class="demo-preview">
+                            <button class="btn-primary">Primary Button</button>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;button class="btn-primary"&gt;Primary Button&lt;/button&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Colors -->
+                <section id="colors" class="doc-section">
+                    <h2>Colors</h2>
+                    <p>Our color palette is designed with minimal, Apple-inspired aesthetics in mind. Click any color to copy its value.</p>
+
+                    <h3 style="margin-bottom: 16px; font-size: 18px;">Neutral Grays</h3>
+                    <div class="color-grid">
+                        <div class="color-swatch" onclick="copyColor('--gray-50', 'rgb(250, 250, 252)')">
+                            <div class="color-preview" style="background: var(--gray-50);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 50</div>
+                                <div class="color-value">--gray-50</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-100', 'rgb(242, 242, 247)')">
+                            <div class="color-preview" style="background: var(--gray-100);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 100</div>
+                                <div class="color-value">--gray-100</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-200', 'rgb(229, 229, 234)')">
+                            <div class="color-preview" style="background: var(--gray-200);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 200</div>
+                                <div class="color-value">--gray-200</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-300', 'rgb(209, 209, 214)')">
+                            <div class="color-preview" style="background: var(--gray-300);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 300</div>
+                                <div class="color-value">--gray-300</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-400', 'rgb(174, 174, 178)')">
+                            <div class="color-preview" style="background: var(--gray-400);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 400</div>
+                                <div class="color-value">--gray-400</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-500', 'rgb(142, 142, 147)')">
+                            <div class="color-preview" style="background: var(--gray-500);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 500</div>
+                                <div class="color-value">--gray-500</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-600', 'rgb(99, 99, 102)')">
+                            <div class="color-preview" style="background: var(--gray-600);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 600</div>
+                                <div class="color-value">--gray-600</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-700', 'rgb(72, 72, 74)')">
+                            <div class="color-preview" style="background: var(--gray-700);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 700</div>
+                                <div class="color-value">--gray-700</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-800', 'rgb(44, 44, 46)')">
+                            <div class="color-preview" style="background: var(--gray-800);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 800</div>
+                                <div class="color-value">--gray-800</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--gray-900', 'rgb(28, 28, 30)')">
+                            <div class="color-preview" style="background: var(--gray-900);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 900</div>
+                                <div class="color-value">--gray-900</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 32px 0 16px; font-size: 18px;">Accent Colors</h3>
+                    <div class="color-grid">
+                        <div class="color-swatch" onclick="copyColor('--accent-blue', 'rgb(0, 122, 255)')">
+                            <div class="color-preview" style="background: var(--accent-blue);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Accent Blue</div>
+                                <div class="color-value">--accent-blue</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--accent-green', 'rgb(52, 199, 89)')">
+                            <div class="color-preview" style="background: var(--accent-green);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Accent Green</div>
+                                <div class="color-value">--accent-green</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--accent-orange', 'rgb(255, 149, 0)')">
+                            <div class="color-preview" style="background: var(--accent-orange);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Accent Orange</div>
+                                <div class="color-value">--accent-orange</div>
+                            </div>
+                        </div>
+                        <div class="color-swatch" onclick="copyColor('--accent-red', 'rgb(255, 59, 48)')">
+                            <div class="color-preview" style="background: var(--accent-red);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Accent Red</div>
+                                <div class="color-value">--accent-red</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Typography -->
+                <section id="typography" class="doc-section">
+                    <h2>Typography</h2>
+                    <p>Our typography system uses the system font stack for optimal performance and native feel.</p>
+
+                    <div class="typography-scale">
+                        <div class="type-example">
+                            <div class="type-label">Heading 1 - 48px / Bold</div>
+                            <h1 style="font-size: 48px; font-weight: 700; margin: 0;">The quick brown fox</h1>
+                        </div>
+                        <div class="type-example">
+                            <div class="type-label">Heading 2 - 32px / Bold</div>
+                            <h2 style="font-size: 32px; font-weight: 700; margin: 0;">The quick brown fox</h2>
+                        </div>
+                        <div class="type-example">
+                            <div class="type-label">Heading 3 - 24px / Semibold</div>
+                            <h3 style="font-size: 24px; font-weight: 600; margin: 0;">The quick brown fox</h3>
+                        </div>
+                        <div class="type-example">
+                            <div class="type-label">Heading 4 - 20px / Semibold</div>
+                            <h4 style="font-size: 20px; font-weight: 600; margin: 0;">The quick brown fox</h4>
+                        </div>
+                        <div class="type-example">
+                            <div class="type-label">Body - 16px / Normal</div>
+                            <p style="font-size: 16px; margin: 0;">The quick brown fox jumps over the lazy dog</p>
+                        </div>
+                        <div class="type-example">
+                            <div class="type-label">Small - 14px / Normal</div>
+                            <p style="font-size: 14px; margin: 0;">The quick brown fox jumps over the lazy dog</p>
+                        </div>
+                        <div class="type-example">
+                            <div class="type-label">Caption - 12px / Medium</div>
+                            <p style="font-size: 12px; font-weight: 500; margin: 0;">The quick brown fox jumps over the lazy dog</p>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Font Weights</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>--font-weight-light: 300;
+--font-weight-normal: 400;
+--font-weight-medium: 500;
+--font-weight-semibold: 600;
+--font-weight-bold: 700;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Spacing -->
+                <section id="spacing" class="doc-section">
+                    <h2>Spacing</h2>
+                    <p>Consistent spacing creates visual rhythm and harmony. Our spacing scale follows an 8px base unit.</p>
+
+                    <div class="spacing-demo">
+                        <div class="spacing-item">
+                            <div class="spacing-visual" style="width: 4px;"></div>
+                            <div>
+                                <div class="spacing-label">XS - Extra Small</div>
+                                <div class="spacing-value">--spacing-xs: 4px</div>
+                            </div>
+                        </div>
+                        <div class="spacing-item">
+                            <div class="spacing-visual" style="width: 8px;"></div>
+                            <div>
+                                <div class="spacing-label">SM - Small</div>
+                                <div class="spacing-value">--spacing-sm: 8px</div>
+                            </div>
+                        </div>
+                        <div class="spacing-item">
+                            <div class="spacing-visual" style="width: 16px;"></div>
+                            <div>
+                                <div class="spacing-label">MD - Medium</div>
+                                <div class="spacing-value">--spacing-md: 16px</div>
+                            </div>
+                        </div>
+                        <div class="spacing-item">
+                            <div class="spacing-visual" style="width: 24px;"></div>
+                            <div>
+                                <div class="spacing-label">LG - Large</div>
+                                <div class="spacing-value">--spacing-lg: 24px</div>
+                            </div>
+                        </div>
+                        <div class="spacing-item">
+                            <div class="spacing-visual" style="width: 32px;"></div>
+                            <div>
+                                <div class="spacing-label">XL - Extra Large</div>
+                                <div class="spacing-value">--spacing-xl: 32px</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Shadows & Elevation -->
+                <section id="shadows" class="doc-section">
+                    <h2>Shadows & Elevation</h2>
+                    <p>Subtle shadows create depth and hierarchy in our ultra-minimal design.</p>
+
+                    <div class="shadow-demo">
+                        <div class="shadow-item" style="box-shadow: var(--shadow-xs);">
+                            <div class="shadow-label">XS - Extra Small</div>
+                            <div class="shadow-value">--shadow-xs</div>
+                        </div>
+                        <div class="shadow-item" style="box-shadow: var(--shadow-sm);">
+                            <div class="shadow-label">SM - Small</div>
+                            <div class="shadow-value">--shadow-sm</div>
+                        </div>
+                        <div class="shadow-item" style="box-shadow: var(--shadow-md);">
+                            <div class="shadow-label">MD - Medium</div>
+                            <div class="shadow-value">--shadow-md</div>
+                        </div>
+                        <div class="shadow-item" style="box-shadow: var(--shadow-lg);">
+                            <div class="shadow-label">LG - Large</div>
+                            <div class="shadow-value">--shadow-lg</div>
+                        </div>
+                        <div class="shadow-item" style="box-shadow: var(--shadow-xl);">
+                            <div class="shadow-label">XL - Extra Large</div>
+                            <div class="shadow-value">--shadow-xl</div>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Border Radius</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px;">
+                            <div style="background: var(--accent-blue); height: 80px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">SM - 10px</div>
+                            <div style="background: var(--accent-blue); height: 80px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">MD - 16px</div>
+                            <div style="background: var(--accent-blue); height: 80px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">LG - 20px</div>
+                            <div style="background: var(--accent-blue); height: 80px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">XL - 24px</div>
+                            <div style="background: var(--accent-blue); height: 80px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600;">FULL</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Buttons -->
+                <section id="buttons" class="doc-section">
+                    <h2>Buttons</h2>
+                    <p>Buttons are the primary call-to-action elements. We provide multiple variants and states.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Button Variants</div>
+                        <div class="demo-preview">
+                            <div class="button-grid">
+                                <button class="btn">Default Button</button>
+                                <button class="btn-primary">Primary Button</button>
+                                <button class="btn-secondary">Secondary Button</button>
+                                <button class="btn-refresh">Refresh Button</button>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;button class="btn"&gt;Default Button&lt;/button&gt;
+&lt;button class="btn-primary"&gt;Primary Button&lt;/button&gt;
+&lt;button class="btn-secondary"&gt;Secondary Button&lt;/button&gt;
+&lt;button class="btn-refresh"&gt;Refresh Button&lt;/button&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Button States</div>
+                        <div class="demo-preview">
+                            <div class="button-grid">
+                                <button class="btn-primary">Normal</button>
+                                <button class="btn-primary" disabled>Disabled</button>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;button class="btn-primary"&gt;Normal&lt;/button&gt;
+&lt;button class="btn-primary" disabled&gt;Disabled&lt;/button&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Forms -->
+                <section id="forms" class="doc-section">
+                    <h2>Form Elements</h2>
+                    <p>Clean, accessible form inputs with focus states and validation.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Input Fields</div>
+                        <div class="demo-preview">
+                            <div class="form-grid">
+                                <input type="text" placeholder="Text input">
+                                <input type="number" placeholder="Number input">
+                                <input type="email" placeholder="Email input">
+                                <input type="password" placeholder="Password input">
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;input type="text" placeholder="Text input"&gt;
+&lt;input type="number" placeholder="Number input"&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Select & Textarea</div>
+                        <div class="demo-preview">
+                            <div class="form-grid">
+                                <select>
+                                    <option>Option 1</option>
+                                    <option>Option 2</option>
+                                    <option>Option 3</option>
+                                </select>
+                                <textarea rows="4" placeholder="Textarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;select&gt;
+    &lt;option&gt;Option 1&lt;/option&gt;
+    &lt;option&gt;Option 2&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;textarea rows="4" placeholder="Textarea"&gt;&lt;/textarea&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Checkboxes & Radio Buttons</div>
+                        <div class="demo-preview">
+                            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" checked>
+                                    <span>Checkbox option</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="radio-demo" checked>
+                                    <span>Radio option 1</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="radio-demo">
+                                    <span>Radio option 2</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;label&gt;
+    &lt;input type="checkbox"&gt;
+    Checkbox option
+&lt;/label&gt;
+
+&lt;label&gt;
+    &lt;input type="radio" name="group"&gt;
+    Radio option
+&lt;/label&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Cards -->
+                <section id="cards" class="doc-section">
+                    <h2>Cards</h2>
+                    <p>Cards are versatile containers for grouping related content.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Basic Card</div>
+                        <div class="demo-preview">
+                            <div class="card" style="max-width: 400px;">
+                                <div class="card-header">
+                                    <div class="card-title">Card Title</div>
+                                    <span class="badge">New</span>
+                                </div>
+                                <div class="card-body">
+                                    This is a basic card with a header and body. It includes hover effects and smooth transitions.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;
+        &lt;div class="card-title"&gt;Card Title&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="card-body"&gt;
+        Card content goes here
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Glass Card (Content Card)</div>
+                        <div class="demo-preview" style="background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%); padding: 32px;">
+                            <div class="content-card" style="max-width: 400px;">
+                                <h3 style="margin-bottom: 12px;">Glass Morphism Card</h3>
+                                <p style="margin: 0; color: var(--gray-600);">This card uses glassmorphism with backdrop blur and subtle transparency.</p>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;div class="content-card"&gt;
+    &lt;h3&gt;Glass Morphism Card&lt;/h3&gt;
+    &lt;p&gt;Content with glassmorphism effect&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Badges -->
+                <section id="badges" class="doc-section">
+                    <h2>Badges & Tags</h2>
+                    <p>Small status indicators and labels for categorization.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Badge Variants</div>
+                        <div class="demo-preview">
+                            <div class="badge-grid">
+                                <span class="badge">Default</span>
+                                <span class="badge badge-active">Active</span>
+                                <span class="badge badge-inactive">Inactive</span>
+                                <span class="badge badge-injured">Injured</span>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;span class="badge"&gt;Default&lt;/span&gt;
+&lt;span class="badge badge-active"&gt;Active&lt;/span&gt;
+&lt;span class="badge badge-inactive"&gt;Inactive&lt;/span&gt;
+&lt;span class="badge badge-injured"&gt;Injured&lt;/span&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Alerts -->
+                <section id="alerts" class="doc-section">
+                    <h2>Alerts & Notifications</h2>
+                    <p>Display important messages and feedback to users.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Alert Types</div>
+                        <div class="demo-preview">
+                            <div class="error" style="margin-bottom: 16px;">
+                                This is an error message
+                            </div>
+                            <div class="success">
+                                This is a success message
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;div class="error"&gt;Error message&lt;/div&gt;
+&lt;div class="success"&gt;Success message&lt;/div&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Modals -->
+                <section id="modals" class="doc-section">
+                    <h2>Modals & Dialogs</h2>
+                    <p>Modal windows for focused interactions and important information.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Modal Example</div>
+                        <div class="demo-preview">
+                            <button class="btn-primary" onclick="document.getElementById('demoModal').classList.add('active')">Open Modal</button>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;div id="myModal" class="modal"&gt;
+    &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+            &lt;h3 class="modal-title"&gt;Modal Title&lt;/h3&gt;
+            &lt;button class="modal-close"&gt;×&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+            Modal content goes here
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tables -->
+                <section id="tables" class="doc-section">
+                    <h2>Tables</h2>
+                    <p>Clean, minimal tables for displaying structured data.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Data Table</div>
+                        <div class="demo-preview">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Position</th>
+                                        <th>Team</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>John Doe</td>
+                                        <td>QB</td>
+                                        <td>Team A</td>
+                                        <td><span class="badge badge-active">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jane Smith</td>
+                                        <td>WR</td>
+                                        <td>Team B</td>
+                                        <td><span class="badge badge-injured">Injured</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;table class="data-table"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Name&lt;/th&gt;
+            &lt;th&gt;Position&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;John Doe&lt;/td&gt;
+            &lt;td&gt;QB&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Navigation -->
+                <section id="navigation" class="doc-section">
+                    <h2>Navigation</h2>
+                    <p>Navigation components for organizing and switching between content.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Tab Navigation</div>
+                        <div class="demo-preview">
+                            <nav class="navigation">
+                                <div class="tabs">
+                                    <button class="tab active">Tab 1</button>
+                                    <button class="tab">Tab 2</button>
+                                    <button class="tab">Tab 3</button>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;nav class="navigation"&gt;
+    &lt;div class="tabs"&gt;
+        &lt;button class="tab active"&gt;Tab 1&lt;/button&gt;
+        &lt;button class="tab"&gt;Tab 2&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Loading States -->
+                <section id="loading" class="doc-section">
+                    <h2>Loading States</h2>
+                    <p>Indicate loading and processing states to users.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Spinner</div>
+                        <div class="demo-preview">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <span class="loading-text">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;div class="loading"&gt;
+    &lt;div class="spinner"&gt;&lt;/div&gt;
+    &lt;span class="loading-text"&gt;Loading...&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Animations -->
+                <section id="animations" class="doc-section">
+                    <h2>Animations</h2>
+                    <p>Built-in animations for delightful micro-interactions.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Animation Library</div>
+                        <div class="demo-preview">
+                            <div class="animation-demo">
+                                <div id="animBox" class="animation-box"></div>
+                                <div class="animation-controls">
+                                    <button class="btn" onclick="playAnimation('anim-fade-in')">Fade In</button>
+                                    <button class="btn" onclick="playAnimation('anim-slide-up')">Slide Up</button>
+                                    <button class="btn" onclick="playAnimation('anim-scale')">Scale</button>
+                                    <button class="btn" onclick="playAnimation('anim-rotate')">Rotate</button>
+                                    <button class="btn" onclick="playAnimation('anim-pulse')">Pulse</button>
+                                    <button class="btn" onclick="playAnimation('anim-bounce')">Bounce</button>
+                                    <button class="btn" onclick="playAnimation('anim-shake')">Shake</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>/* Built-in animations */
+.anim-fade-in { animation: fadeIn 0.5s ease; }
+.anim-slide-up { animation: slideUp 0.3s ease; }
+.anim-scale { animation: scale 0.3s ease; }
+.anim-rotate { animation: rotate 0.5s ease; }
+.anim-pulse { animation: pulse 2s infinite; }
+.anim-bounce { animation: bounce 1s infinite; }
+.anim-shake { animation: shake 0.5s ease; }</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Glassmorphism -->
+                <section id="glassmorphism" class="doc-section">
+                    <h2>Glassmorphism</h2>
+                    <p>Create beautiful frosted glass effects with our glassmorphism system.</p>
+
+                    <div class="glassmorphism-showcase">
+                        <div class="glass-card">
+                            <h3 style="margin-bottom: 12px;">Glass Morphism Effect</h3>
+                            <p style="margin: 0; opacity: 0.9;">This card demonstrates the glassmorphism effect with backdrop blur, subtle transparency, and soft borders.</p>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Glass Variables</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>/* Glassmorphism CSS Variables */
+--glass-bg: rgba(255, 255, 255, 0.7);
+--glass-bg-hover: rgba(255, 255, 255, 0.85);
+--glass-border: rgba(255, 255, 255, 0.18);
+--glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+--glass-shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.08);
+
+/* Apply glassmorphism */
+.glass-element {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="best-practices">
+                        <h3 style="margin-bottom: 16px; font-size: 18px;">Browser Support & Performance</h3>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Modern Browsers:</strong> Glassmorphism works best in Chrome, Safari, and Edge. Firefox has limited support.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Performance:</strong> Use sparingly on mobile devices as backdrop-filter can be GPU-intensive.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon warning">!</div>
+                            <div>
+                                <strong>Fallback:</strong> Always provide a solid background color fallback for unsupported browsers.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Layout Patterns -->
+                <section id="layouts" class="doc-section">
+                    <h2>Layout Patterns</h2>
+                    <p>Common layout patterns for building responsive interfaces.</p>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Cards Grid</div>
+                        <div class="demo-preview">
+                            <div class="cards-grid">
+                                <div class="card">
+                                    <div class="card-title">Card 1</div>
+                                    <div class="card-body">Grid layout example</div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-title">Card 2</div>
+                                    <div class="card-body">Responsive grid</div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-title">Card 3</div>
+                                    <div class="card-body">Auto-fill columns</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;div class="cards-grid"&gt;
+    &lt;div class="card"&gt;...&lt;/div&gt;
+    &lt;div class="card"&gt;...&lt;/div&gt;
+    &lt;div class="card"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+
+/* CSS */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Responsive Breakpoints</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>/* Mobile First Approach */
+
+/* Mobile: 0-767px (default) */
+.container {
+    padding: 16px;
+}
+
+/* Tablet: 768px+ */
+@media (min-width: 768px) {
+    .container {
+        padding: 24px;
+    }
+}
+
+/* Desktop: 1024px+ */
+@media (min-width: 1024px) {
+    .container {
+        padding: 32px;
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Live Code Editor -->
+                <section id="live-editor" class="doc-section">
+                    <h2>Live Code Editor</h2>
+                    <p>Try out components in real-time. Edit the HTML and see instant results.</p>
+
+                    <div class="live-editor">
+                        <div class="editor-container">
+                            <div class="editor-panel">
+                                <div class="editor-header">HTML</div>
+                                <div class="editor-content">
+                                    <textarea id="liveHtml" class="editor-textarea"><button class="btn-primary">Click Me</button>
+
+<div class="card" style="margin-top: 16px;">
+  <div class="card-title">Card Title</div>
+  <div class="card-body">This is a card</div>
+</div></textarea>
+                                </div>
+                            </div>
+                            <div class="editor-panel">
+                                <div class="editor-header">Preview</div>
+                                <div class="editor-content">
+                                    <div id="livePreview" class="editor-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Interactive Controls</div>
+                        <div class="control-panel">
+                            <div class="control-group">
+                                <label class="control-label">Border Radius (--radius-md): <span id="radiusValue">16px</span></label>
+                                <input type="range" class="slider" min="0" max="32" value="16" id="radiusSlider">
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Shadow Intensity: <span id="shadowValue">Medium</span></label>
+                                <input type="range" class="slider" min="1" max="5" value="3" id="shadowSlider">
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Primary Color:</label>
+                                <input type="color" value="#007AFF" id="colorPicker" style="width: 100%; height: 40px; border-radius: 8px; border: 1px solid var(--gray-300); cursor: pointer;">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Best Practices -->
+                <section id="best-practices" class="doc-section">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for building with this design system.</p>
+
+                    <div class="best-practices">
+                        <h3 style="margin-bottom: 16px; font-size: 18px;">Do's</h3>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Use CSS Variables:</strong> Leverage the provided CSS custom properties for consistent theming.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Mobile First:</strong> Design for mobile screens first, then enhance for larger viewports.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Semantic HTML:</strong> Use proper HTML5 semantic elements for better accessibility and SEO.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Consistent Spacing:</strong> Stick to the spacing scale (xs, sm, md, lg, xl) for visual rhythm.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="best-practices">
+                        <h3 style="margin-bottom: 16px; font-size: 18px;">Don'ts</h3>
+                        <div class="practice-item">
+                            <div class="practice-icon error">×</div>
+                            <div>
+                                <strong>Avoid Hardcoded Colors:</strong> Don't use hex codes directly. Use CSS variables instead.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon error">×</div>
+                            <div>
+                                <strong>Don't Override Core Styles:</strong> Extend the system rather than fighting against it.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon error">×</div>
+                            <div>
+                                <strong>Avoid Excessive Glassmorphism:</strong> Too many glass elements can hurt performance.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Performance Tips</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>/* Optimize animations for 60fps */
+.smooth-animation {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* Reduce backdrop-filter on mobile */
+@media (max-width: 768px) {
+    .glass-bg {
+        backdrop-filter: blur(10px); /* Reduced from 20px */
+    }
+}
+
+/* Use passive event listeners */
+element.addEventListener('scroll', handler, { passive: true });</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Accessibility -->
+                <section id="accessibility" class="doc-section">
+                    <h2>Accessibility</h2>
+                    <p>Building inclusive experiences for all users.</p>
+
+                    <div class="best-practices">
+                        <h3 style="margin-bottom: 16px; font-size: 18px;">Accessibility Guidelines</h3>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Keyboard Navigation:</strong> All interactive elements are keyboard accessible with visible focus states.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Color Contrast:</strong> Text colors meet WCAG AA standards (4.5:1 for normal text).
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Screen Readers:</strong> Use ARIA labels and semantic HTML for screen reader support.
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <div class="practice-icon">✓</div>
+                            <div>
+                                <strong>Reduced Motion:</strong> Respects prefers-reduced-motion for users sensitive to animations.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Accessible Component Example</div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>&lt;!-- Accessible Button --&gt;
+&lt;button
+    class="btn-primary"
+    aria-label="Save changes"
+    aria-describedby="save-description"&gt;
+    Save
+&lt;/button&gt;
+&lt;span id="save-description" class="sr-only"&gt;
+    This will save your changes permanently
+&lt;/span&gt;
+
+&lt;!-- Accessible Form --&gt;
+&lt;label for="email"&gt;Email Address&lt;/label&gt;
+&lt;input
+    type="email"
+    id="email"
+    aria-required="true"
+    aria-invalid="false"
+    aria-describedby="email-error"&gt;
+&lt;span id="email-error" role="alert"&gt;&lt;/span&gt;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="component-demo">
+                        <div class="demo-title">Focus Visible Styles</div>
+                        <div class="demo-preview">
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                                <button class="btn">Tab to focus</button>
+                                <input type="text" placeholder="Tab to focus" style="max-width: 200px;">
+                                <a href="#" style="color: var(--accent-blue);">Tab to focus</a>
+                            </div>
+                        </div>
+                        <div class="code-block-container">
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <pre class="code-block"><code>/* Focus visible for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Back to Top Button -->
+        <button class="back-to-top" id="backToTop" onclick="scrollToTop()">↑</button>
+
+        <!-- Demo Modal -->
+        <div id="demoModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Modal Example</h3>
+                    <button class="modal-close" onclick="document.getElementById('demoModal').classList.remove('active')">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>This is a modal window with glassmorphism backdrop and smooth animations.</p>
+                    <p>You can add any content here including forms, images, or other components.</p>
+                    <button class="btn-primary" onclick="document.getElementById('demoModal').classList.remove('active')">Close Modal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling.querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Copy color value
+        function copyColor(name, value) {
+            navigator.clipboard.writeText(value).then(() => {
+                const notification = document.createElement('div');
+                notification.textContent = `Copied ${value}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    bottom: 32px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: var(--gray-900);
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    z-index: 10000;
+                    animation: slideUp 0.3s ease;
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 2000);
+            });
+        }
+
+        // Sidebar navigation active state
+        const sections = document.querySelectorAll('.doc-section');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Live editor
+        const liveHtml = document.getElementById('liveHtml');
+        const livePreview = document.getElementById('livePreview');
+
+        function updatePreview() {
+            livePreview.innerHTML = liveHtml.value;
+        }
+
+        liveHtml.addEventListener('input', updatePreview);
+        updatePreview();
+
+        // Interactive controls
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusValue = document.getElementById('radiusValue');
+        const shadowSlider = document.getElementById('shadowSlider');
+        const shadowValue = document.getElementById('shadowValue');
+        const colorPicker = document.getElementById('colorPicker');
+
+        radiusSlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            radiusValue.textContent = `${value}px`;
+            document.documentElement.style.setProperty('--radius-md', `${value}px`);
+        });
+
+        const shadowValues = ['XS', 'SM', 'Medium', 'LG', 'XL'];
+        const shadowVars = ['--shadow-xs', '--shadow-sm', '--shadow-md', '--shadow-lg', '--shadow-xl'];
+
+        shadowSlider.addEventListener('input', (e) => {
+            const index = e.target.value - 1;
+            shadowValue.textContent = shadowValues[index];
+            document.querySelectorAll('.card, .btn, .content-card').forEach(el => {
+                el.style.boxShadow = `var(${shadowVars[index]})`;
+            });
+        });
+
+        colorPicker.addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--accent-blue', e.target.value);
+        });
+
+        // Animation demo
+        function playAnimation(className) {
+            const box = document.getElementById('animBox');
+            box.className = 'animation-box';
+            setTimeout(() => {
+                box.classList.add(className);
+            }, 10);
+
+            setTimeout(() => {
+                box.className = 'animation-box';
+            }, 2000);
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

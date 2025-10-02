@@ -134,6 +134,11 @@ func main() {
 		http.ServeFile(w, r, "./dashboard/api-docs.html")
 	})
 
+	// UI System Documentation endpoint
+	mux.HandleFunc("/ui-system.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./dashboard/ui-system.html")
+	})
+
 	// Style Agent endpoints
 	mux.HandleFunc("/api/v1/style/check", applyMiddleware(styleAgentHandler.HandleStyleCheck))
 	mux.HandleFunc("/api/v1/style/rules", applyMiddleware(styleAgentHandler.HandleStyleRules))
