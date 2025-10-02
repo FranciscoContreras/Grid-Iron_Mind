@@ -45,12 +45,12 @@ func (h *StandingsHandler) HandleStandings(w http.ResponseWriter, r *http.Reques
 
 	var week *int
 	if weekStr != "" {
-		w, err := strconv.Atoi(weekStr)
+		weekNum, err := strconv.Atoi(weekStr)
 		if err != nil {
 			response.BadRequest(w, "Invalid week")
 			return
 		}
-		week = &w
+		week = &weekNum
 	}
 
 	// If no week specified, get latest week with standings
