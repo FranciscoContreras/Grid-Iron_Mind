@@ -1,10 +1,10 @@
-.PHONY: help build sync-full sync-update sync-live sync-stats sync-injuries clean install-cron logs
+.PHONY: help build build-importer sync-full sync-update sync-live sync-stats sync-injuries clean install-cron logs
 
 # Default target
 help:
-	@echo "Grid Iron Mind - 2025 Season Sync"
+	@echo "Grid Iron Mind - 2025 Season Sync & Historical Import"
 	@echo ""
-	@echo "Available commands:"
+	@echo "2025 Season Sync Commands:"
 	@echo "  make build         - Build the sync2025 binary"
 	@echo "  make sync-full     - Run full initial sync (30-60 min)"
 	@echo "  make sync-update   - Run regular update (2-5 min)"
@@ -12,6 +12,16 @@ help:
 	@echo "  make sync-stats    - Sync player stats only"
 	@echo "  make sync-injuries - Sync injury reports only"
 	@echo "  make install-cron  - Install automated cron schedule"
+	@echo ""
+	@echo "Historical Import Commands (2010-2024):"
+	@echo "  make build-importer       - Build historical import tool"
+	@echo "  make import-year YEAR=2024 - Import single year"
+	@echo "  make import-range START=2010 END=2014 - Import year range"
+	@echo "  make import-full          - Import all 15 years (2010-2024)"
+	@echo "  make import-validate      - Validate imported data"
+	@echo "  make import-stats         - Show import statistics"
+	@echo ""
+	@echo "Other Commands:"
 	@echo "  make logs          - View sync logs"
 	@echo "  make clean         - Remove built binaries"
 	@echo ""
@@ -68,10 +78,45 @@ install-cron:
 logs:
 	@tail -f logs/sync-2025.log
 
+# Build historical import tool
+build-importer:
+	@echo "Building historical import tool..."
+	@mkdir -p bin logs
+	@go build -o bin/import-historical cmd/import_historical/main.go
+	@echo "✓ Build complete: bin/import-historical"
+
+# Import single year
+import-year: build-importer
+	@echo "Importing data for year $(YEAR)..."
+	@./bin/import-historical --mode=year --year=$(YEAR) --verbose 2>&1 | tee -a logs/import-historical.log
+
+# Import year range
+import-range: build-importer
+	@echo "Importing data for years $(START)-$(END)..."
+	@./bin/import-historical --mode=range --start=$(START) --end=$(END) --verbose 2>&1 | tee -a logs/import-historical.log
+
+# Import full 15 years
+import-full: build-importer
+	@echo "Importing 15 years of historical data (2010-2024)..."
+	@echo "⚠️  This will take 60-90 minutes"
+	@echo "Press Ctrl+C within 5 seconds to cancel..."
+	@sleep 5
+	@./bin/import-historical --mode=full --start=2010 --end=2024 --verbose 2>&1 | tee -a logs/import-historical.log
+
+# Validate imported data
+import-validate: build-importer
+	@echo "Validating imported historical data..."
+	@./bin/import-historical --mode=validate
+
+# Show import statistics
+import-stats: build-importer
+	@echo "Showing import statistics..."
+	@./bin/import-historical --mode=stats
+
 # Clean built files
 clean:
 	@echo "Cleaning built files..."
-	@rm -f bin/sync2025
+	@rm -f bin/sync2025 bin/import-historical
 	@echo "✓ Clean complete"
 
 # Development helpers
