@@ -128,6 +128,66 @@ body {
     font-size: 16px;
 }
 
+/* Glassmorphic Gradient Button */
+.btn-glass {
+    position: relative;
+    padding: 18px 48px;
+    font-size: 18px;
+    font-weight: 400;
+    border-radius: 9999px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.7) 100%
+    );
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--soft-text);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.btn-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(150, 130, 200, 0.15) 0%,
+        rgba(100, 150, 255, 0.15) 50%,
+        rgba(255, 200, 150, 0.1) 100%
+    );
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    border-radius: inherit;
+}
+
+.btn-glass:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-glass:hover::before {
+    opacity: 1.2;
+}
+
+.btn-glass:active {
+    transform: translateY(0);
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
 /* ============================================
    CARDS
    ============================================ */
