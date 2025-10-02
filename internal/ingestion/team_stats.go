@@ -235,10 +235,11 @@ type TeamStatsData struct {
 
 // parseTeamStats extracts team statistics from ESPN boxscore format
 func parseTeamStats(statistics []struct {
-	Name         string
-	DisplayValue string
-	Value        interface{}
-	Label        string
+	Name             string
+	DisplayValue     string
+	Value            interface{}
+	Label            string
+	Abbreviation     string
 }) TeamStatsData {
 	stats := TeamStatsData{}
 
