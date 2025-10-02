@@ -716,18 +716,18 @@ func (i *Importer) upsertGameFromESPN(event *espn.Event, season, week int) error
 		return fmt.Errorf("away team %s not found: %w", awayTeam.Team.Abbreviation, err)
 	}
 
-	// Get scores
+	// Get scores (ESPN returns scores as strings)
 	homeScore := 0
 	awayScore := 0
-	if homeTeam.Score != nil {
-		homeScore = *homeTeam.Score
+	if homeTeam.Score != "" {
+		fmt.Sscanf(homeTeam.Score, "%d", &homeScore)
 	}
-	if awayTeam.Score != nil {
-		awayScore = *awayTeam.Score
+	if awayTeam.Score != "" {
+		fmt.Sscanf(awayTeam.Score, "%d", &awayScore)
 	}
 
 	// Parse game date
-	gameDate := time.Time(event.Date)
+	gameDate := event.Date.Time
 
 	// Status mapping
 	status := "scheduled"
