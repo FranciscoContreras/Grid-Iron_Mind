@@ -43,5 +43,9 @@ temp/
 bin/
 /server
 
+# Rust build artifacts
+target/
+Cargo.lock
+
 # Heroku
 .heroku/
