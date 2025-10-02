@@ -30,7 +30,7 @@ func NewGamesHandler() *GamesHandler {
 
 // HandleGames handles both GET /games (list) and GET /games/:id (single) and GET /games/:id/stats
 func (h *GamesHandler) HandleGames(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/games")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/games"); path = strings.TrimPrefix(path, "/api/v2/games")
 	path = strings.TrimPrefix(path, "/")
 
 	if path == "" {
@@ -163,7 +163,7 @@ func (h *GamesHandler) getGame(w http.ResponseWriter, r *http.Request, idStr str
 // HandleGameStats returns team statistics for a specific game
 func (h *GamesHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 	// Extract game ID from path: /api/v1/games/:id/stats
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/games/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/games/"); path = strings.TrimPrefix(path, "/api/v2/games/")
 	path = strings.TrimSuffix(path, "/stats")
 
 	id, err := uuid.Parse(path)
@@ -293,7 +293,7 @@ func (h *GamesHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 // HandleScoringPlays returns scoring plays timeline for a specific game
 func (h *GamesHandler) HandleScoringPlays(w http.ResponseWriter, r *http.Request) {
 	// Extract game ID from path: /api/v1/games/:id/scoring-plays
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/games/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/games/"); path = strings.TrimPrefix(path, "/api/v2/games/")
 	path = strings.TrimSuffix(path, "/scoring-plays")
 
 	id, err := uuid.Parse(path)

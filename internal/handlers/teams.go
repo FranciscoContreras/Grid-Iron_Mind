@@ -30,7 +30,10 @@ func NewTeamsHandler() *TeamsHandler {
 // HandleTeams handles GET /teams (list) and GET /teams/:id (single)
 func (h *TeamsHandler) HandleTeams(w http.ResponseWriter, r *http.Request) {
 	// Parse path to determine if this is a list or single team request
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/teams")
+	// Support both v1 and v2 API paths
+	path := r.URL.Path
+	path = strings.TrimPrefix(path, "/api/v1/teams")
+	path = strings.TrimPrefix(path, "/api/v2/teams")
 	path = strings.Trim(path, "/")
 
 	if path == "" {

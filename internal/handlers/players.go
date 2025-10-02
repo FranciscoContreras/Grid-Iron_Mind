@@ -29,7 +29,10 @@ func NewPlayersHandler() *PlayersHandler {
 // HandlePlayers handles GET /players (list), GET /players/:id (single), GET /players/:id/career, and GET /players/:id/history
 func (h *PlayersHandler) HandlePlayers(w http.ResponseWriter, r *http.Request) {
 	// Parse path to determine the request type
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players")
+	// Support both v1 and v2 API paths
+	path := r.URL.Path
+	path = strings.TrimPrefix(path, "/api/v1/players")
+	path = strings.TrimPrefix(path, "/api/v2/players")
 	path = strings.Trim(path, "/")
 
 	if path == "" {

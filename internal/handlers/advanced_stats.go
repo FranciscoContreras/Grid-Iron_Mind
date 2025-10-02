@@ -23,7 +23,7 @@ func NewAdvancedStatsHandler() *AdvancedStatsHandler {
 //   - GET /api/v1/players/:id/advanced-stats - Get player's advanced stats
 func (h *AdvancedStatsHandler) HandleAdvancedStats(w http.ResponseWriter, r *http.Request) {
 	// Extract player ID from path
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/players/"); path = strings.TrimPrefix(path, "/api/v2/players/")
 	path = strings.TrimSuffix(path, "/advanced-stats")
 
 	playerID, err := uuid.Parse(path)

@@ -24,7 +24,7 @@ func NewCareerHandler() *CareerHandler {
 // HandlePlayerCareerStats handles GET /players/:id/career
 func (h *CareerHandler) HandlePlayerCareerStats(w http.ResponseWriter, r *http.Request) {
 	// Extract player ID from path
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/players/"); path = strings.TrimPrefix(path, "/api/v2/players/")
 	path = strings.TrimSuffix(path, "/career")
 	playerID, err := uuid.Parse(path)
 	if err != nil {
@@ -74,7 +74,7 @@ func (h *CareerHandler) HandlePlayerCareerStats(w http.ResponseWriter, r *http.R
 // HandlePlayerTeamHistory handles GET /players/:id/history
 func (h *CareerHandler) HandlePlayerTeamHistory(w http.ResponseWriter, r *http.Request) {
 	// Extract player ID from path
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/players/"); path = strings.TrimPrefix(path, "/api/v2/players/")
 	path = strings.TrimSuffix(path, "/history")
 	playerID, err := uuid.Parse(path)
 	if err != nil {

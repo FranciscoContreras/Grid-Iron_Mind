@@ -21,7 +21,7 @@ func NewInjuryHandler() *InjuryHandler {
 // HandlePlayerInjuries handles GET /api/v1/players/{id}/injuries
 func (h *InjuryHandler) HandlePlayerInjuries(w http.ResponseWriter, r *http.Request) {
 	// Extract player ID from path
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/players/"); path = strings.TrimPrefix(path, "/api/v2/players/")
 	path = strings.TrimSuffix(path, "/injuries")
 	playerID, err := uuid.Parse(path)
 	if err != nil {
@@ -49,7 +49,7 @@ func (h *InjuryHandler) HandlePlayerInjuries(w http.ResponseWriter, r *http.Requ
 // HandleTeamInjuries handles GET /api/v1/teams/{id}/injuries
 func (h *InjuryHandler) HandleTeamInjuries(w http.ResponseWriter, r *http.Request) {
 	// Extract team ID from path
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/teams/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/teams/"); path = strings.TrimPrefix(path, "/api/v2/teams/")
 	path = strings.TrimSuffix(path, "/injuries")
 	teamID, err := uuid.Parse(path)
 	if err != nil {

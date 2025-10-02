@@ -31,7 +31,7 @@ func NewStatsHandler() *StatsHandler {
 // HandleGameStats handles GET /stats/game/:gameID - returns player stats for a game
 func (h *StatsHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 	// Extract game ID from path: /api/v1/stats/game/{id}
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/stats/game/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/stats/game/"); path = strings.TrimPrefix(path, "/api/v2/stats/game/")
 	path = strings.TrimSuffix(path, "/")
 
 	gameID, err := uuid.Parse(path)
@@ -72,7 +72,7 @@ func (h *StatsHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 // HandlePlayerStats handles GET /players/:playerID/stats
 func (h *StatsHandler) HandlePlayerStats(w http.ResponseWriter, r *http.Request) {
 	// Extract player ID from path: /api/v1/players/{id}/stats
-	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
+	path := r.URL.Path; path = strings.TrimPrefix(path, "/api/v1/players/"); path = strings.TrimPrefix(path, "/api/v2/players/")
 	parts := strings.Split(path, "/")
 	if len(parts) < 2 {
 		response.Error(w, http.StatusBadRequest, "INVALID_PATH", "Invalid player stats path")
