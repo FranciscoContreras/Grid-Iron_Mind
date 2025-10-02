@@ -4,7 +4,7 @@
 
 set -e
 
-PIPELINE="nfl-data-pipeline/target/release/nfl-data-pipeline"
+PIPELINE="target/release/nfl-data-pipeline"
 
 # Get current day of week (0=Sunday, 1=Monday, etc.)
 DAY=$(date +%u)
