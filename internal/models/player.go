@@ -9,7 +9,7 @@ import (
 // Player represents an NFL player
 type Player struct {
 	ID           uuid.UUID  `json:"id"`
-	NFLID        *int       `json:"nfl_id,omitempty"`
+	NFLID        *string    `json:"nfl_id,omitempty"`
 	Name         string     `json:"name" validate:"required"`
 	Position     string     `json:"position" validate:"required"`
 	TeamID       *uuid.UUID `json:"team_id,omitempty"`
