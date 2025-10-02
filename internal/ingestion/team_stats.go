@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/francisco/gridironmind/internal/espn"
 	"github.com/google/uuid"
 )
 
@@ -238,11 +237,11 @@ type TeamStatsData struct {
 
 // parseTeamStats extracts team statistics from ESPN boxscore format
 func parseTeamStats(statistics []struct {
-	Name             string
-	DisplayValue     string
-	Value            interface{}
-	Label            string
-	Abbreviation     string
+	Name             string      `json:"name"`
+	DisplayValue     string      `json:"displayValue"`
+	Value            interface{} `json:"value"`
+	Label            string      `json:"label"`
+	Abbreviation     string      `json:"abbreviation"`
 }) TeamStatsData {
 	stats := TeamStatsData{}
 
