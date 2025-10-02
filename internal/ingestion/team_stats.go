@@ -94,7 +94,14 @@ func (s *Service) syncGameTeamStats(ctx context.Context, gameID uuid.UUID, nflGa
 
 	// Process each team's stats
 	for _, teamBox := range gameDetail.BoxScore.Teams {
-		if err := s.insertOrUpdateTeamStats(ctx, gameID, teamBox); err != nil {
+		// Extract team ID and statistics
+		teamID := teamBox.Team.ID
+		if teamID == "" {
+			log.Printf("Skipping team with empty ID")
+			continue
+		}
+
+		if err := s.insertOrUpdateTeamStats(ctx, gameID, teamID, teamBox.Statistics); err != nil {
 			log.Printf("Failed to insert team stats: %v", err)
 			continue
 		}
@@ -104,20 +111,16 @@ func (s *Service) syncGameTeamStats(ctx context.Context, gameID uuid.UUID, nflGa
 }
 
 // insertOrUpdateTeamStats inserts or updates team statistics for a game
-func (s *Service) insertOrUpdateTeamStats(ctx context.Context, gameID uuid.UUID, teamBox struct {
-	Team       espn.TeamInfo
-	Statistics []struct {
-		Name             string
-		DisplayValue     string
-		Value            interface{}
-		Label            string
-		Abbreviation     string
-	}
+func (s *Service) insertOrUpdateTeamStats(ctx context.Context, gameID uuid.UUID, teamIDStr string, statistics []struct {
+	Name             string      `json:"name"`
+	DisplayValue     string      `json:"displayValue"`
+	Value            interface{} `json:"value"`
+	Label            string      `json:"label"`
+	Abbreviation     string      `json:"abbreviation"`
 }) error {
-	// Find team by ESPN ID
-	teamIDStr := teamBox.Team.ID
+	// Validate team ID
 	if teamIDStr == "" {
-		return fmt.Errorf("team ID is empty in boxscore")
+		return fmt.Errorf("team ID is empty")
 	}
 
 	nflTeamID, err := strconv.Atoi(teamIDStr)
@@ -133,7 +136,7 @@ func (s *Service) insertOrUpdateTeamStats(ctx context.Context, gameID uuid.UUID,
 	}
 
 	// Parse statistics from ESPN boxscore
-	stats := parseTeamStats(teamBox.Statistics)
+	stats := parseTeamStats(statistics)
 
 	// Insert or update team stats
 	query := `
