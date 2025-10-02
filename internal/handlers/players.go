@@ -28,11 +28,6 @@ func NewPlayersHandler() *PlayersHandler {
 
 // HandlePlayers handles GET /players (list), GET /players/:id (single), GET /players/:id/career, and GET /players/:id/history
 func (h *PlayersHandler) HandlePlayers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	// Parse path to determine the request type
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players")
 	path = strings.Trim(path, "/")
@@ -52,6 +47,10 @@ func (h *PlayersHandler) HandlePlayers(w http.ResponseWriter, r *http.Request) {
 		// Get player injuries
 		injuryHandler := NewInjuryHandler()
 		injuryHandler.HandlePlayerInjuries(w, r)
+	} else if strings.HasSuffix(path, "/advanced-stats") {
+		// Get player advanced stats (Next Gen Stats)
+		advancedStatsHandler := NewAdvancedStatsHandler()
+		advancedStatsHandler.HandleAdvancedStats(w, r)
 	} else if strings.Contains(path, "/vs-defense/") {
 		// Get player vs defense stats
 		defensiveHandler := NewDefensiveHandler()

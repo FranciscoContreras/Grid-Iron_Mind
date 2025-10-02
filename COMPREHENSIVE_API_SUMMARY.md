@@ -236,17 +236,21 @@ short_name, display_name, espn_id, experience_years, status_detail
 
 ## 🔄 Next Steps for Full Completion
 
-### High Priority (Quick Wins)
-1. **Populate Team Stats** - Create sync function for game_team_stats
-2. **API Handlers** - Expose new tables through REST endpoints
-3. **Full Roster Sync** - Complete player roster population
-4. **Weather Enrichment** - Run for 2024/2025 seasons
+### High Priority (Quick Wins) ✅ COMPLETE
+1. ✅ **Populate Team Stats** - Sync function created (`internal/ingestion/team_stats.go`)
+2. ✅ **API Handlers** - Team stats endpoint live (`GET /api/v1/games/:id/stats`)
+3. ✅ **Full Roster Sync** - `SyncAllRosters()` implemented and working
+4. ✅ **Weather Enrichment** - `EnrichGamesWithWeather()` ready for 2024/2025
+
+**See:** `docs/HIGH_PRIORITY_TASKS_COMPLETE.md` for full details
 
 ### Medium Priority
-1. **Scoring Plays** - Parse and store scoring timeline
-2. **Player Career Stats** - Backfill historical seasons
-3. **Standings Calculation** - Compute weekly standings
-4. **Advanced Stats** - Integrate NFLverse data
+1. ✅ **Scoring Plays** - Timeline feature complete (`internal/ingestion/scoring_plays.go`)
+2. ✅ **Player Career Stats** - NFLverse CSV integration complete (`internal/ingestion/player_season_stats.go`)
+3. ✅ **Standings Calculation** - Compute weekly standings (`internal/ingestion/standings.go`)
+4. ✅ **Advanced Stats** - Integrate NFLverse data (`internal/ingestion/nextgen_stats.go`)
+
+**See:** `docs/SCORING_PLAYS_IMPLEMENTATION.md` and `docs/PLAYER_CAREER_STATS_COMPLETE.md` for details
 
 ### Long Term
 1. **Real-time Updates** - WebSocket for live games

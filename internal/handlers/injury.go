@@ -20,11 +20,6 @@ func NewInjuryHandler() *InjuryHandler {
 
 // HandlePlayerInjuries handles GET /api/v1/players/{id}/injuries
 func (h *InjuryHandler) HandlePlayerInjuries(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// Extract player ID from path
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
 	path = strings.TrimSuffix(path, "/injuries")
@@ -53,11 +48,6 @@ func (h *InjuryHandler) HandlePlayerInjuries(w http.ResponseWriter, r *http.Requ
 
 // HandleTeamInjuries handles GET /api/v1/teams/{id}/injuries
 func (h *InjuryHandler) HandleTeamInjuries(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// Extract team ID from path
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/teams/")
 	path = strings.TrimSuffix(path, "/injuries")

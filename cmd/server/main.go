@@ -61,58 +61,80 @@ func main() {
 	gamesHandler := handlers.NewGamesHandler()
 	statsHandler := handlers.NewStatsHandler()
 	defensiveHandler := handlers.NewDefensiveHandler()
+	standingsHandler := handlers.NewStandingsHandler()
 	adminHandler := handlers.NewAdminHandler(cfg.WeatherAPIKey)
 	weatherHandler := handlers.NewWeatherHandler(weather.NewClient(cfg.WeatherAPIKey))
 	styleAgentHandler := handlers.NewStyleAgentHandler()
+	metricsHandler := handlers.NewMetricsHandler()
 
 	// Setup router
 	mux := http.NewServeMux()
 
-	// API endpoints
-	mux.HandleFunc("/api/v1/players", applyMiddleware(playersHandler.HandlePlayers))
-	mux.HandleFunc("/api/v1/players/", applyMiddleware(playersHandler.HandlePlayers))
-	mux.HandleFunc("/api/v1/teams", applyMiddleware(teamsHandler.HandleTeams))
-	mux.HandleFunc("/api/v1/teams/", applyMiddleware(teamsHandler.HandleTeams))
-	mux.HandleFunc("/api/v1/games", applyMiddleware(gamesHandler.HandleGames))
-	mux.HandleFunc("/api/v1/games/", applyMiddleware(gamesHandler.HandleGames))
-	mux.HandleFunc("/api/v1/stats/leaders", applyMiddleware(statsHandler.HandleStatsLeaders))
-	mux.HandleFunc("/api/v1/stats/game/", applyMiddleware(statsHandler.HandleGameStats))
+	// API endpoints (all GET methods)
+	mux.HandleFunc("/api/v1/players", applyGETMiddleware(playersHandler.HandlePlayers))
+	mux.HandleFunc("/api/v1/players/", applyGETMiddleware(playersHandler.HandlePlayers))
+	mux.HandleFunc("/api/v1/teams", applyGETMiddleware(teamsHandler.HandleTeams))
+	mux.HandleFunc("/api/v1/teams/", applyGETMiddleware(teamsHandler.HandleTeams))
+	mux.HandleFunc("/api/v1/games", applyGETMiddleware(gamesHandler.HandleGames))
+	mux.HandleFunc("/api/v1/games/", applyGETMiddleware(gamesHandler.HandleGames))
+	mux.HandleFunc("/api/v1/stats/leaders", applyGETMiddleware(statsHandler.HandleStatsLeaders))
+	mux.HandleFunc("/api/v1/stats/game/", applyGETMiddleware(statsHandler.HandleGameStats))
 
-	// Defensive stats endpoints
-	mux.HandleFunc("/api/v1/defense/rankings", applyMiddleware(defensiveHandler.HandleDefensiveRankings))
+	// Standings endpoint (GET)
+	mux.HandleFunc("/api/v1/standings", applyGETMiddleware(standingsHandler.HandleStandings))
 
-	// Admin endpoints for data ingestion (require API key authentication)
-	mux.HandleFunc("/api/v1/admin/sync/teams", applyAdminMiddleware(adminHandler.HandleSyncTeams))
-	mux.HandleFunc("/api/v1/admin/sync/rosters", applyAdminMiddleware(adminHandler.HandleSyncRosters))
-	mux.HandleFunc("/api/v1/admin/sync/games", applyAdminMiddleware(adminHandler.HandleSyncGames))
-	mux.HandleFunc("/api/v1/admin/sync/full", applyAdminMiddleware(adminHandler.HandleFullSync))
-	mux.HandleFunc("/api/v1/admin/sync/historical/season", applyAdminMiddleware(adminHandler.HandleSyncHistoricalGames))
-	mux.HandleFunc("/api/v1/admin/sync/historical/seasons", applyAdminMiddleware(adminHandler.HandleSyncMultipleSeasons))
+	// Defensive stats endpoints (GET)
+	mux.HandleFunc("/api/v1/defense/rankings", applyGETMiddleware(defensiveHandler.HandleDefensiveRankings))
 
-	// NFLverse enrichment endpoints
-	mux.HandleFunc("/api/v1/admin/sync/nflverse/stats", applyAdminMiddleware(adminHandler.HandleSyncNFLverseStats))
-	mux.HandleFunc("/api/v1/admin/sync/nflverse/schedule", applyAdminMiddleware(adminHandler.HandleSyncNFLverseSchedule))
-	mux.HandleFunc("/api/v1/admin/sync/nflverse/nextgen", applyAdminMiddleware(adminHandler.HandleSyncNFLverseNextGen))
+	// Admin endpoints for data ingestion (POST methods, require API key authentication)
+	mux.HandleFunc("/api/v1/admin/sync/teams", applyPOSTAdminMiddleware(adminHandler.HandleSyncTeams))
+	mux.HandleFunc("/api/v1/admin/sync/rosters", applyPOSTAdminMiddleware(adminHandler.HandleSyncRosters))
+	mux.HandleFunc("/api/v1/admin/sync/games", applyPOSTAdminMiddleware(adminHandler.HandleSyncGames))
+	mux.HandleFunc("/api/v1/admin/sync/full", applyPOSTAdminMiddleware(adminHandler.HandleFullSync))
+	mux.HandleFunc("/api/v1/admin/sync/historical/season", applyPOSTAdminMiddleware(adminHandler.HandleSyncHistoricalGames))
+	mux.HandleFunc("/api/v1/admin/sync/historical/seasons", applyPOSTAdminMiddleware(adminHandler.HandleSyncMultipleSeasons))
 
-	// Weather enrichment endpoint
-	mux.HandleFunc("/api/v1/admin/sync/weather", applyAdminMiddleware(adminHandler.HandleEnrichWeather))
+	// NFLverse enrichment endpoints (POST)
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/stats", applyPOSTAdminMiddleware(adminHandler.HandleSyncNFLverseStats))
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/schedule", applyPOSTAdminMiddleware(adminHandler.HandleSyncNFLverseSchedule))
+	mux.HandleFunc("/api/v1/admin/sync/nflverse/nextgen", applyPOSTAdminMiddleware(adminHandler.HandleSyncNFLverseNextGen))
 
-	// Team stats sync endpoint
-	mux.HandleFunc("/api/v1/admin/sync/team-stats", applyAdminMiddleware(adminHandler.HandleSyncTeamStats))
+	// Next Gen Stats sync endpoint (POST)
+	mux.HandleFunc("/api/v1/admin/sync/nextgen-stats", applyPOSTAdminMiddleware(adminHandler.HandleSyncNextGenStats))
 
-	// Injury sync endpoint
-	mux.HandleFunc("/api/v1/admin/sync/injuries", applyAdminMiddleware(adminHandler.HandleSyncInjuries))
+	// Weather enrichment endpoint (POST)
+	mux.HandleFunc("/api/v1/admin/sync/weather", applyPOSTAdminMiddleware(adminHandler.HandleEnrichWeather))
 
-	// Weather API endpoints
-	mux.HandleFunc("/api/v1/weather/current", applyMiddleware(weatherHandler.HandleCurrentWeather))
-	mux.HandleFunc("/api/v1/weather/historical", applyMiddleware(weatherHandler.HandleHistoricalWeather))
-	mux.HandleFunc("/api/v1/weather/forecast", applyMiddleware(weatherHandler.HandleForecastWeather))
+	// Team stats sync endpoint (POST)
+	mux.HandleFunc("/api/v1/admin/sync/team-stats", applyPOSTAdminMiddleware(adminHandler.HandleSyncTeamStats))
 
-	mux.HandleFunc("/api/v1/admin/keys/generate", applyAdminMiddleware(adminHandler.HandleGenerateAPIKey))
+	// Injury sync endpoint (POST)
+	mux.HandleFunc("/api/v1/admin/sync/injuries", applyPOSTAdminMiddleware(adminHandler.HandleSyncInjuries))
 
-	// Health check endpoint
-	mux.HandleFunc("/health", applyMiddleware(healthCheck))
-	mux.HandleFunc("/api/v1/health", applyMiddleware(healthCheck))
+	// Scoring plays sync endpoint (POST)
+	mux.HandleFunc("/api/v1/admin/sync/scoring-plays", applyPOSTAdminMiddleware(adminHandler.HandleSyncScoringPlays))
+
+	// Player season stats sync endpoint (POST)
+	mux.HandleFunc("/api/v1/admin/sync/player-season-stats", applyPOSTAdminMiddleware(adminHandler.HandleSyncPlayerSeasonStats))
+
+	// Standings calculation endpoint (POST)
+	mux.HandleFunc("/api/v1/admin/calc/standings", applyPOSTAdminMiddleware(adminHandler.HandleCalculateStandings))
+
+	// Weather API endpoints (GET)
+	mux.HandleFunc("/api/v1/weather/current", applyGETMiddleware(weatherHandler.HandleCurrentWeather))
+	mux.HandleFunc("/api/v1/weather/historical", applyGETMiddleware(weatherHandler.HandleHistoricalWeather))
+	mux.HandleFunc("/api/v1/weather/forecast", applyGETMiddleware(weatherHandler.HandleForecastWeather))
+
+	// Generate API Key (POST)
+	mux.HandleFunc("/api/v1/admin/keys/generate", applyPOSTAdminMiddleware(adminHandler.HandleGenerateAPIKey))
+
+	// Health check endpoints (GET)
+	mux.HandleFunc("/health", applyGETMiddleware(healthCheck))
+	mux.HandleFunc("/api/v1/health", applyGETMiddleware(healthCheck))
+
+	// Metrics endpoints (GET)
+	mux.HandleFunc("/api/v1/metrics/database", applyGETMiddleware(metricsHandler.HandleDatabaseMetrics))
+	mux.HandleFunc("/api/v1/metrics/health", applyGETMiddleware(metricsHandler.HandleHealthMetrics))
 
 	// API Documentation endpoint
 	mux.HandleFunc("/api-docs.html", func(w http.ResponseWriter, r *http.Request) {
@@ -190,6 +212,34 @@ func applyAdminMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 			middleware.RecoverPanic(
 				middleware.AdminAuth(
 					middleware.StandardRateLimit(handler),
+				),
+			),
+		),
+	)
+}
+
+// applyGETMiddleware applies standard middleware + GET method validation
+func applyGETMiddleware(handler http.HandlerFunc) http.HandlerFunc {
+	return middleware.CORS(
+		middleware.LogRequest(
+			middleware.RecoverPanic(
+				middleware.GET(
+					middleware.StandardRateLimit(handler),
+				),
+			),
+		),
+	)
+}
+
+// applyPOSTAdminMiddleware applies admin middleware + POST method validation
+func applyPOSTAdminMiddleware(handler http.HandlerFunc) http.HandlerFunc {
+	return middleware.CORS(
+		middleware.LogRequest(
+			middleware.RecoverPanic(
+				middleware.AdminAuth(
+					middleware.POST(
+						middleware.StandardRateLimit(handler),
+					),
 				),
 			),
 		),

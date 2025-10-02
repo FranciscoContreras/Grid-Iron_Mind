@@ -1,3 +1,25 @@
+// Package middleware provides HTTP middleware for authentication, rate limiting,
+// CORS, logging, and error handling.
+//
+// Middleware Stack (typical order):
+//   1. CORS - Set CORS headers
+//   2. LogRequest - Log with request ID and timing
+//   3. RecoverPanic - Catch panics and return 500
+//   4. Auth - Validate API keys (optional)
+//   5. RateLimit - Enforce rate limits
+//   6. Handler - Business logic
+//
+// Example usage:
+//
+//	func applyMiddleware(handler http.HandlerFunc) http.HandlerFunc {
+//	    return middleware.CORS(
+//	        middleware.LogRequest(
+//	            middleware.RecoverPanic(
+//	                middleware.StandardRateLimit(handler),
+//	            ),
+//	        ),
+//	    )
+//	}
 package middleware
 
 import (
@@ -10,7 +32,22 @@ import (
 	"github.com/francisco/gridironmind/pkg/response"
 )
 
-// APIKeyAuth middleware validates API key from X-API-Key header
+// APIKeyAuth middleware validates API key from X-API-Key or Authorization header.
+//
+// This middleware:
+//   - Checks X-API-Key header first
+//   - Falls back to Authorization: Bearer <token>
+//   - Uses constant-time comparison to prevent timing attacks
+//   - Allows all requests if no API_KEY is configured (development mode)
+//   - Returns 401 Unauthorized for invalid/missing keys
+//
+// Environment variables:
+//   - API_KEY: The valid API key to check against
+//
+// Example:
+//
+//	curl -H "X-API-Key: your-api-key" https://api.example.com/endpoint
+//	curl -H "Authorization: Bearer your-api-key" https://api.example.com/endpoint
 func APIKeyAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get API key from environment

@@ -30,11 +30,6 @@ func NewStatsHandler() *StatsHandler {
 
 // HandleGameStats handles GET /stats/game/:gameID - returns player stats for a game
 func (h *StatsHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	// Extract game ID from path: /api/v1/stats/game/{id}
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/stats/game/")
 	path = strings.TrimSuffix(path, "/")
@@ -76,11 +71,6 @@ func (h *StatsHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 
 // HandlePlayerStats handles GET /players/:playerID/stats
 func (h *StatsHandler) HandlePlayerStats(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	// Extract player ID from path: /api/v1/players/{id}/stats
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
 	parts := strings.Split(path, "/")
@@ -138,11 +128,6 @@ func (h *StatsHandler) HandlePlayerStats(w http.ResponseWriter, r *http.Request)
 
 // HandleStatsLeaders handles GET /stats/leaders
 func (h *StatsHandler) HandleStatsLeaders(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	log.Printf("%s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
 
 	// Parse query parameters

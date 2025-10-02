@@ -29,11 +29,6 @@ func NewTeamsHandler() *TeamsHandler {
 
 // HandleTeams handles GET /teams (list) and GET /teams/:id (single)
 func (h *TeamsHandler) HandleTeams(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	// Parse path to determine if this is a list or single team request
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/teams")
 	path = strings.Trim(path, "/")

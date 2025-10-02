@@ -32,6 +32,18 @@ var AIRateLimit = RateLimitConfig{
 	BurstSize:         2,
 }
 
+// AdminRateLimit for admin/sync endpoints (30 requests per minute)
+var AdminRateLimit = RateLimitConfig{
+	RequestsPerMinute: 30,
+	BurstSize:         5,
+}
+
+// WeatherRateLimit for weather API endpoints (60 requests per minute)
+var WeatherRateLimit = RateLimitConfig{
+	RequestsPerMinute: 60,
+	BurstSize:         10,
+}
+
 // RateLimit middleware with configurable limits
 func RateLimit(config RateLimitConfig) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {

@@ -23,11 +23,6 @@ func NewCareerHandler() *CareerHandler {
 
 // HandlePlayerCareerStats handles GET /players/:id/career
 func (h *CareerHandler) HandlePlayerCareerStats(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	// Extract player ID from path
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
 	path = strings.TrimSuffix(path, "/career")
@@ -78,11 +73,6 @@ func (h *CareerHandler) HandlePlayerCareerStats(w http.ResponseWriter, r *http.R
 
 // HandlePlayerTeamHistory handles GET /players/:id/history
 func (h *CareerHandler) HandlePlayerTeamHistory(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	// Extract player ID from path
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
 	path = strings.TrimSuffix(path, "/history")

@@ -27,11 +27,6 @@ func NewAdminHandler(weatherAPIKey string) *AdminHandler {
 
 // HandleSyncTeams triggers a teams sync
 func (h *AdminHandler) HandleSyncTeams(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	log.Println("Admin endpoint: Teams sync requested")
 
 	ctx := r.Context()
@@ -54,11 +49,6 @@ func (h *AdminHandler) HandleSyncTeams(w http.ResponseWriter, r *http.Request) {
 
 // HandleSyncRosters triggers a full roster sync for all teams
 func (h *AdminHandler) HandleSyncRosters(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	log.Println("Admin endpoint: Rosters sync requested")
 
 	// Run sync in background for long operations
@@ -84,11 +74,6 @@ func (h *AdminHandler) HandleSyncRosters(w http.ResponseWriter, r *http.Request)
 
 // HandleSyncGames triggers a games/scoreboard sync
 func (h *AdminHandler) HandleSyncGames(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	log.Println("Admin endpoint: Games sync requested")
 
 	ctx := r.Context()
@@ -114,11 +99,6 @@ func (h *AdminHandler) HandleSyncGames(w http.ResponseWriter, r *http.Request) {
 
 // HandleFullSync triggers a complete data sync (teams -> rosters -> games)
 func (h *AdminHandler) HandleFullSync(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	log.Println("Admin endpoint: Full sync requested")
 
 	ctx := r.Context()
@@ -448,7 +428,7 @@ func (h *AdminHandler) HandleSyncTeamStats(w http.ResponseWriter, r *http.Reques
 	log.Printf("Admin endpoint: Team stats sync requested for season %d, week %d (debug=%v)", reqBody.Season, reqBody.Week, reqBody.Debug)
 
 	ctx := r.Context()
-	if err := h.ingestionService.SyncGameTeamStats(ctx, reqBody.Season, reqBody.Week); err != nil {
+	if err := h.ingestionService.SyncTeamStats(ctx, reqBody.Season, reqBody.Week); err != nil {
 		log.Printf("Team stats sync failed: %v", err)
 		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", fmt.Sprintf("Failed to sync team stats: %v", err))
 		return
@@ -490,4 +470,288 @@ func (h *AdminHandler) HandleSyncInjuries(w http.ResponseWriter, r *http.Request
 		"message": "Injury reports sync started (running in background)",
 		"status":  "success",
 	})
+}
+
+// HandleSyncScoringPlays triggers scoring plays sync for completed games
+func (h *AdminHandler) HandleSyncScoringPlays(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season int `json:"season"`
+		Week   int `json:"week"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	if reqBody.Season == 0 {
+		reqBody.Season = time.Now().Year()
+	}
+	if reqBody.Week == 0 {
+		response.Error(w, http.StatusBadRequest, "MISSING_WEEK", "Week parameter is required")
+		return
+	}
+
+	log.Printf("Admin endpoint: Scoring plays sync requested for season %d, week %d", reqBody.Season, reqBody.Week)
+
+	ctx := r.Context()
+	if err := h.ingestionService.SyncScoringPlays(ctx, reqBody.Season, reqBody.Week); err != nil {
+		log.Printf("Scoring plays sync failed: %v", err)
+		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", fmt.Sprintf("Failed to sync scoring plays: %v", err))
+		return
+	}
+
+	// Invalidate games cache since scoring plays are now available
+	if err := cache.DeletePattern(ctx, cache.InvalidateGamesCache()); err != nil {
+		log.Printf("Failed to invalidate games cache: %v", err)
+	}
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("Scoring plays sync completed for season %d, week %d", reqBody.Season, reqBody.Week),
+		"season":  reqBody.Season,
+		"week":    reqBody.Week,
+		"status":  "success",
+	})
+}
+
+// HandleSyncPlayerSeasonStats triggers player season stats sync from NFLverse
+func (h *AdminHandler) HandleSyncPlayerSeasonStats(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season      int  `json:"season"`
+		StartSeason int  `json:"start_season"`
+		EndSeason   int  `json:"end_season"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	// Determine if single season or range
+	if reqBody.StartSeason > 0 && reqBody.EndSeason > 0 {
+		// Range sync (run in background for long operations)
+		log.Printf("Admin endpoint: Player season stats sync requested for seasons %d-%d", reqBody.StartSeason, reqBody.EndSeason)
+
+		go func() {
+			ctx := context.Background()
+			if err := h.ingestionService.SyncPlayerSeasonStatsRange(ctx, reqBody.StartSeason, reqBody.EndSeason); err != nil {
+				log.Printf("Player season stats range sync failed: %v", err)
+			} else {
+				log.Println("Player season stats range sync completed successfully")
+			}
+		}()
+
+		response.Success(w, map[string]interface{}{
+			"message":      fmt.Sprintf("Player season stats sync started for seasons %d-%d", reqBody.StartSeason, reqBody.EndSeason),
+			"start_season": reqBody.StartSeason,
+			"end_season":   reqBody.EndSeason,
+			"status":       "processing",
+		})
+		return
+	}
+
+	// Single season sync
+	if reqBody.Season == 0 {
+		reqBody.Season = time.Now().Year()
+	}
+
+	log.Printf("Admin endpoint: Player season stats sync requested for season %d", reqBody.Season)
+
+	ctx := r.Context()
+	if err := h.ingestionService.SyncPlayerSeasonStats(ctx, reqBody.Season); err != nil {
+		log.Printf("Player season stats sync failed: %v", err)
+		response.Error(w, http.StatusInternalServerError, "SYNC_FAILED", fmt.Sprintf("Failed to sync player season stats: %v", err))
+		return
+	}
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("Player season stats sync completed for season %d", reqBody.Season),
+		"season":  reqBody.Season,
+		"status":  "success",
+	})
+}
+
+// HandleCalculateStandings triggers standings calculation for a season/week
+func (h *AdminHandler) HandleCalculateStandings(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var reqBody struct {
+		Season int  `json:"season"`
+		Week   *int `json:"week"` // NULL for entire season
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request body")
+		return
+	}
+
+	if reqBody.Season == 0 {
+		reqBody.Season = time.Now().Year()
+	}
+
+	ctx := r.Context()
+
+	// If week specified, calculate for that week only
+	if reqBody.Week != nil {
+		log.Printf("Admin endpoint: Calculate standings for season %d week %d", reqBody.Season, *reqBody.Week)
+
+		if err := h.ingestionService.CalculateStandings(ctx, reqBody.Season, *reqBody.Week); err != nil {
+			log.Printf("Standings calculation failed: %v", err)
+			response.Error(w, http.StatusInternalServerError, "CALC_FAILED", fmt.Sprintf("Failed to calculate standings: %v", err))
+			return
+		}
+
+		response.Success(w, map[string]interface{}{
+			"message": fmt.Sprintf("Standings calculated for season %d week %d", reqBody.Season, *reqBody.Week),
+			"season":  reqBody.Season,
+			"week":    *reqBody.Week,
+			"status":  "success",
+		})
+		return
+	}
+
+	// Calculate for entire season (background for long operation)
+	log.Printf("Admin endpoint: Calculate standings for entire season %d", reqBody.Season)
+
+	go func() {
+		bgCtx := context.Background()
+		if err := h.ingestionService.CalculateStandingsSeason(bgCtx, reqBody.Season); err != nil {
+			log.Printf("Season standings calculation failed: %v", err)
+		} else {
+			log.Printf("Season standings calculation completed for season %d", reqBody.Season)
+		}
+	}()
+
+	response.Success(w, map[string]interface{}{
+		"message": fmt.Sprintf("Standings calculation started for season %d", reqBody.Season),
+		"season":  reqBody.Season,
+		"status":  "processing",
+	})
+}
+
+// HandleSyncNextGenStats syncs Next Gen Stats from NFLverse
+//
+// Request body:
+//
+//	{
+//	  "season": 2024,
+//	  "stat_type": "passing", // or "rushing", "receiving", "all"
+//	  "start_season": 2020,   // Optional: for range sync
+//	  "end_season": 2024      // Optional: for range sync
+//	}
+//
+// Example: POST /api/v1/admin/sync/nextgen-stats
+//
+//	{"season": 2024, "stat_type": "passing"}
+func (h *AdminHandler) HandleSyncNextGenStats(w http.ResponseWriter, r *http.Request) {
+	var reqBody struct {
+		Season      int    `json:"season"`
+		StatType    string `json:"stat_type"`
+		StartSeason int    `json:"start_season"`
+		EndSeason   int    `json:"end_season"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		response.BadRequest(w, "Invalid request body")
+		return
+	}
+
+	ctx := r.Context()
+
+	// Range sync (background)
+	if reqBody.StartSeason > 0 && reqBody.EndSeason > 0 {
+		if reqBody.StatType == "" {
+			reqBody.StatType = "all"
+		}
+
+		log.Printf("Admin endpoint: Sync Next Gen Stats (%s) for seasons %d-%d",
+			reqBody.StatType, reqBody.StartSeason, reqBody.EndSeason)
+
+		go func() {
+			bgCtx := context.Background()
+
+			if reqBody.StatType == "all" {
+				for season := reqBody.StartSeason; season <= reqBody.EndSeason; season++ {
+					if err := h.ingestionService.SyncAllNextGenStats(bgCtx, season); err != nil {
+						log.Printf("Failed to sync all NGS for season %d: %v", season, err)
+					}
+				}
+			} else {
+				if err := h.ingestionService.SyncNextGenStatsRange(bgCtx,
+					reqBody.StartSeason, reqBody.EndSeason, reqBody.StatType); err != nil {
+					log.Printf("Range NGS sync failed: %v", err)
+				}
+			}
+
+			log.Printf("Next Gen Stats range sync completed")
+		}()
+
+		response.Success(w, map[string]interface{}{
+			"message":      fmt.Sprintf("Next Gen Stats sync started for seasons %d-%d", reqBody.StartSeason, reqBody.EndSeason),
+			"start_season": reqBody.StartSeason,
+			"end_season":   reqBody.EndSeason,
+			"stat_type":    reqBody.StatType,
+			"status":       "processing",
+		})
+		return
+	}
+
+	// Single season sync
+	if reqBody.Season == 0 {
+		response.BadRequest(w, "Season is required")
+		return
+	}
+
+	if reqBody.StatType == "" {
+		reqBody.StatType = "all"
+	}
+
+	log.Printf("Admin endpoint: Sync Next Gen Stats (%s) for season %d", reqBody.StatType, reqBody.Season)
+
+	// Sync all types or specific type
+	if reqBody.StatType == "all" {
+		// Background for all types
+		go func() {
+			bgCtx := context.Background()
+			if err := h.ingestionService.SyncAllNextGenStats(bgCtx, reqBody.Season); err != nil {
+				log.Printf("All NGS sync failed: %v", err)
+			} else {
+				log.Printf("All Next Gen Stats synced for season %d", reqBody.Season)
+			}
+		}()
+
+		response.Success(w, map[string]interface{}{
+			"message":   fmt.Sprintf("All Next Gen Stats sync started for season %d", reqBody.Season),
+			"season":    reqBody.Season,
+			"stat_type": "all",
+			"status":    "processing",
+		})
+	} else {
+		// Foreground for single type (faster)
+		if err := h.ingestionService.SyncNextGenStats(ctx, reqBody.Season, reqBody.StatType); err != nil {
+			response.Error(w, http.StatusInternalServerError, "SYNC_FAILED",
+				fmt.Sprintf("Failed to sync Next Gen Stats: %v", err))
+			return
+		}
+
+		response.Success(w, map[string]interface{}{
+			"message":   fmt.Sprintf("Next Gen Stats (%s) synced successfully", reqBody.StatType),
+			"season":    reqBody.Season,
+			"stat_type": reqBody.StatType,
+			"status":    "success",
+		})
+	}
 }

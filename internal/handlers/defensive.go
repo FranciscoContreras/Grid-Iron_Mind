@@ -22,11 +22,6 @@ func NewDefensiveHandler() *DefensiveHandler {
 
 // HandleTeamDefenseStats handles GET /api/v1/teams/:teamId/defense/stats
 func (h *DefensiveHandler) HandleTeamDefenseStats(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET is allowed")
-		return
-	}
-
 	// Extract team ID from path
 	pathParts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 	if len(pathParts) < 3 {
@@ -80,11 +75,6 @@ func (h *DefensiveHandler) HandleTeamDefenseStats(w http.ResponseWriter, r *http
 
 // HandleDefensiveRankings handles GET /api/v1/defense/rankings
 func (h *DefensiveHandler) HandleDefensiveRankings(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET is allowed")
-		return
-	}
-
 	query := r.URL.Query()
 	seasonStr := query.Get("season")
 	if seasonStr == "" {
@@ -133,11 +123,6 @@ func (h *DefensiveHandler) HandleDefensiveRankings(w http.ResponseWriter, r *htt
 
 // HandlePlayerVsDefense handles GET /api/v1/players/:playerId/vs-defense/:teamId
 func (h *DefensiveHandler) HandlePlayerVsDefense(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET is allowed")
-		return
-	}
-
 	// Extract player ID and defense team ID from path
 	// Path: /api/v1/players/:playerId/vs-defense/:teamId
 	pathParts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")

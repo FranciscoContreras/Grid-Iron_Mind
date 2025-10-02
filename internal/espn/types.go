@@ -345,7 +345,40 @@ type GameDetailResponse struct {
 			Text string `json:"text"`
 		} `json:"link"`
 	} `json:"weather,omitempty"`
-	Injuries []InjuryReport `json:"injuries,omitempty"`
+	Injuries     []InjuryReport `json:"injuries,omitempty"`
+	ScoringPlays []ScoringPlay  `json:"scoringPlays,omitempty"`
+}
+
+// ScoringPlay represents a scoring play in a game
+type ScoringPlay struct {
+	ID        string   `json:"id"`
+	Type      PlayType `json:"type"`
+	Text      string   `json:"text"`
+	AwayScore int      `json:"awayScore"`
+	HomeScore int      `json:"homeScore"`
+	Period    struct {
+		Number int `json:"number"`
+	} `json:"period"`
+	Clock struct {
+		Value        float64 `json:"value"`
+		DisplayValue string  `json:"displayValue"`
+	} `json:"clock"`
+	Team        TeamInfo   `json:"team"`
+	ScoringType ScoringType `json:"scoringType"`
+}
+
+// PlayType represents the type of play
+type PlayType struct {
+	ID           string `json:"id"`
+	Text         string `json:"text"`
+	Abbreviation string `json:"abbreviation"`
+}
+
+// ScoringType represents the scoring type classification
+type ScoringType struct {
+	Name         string `json:"name"`
+	DisplayName  string `json:"displayName"`
+	Abbreviation string `json:"abbreviation"`
 }
 
 // InjuryReport represents injury reports from ESPN

@@ -22,11 +22,6 @@ func NewWeatherHandler(weatherClient *weather.Client) *WeatherHandler {
 // GET /api/v1/weather/current?location=Kansas+City,MO
 // GET /api/v1/weather/current?lat=39.0489&lon=-94.4839
 func (h *WeatherHandler) HandleCurrentWeather(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET requests are allowed")
-		return
-	}
-
 	location := r.URL.Query().Get("location")
 	latStr := r.URL.Query().Get("lat")
 	lonStr := r.URL.Query().Get("lon")
@@ -67,11 +62,6 @@ func (h *WeatherHandler) HandleCurrentWeather(w http.ResponseWriter, r *http.Req
 // GET /api/v1/weather/historical?location=Kansas+City,MO&date=2024-12-21
 // GET /api/v1/weather/historical?lat=39.0489&lon=-94.4839&date=2024-12-21
 func (h *WeatherHandler) HandleHistoricalWeather(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET requests are allowed")
-		return
-	}
-
 	location := r.URL.Query().Get("location")
 	latStr := r.URL.Query().Get("lat")
 	lonStr := r.URL.Query().Get("lon")
@@ -117,11 +107,6 @@ func (h *WeatherHandler) HandleHistoricalWeather(w http.ResponseWriter, r *http.
 // HandleForecastWeather gets weather forecast for upcoming days
 // GET /api/v1/weather/forecast?location=Kansas+City,MO&days=7
 func (h *WeatherHandler) HandleForecastWeather(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET requests are allowed")
-		return
-	}
-
 	location := r.URL.Query().Get("location")
 	if location == "" {
 		response.Error(w, http.StatusBadRequest, "MISSING_PARAMETER", "'location' parameter is required")

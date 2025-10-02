@@ -30,11 +30,6 @@ func NewGamesHandler() *GamesHandler {
 
 // HandleGames handles both GET /games (list) and GET /games/:id (single) and GET /games/:id/stats
 func (h *GamesHandler) HandleGames(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/games")
 	path = strings.TrimPrefix(path, "/")
 
@@ -44,6 +39,9 @@ func (h *GamesHandler) HandleGames(w http.ResponseWriter, r *http.Request) {
 	} else if strings.HasSuffix(path, "/stats") {
 		// Get team stats for game
 		h.HandleGameStats(w, r)
+	} else if strings.HasSuffix(path, "/scoring-plays") {
+		// Get scoring plays for game
+		h.HandleScoringPlays(w, r)
 	} else {
 		// Get single game by ID
 		h.getGame(w, r, path)
@@ -147,18 +145,15 @@ func (h *GamesHandler) listGames(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *GamesHandler) getGame(w http.ResponseWriter, r *http.Request, idStr string) {
-	log.Printf("%s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
-
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, "INVALID_ID", "Game ID must be a valid UUID")
+		response.LogAndBadRequest(w, r, "Game ID must be a valid UUID", err)
 		return
 	}
 
 	game, err := h.queries.GetGameByID(r.Context(), id)
 	if err != nil {
-		log.Printf("Error getting game %s: %v", id, err)
-		response.Error(w, http.StatusNotFound, "NOT_FOUND", "Game not found")
+		response.LogAndNotFound(w, r, "Game")
 		return
 	}
 
@@ -167,11 +162,6 @@ func (h *GamesHandler) getGame(w http.ResponseWriter, r *http.Request, idStr str
 
 // HandleGameStats returns team statistics for a specific game
 func (h *GamesHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		response.Error(w, http.StatusMethodNotAllowed, "METHOD_NOT_ALLOWED", "Only GET method is allowed")
-		return
-	}
-
 	// Extract game ID from path: /api/v1/games/:id/stats
 	path := strings.TrimPrefix(r.URL.Path, "/api/v1/games/")
 	path = strings.TrimSuffix(path, "/stats")
@@ -298,4 +288,102 @@ func (h *GamesHandler) HandleGameStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, stats)
+}
+
+// HandleScoringPlays returns scoring plays timeline for a specific game
+func (h *GamesHandler) HandleScoringPlays(w http.ResponseWriter, r *http.Request) {
+	// Extract game ID from path: /api/v1/games/:id/scoring-plays
+	path := strings.TrimPrefix(r.URL.Path, "/api/v1/games/")
+	path = strings.TrimSuffix(path, "/scoring-plays")
+
+	id, err := uuid.Parse(path)
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "INVALID_ID", "Game ID must be a valid UUID")
+		return
+	}
+
+	log.Printf("Fetching scoring plays for game %s", id)
+
+	// Query scoring plays for this game
+	query := `
+		SELECT
+			sp.id,
+			sp.game_id,
+			sp.team_id,
+			t.name as team_name,
+			t.abbreviation as team_abbr,
+			sp.quarter,
+			sp.time_remaining,
+			sp.sequence_number,
+			sp.play_type,
+			sp.scoring_type,
+			sp.points,
+			sp.description,
+			sp.scoring_player_id,
+			sp.assist_player_id,
+			sp.home_score,
+			sp.away_score,
+			p1.name as scoring_player_name,
+			p2.name as assist_player_name
+		FROM game_scoring_plays sp
+		JOIN teams t ON sp.team_id = t.id
+		LEFT JOIN players p1 ON sp.scoring_player_id = p1.id
+		LEFT JOIN players p2 ON sp.assist_player_id = p2.id
+		WHERE sp.game_id = $1
+		ORDER BY sp.sequence_number
+	`
+
+	rows, err := db.GetPool().Query(r.Context(), query, id)
+	if err != nil {
+		log.Printf("Error querying scoring plays for game %s: %v", id, err)
+		response.Error(w, http.StatusInternalServerError, "QUERY_FAILED", "Failed to fetch scoring plays")
+		return
+	}
+	defer rows.Close()
+
+	type ScoringPlay struct {
+		ID                 uuid.UUID  `json:"id"`
+		GameID             uuid.UUID  `json:"game_id"`
+		TeamID             uuid.UUID  `json:"team_id"`
+		TeamName           string     `json:"team_name"`
+		TeamAbbr           string     `json:"team_abbr"`
+		Quarter            int        `json:"quarter"`
+		TimeRemaining      string     `json:"time_remaining"`
+		SequenceNumber     int        `json:"sequence_number"`
+		PlayType           string     `json:"play_type"`
+		ScoringType        string     `json:"scoring_type"`
+		Points             int        `json:"points"`
+		Description        string     `json:"description"`
+		ScoringPlayerID    *uuid.UUID `json:"scoring_player_id,omitempty"`
+		AssistPlayerID     *uuid.UUID `json:"assist_player_id,omitempty"`
+		HomeScore          int        `json:"home_score"`
+		AwayScore          int        `json:"away_score"`
+		ScoringPlayerName  *string    `json:"scoring_player_name,omitempty"`
+		AssistPlayerName   *string    `json:"assist_player_name,omitempty"`
+	}
+
+	var plays []ScoringPlay
+	for rows.Next() {
+		var sp ScoringPlay
+		err := rows.Scan(
+			&sp.ID, &sp.GameID, &sp.TeamID, &sp.TeamName, &sp.TeamAbbr,
+			&sp.Quarter, &sp.TimeRemaining, &sp.SequenceNumber,
+			&sp.PlayType, &sp.ScoringType, &sp.Points, &sp.Description,
+			&sp.ScoringPlayerID, &sp.AssistPlayerID,
+			&sp.HomeScore, &sp.AwayScore,
+			&sp.ScoringPlayerName, &sp.AssistPlayerName,
+		)
+		if err != nil {
+			log.Printf("Error scanning scoring play: %v", err)
+			continue
+		}
+		plays = append(plays, sp)
+	}
+
+	if len(plays) == 0 {
+		response.Error(w, http.StatusNotFound, "NOT_FOUND", "No scoring plays found for this game")
+		return
+	}
+
+	response.Success(w, plays)
 }
