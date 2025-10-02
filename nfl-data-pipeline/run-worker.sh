@@ -16,11 +16,11 @@ echo "📅 Day: $DAY, Hour: $HOUR"
 
 # Continuous loop for always-on worker
 while true; do
-    # Sunday (DAY=7): Game day - run live mode during game hours
+    # Sunday (DAY=7): Game day
     if [ "$DAY" -eq 7 ]; then
         if [ "$HOUR" -ge 13 ] && [ "$HOUR" -le 23 ]; then
-            echo "🔴 SUNDAY GAME DAY - Running live mode"
-            $PIPELINE --mode live || echo "⚠️  Live mode failed, continuing..."
+            echo "🔴 SUNDAY GAME DAY - Running update mode (frequent)"
+            $PIPELINE --mode update || echo "⚠️  Update failed, continuing..."
         else
             echo "📊 Sunday off-hours - Running update mode"
             $PIPELINE --mode update || echo "⚠️  Update failed, continuing..."
@@ -29,8 +29,8 @@ while true; do
     # Monday (DAY=1): Monday Night Football
     elif [ "$DAY" -eq 1 ]; then
         if [ "$HOUR" -ge 20 ] && [ "$HOUR" -le 23 ]; then
-            echo "🏈 MONDAY NIGHT FOOTBALL - Running live mode"
-            $PIPELINE --mode live || echo "⚠️  Live mode failed, continuing..."
+            echo "🏈 MONDAY NIGHT FOOTBALL - Running update mode (frequent)"
+            $PIPELINE --mode update || echo "⚠️  Update failed, continuing..."
         else
             echo "📊 Monday off-hours - Running update mode"
             $PIPELINE --mode update || echo "⚠️  Update failed, continuing..."
@@ -39,8 +39,8 @@ while true; do
     # Thursday (DAY=4): Thursday Night Football
     elif [ "$DAY" -eq 4 ]; then
         if [ "$HOUR" -ge 20 ] && [ "$HOUR" -le 23 ]; then
-            echo "🏈 THURSDAY NIGHT FOOTBALL - Running live mode"
-            $PIPELINE --mode live || echo "⚠️  Live mode failed, continuing..."
+            echo "🏈 THURSDAY NIGHT FOOTBALL - Running update mode (frequent)"
+            $PIPELINE --mode update || echo "⚠️  Update failed, continuing..."
         else
             echo "📊 Thursday off-hours - Running update mode"
             $PIPELINE --mode update || echo "⚠️  Update failed, continuing..."
