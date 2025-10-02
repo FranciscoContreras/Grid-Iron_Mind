@@ -136,9 +136,23 @@ func main() {
 	mux.HandleFunc("/api/v1/metrics/database", applyGETMiddleware(metricsHandler.HandleDatabaseMetrics))
 	mux.HandleFunc("/api/v1/metrics/health", applyGETMiddleware(metricsHandler.HandleHealthMetrics))
 
-	// API Documentation endpoint
+	// API Documentation endpoints
 	mux.HandleFunc("/api-docs.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./dashboard/api-docs.html")
+	})
+	mux.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/api-docs.html", http.StatusMovedPermanently)
+	})
+	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/api-docs.html", http.StatusMovedPermanently)
+	})
+
+	// Dashboard redirect
+	mux.HandleFunc("/dashboard", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	})
+	mux.HandleFunc("/dashboard/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	})
 
 	// UI System Documentation endpoint
