@@ -9,6 +9,7 @@ import (
 
 	"github.com/francisco/gridironmind/internal/config"
 	"github.com/francisco/gridironmind/internal/db"
+	"github.com/francisco/gridironmind/internal/espn"
 	"github.com/francisco/gridironmind/internal/nflverse"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -37,6 +38,7 @@ type ImportStats struct {
 type Importer struct {
 	dbPool     *pgxpool.Pool
 	csvParser  *nflverse.CSVParser
+	espnClient *espn.Client
 	ctx        context.Context
 }
 
@@ -68,9 +70,10 @@ func main() {
 
 	// Create importer
 	importer := &Importer{
-		dbPool:    db.GetPool(),
-		csvParser: nflverse.NewCSVParser(),
-		ctx:       ctx,
+		dbPool:     db.GetPool(),
+		csvParser:  nflverse.NewCSVParser(),
+		espnClient: espn.NewClient(),
+		ctx:        ctx,
 	}
 
 	// Initialize import progress tracking
@@ -255,10 +258,16 @@ func (i *Importer) importRosters(year int, stats *ImportStats) error {
 func (i *Importer) importSchedule(year int, stats *ImportStats) error {
 	i.markProgress(year, "schedule", "in_progress")
 
+	// For 2023+, use ESPN API as NFLverse may not have schedule files
+	if year >= 2023 {
+		return i.importScheduleFromESPN(year, stats)
+	}
+
 	schedules, err := i.csvParser.ParseSchedule(i.ctx, year)
 	if err != nil {
-		i.markProgress(year, "schedule", "failed")
-		return err
+		// Fallback to ESPN for any year if NFLverse fails
+		log.Printf("    NFLverse schedule not available, trying ESPN API...")
+		return i.importScheduleFromESPN(year, stats)
 	}
 
 	// Filter to regular season only (can be changed)
@@ -280,6 +289,48 @@ func (i *Importer) importSchedule(year int, stats *ImportStats) error {
 		stats.GamesImported++
 	}
 
+	i.markProgress(year, "schedule", "completed")
+	i.updateProgress(year, "schedule", stats.GamesImported)
+	return nil
+}
+
+func (i *Importer) importScheduleFromESPN(year int, stats *ImportStats) error {
+	log.Printf(" (using ESPN API)")
+
+	// ESPN regular season has 18 weeks
+	totalGames := 0
+	for week := 1; week <= 18; week++ {
+		scoreboard, err := i.espnClient.FetchSeasonGames(i.ctx, year, week)
+		if err != nil {
+			if *verbose {
+				log.Printf("    Warning: Failed to fetch week %d: %v", week, err)
+			}
+			continue
+		}
+
+		for _, event := range scoreboard.Events {
+			if *dryRun {
+				stats.GamesImported++
+				totalGames++
+				continue
+			}
+
+			if err := i.upsertGameFromESPN(&event, year, week); err != nil {
+				if *verbose {
+					log.Printf("    Warning: Failed to upsert game %s: %v", event.ID, err)
+				}
+				continue
+			}
+			stats.GamesImported++
+			totalGames++
+		}
+
+		if *verbose {
+			log.Printf("    Week %d: %d games", week, len(scoreboard.Events))
+		}
+	}
+
+	log.Printf(" (imported %d games from ESPN)", totalGames)
 	i.markProgress(year, "schedule", "completed")
 	i.updateProgress(year, "schedule", stats.GamesImported)
 	return nil
@@ -619,6 +670,89 @@ func (i *Importer) upsertGame(s *nflverse.ScheduleCSV) error {
 		id, s.GameID, s.Season, s.Week, gameDate, homeTeamID, awayTeamID,
 		s.HomeScore, s.AwayScore, "final", nilString(s.Stadium),
 		nilInt(s.Temp), nilString(""), now, now,
+	)
+
+	return err
+}
+
+func (i *Importer) upsertGameFromESPN(event *espn.Event, season, week int) error {
+	// Extract team IDs from ESPN event
+	if len(event.Competitions) == 0 || len(event.Competitions[0].Competitors) < 2 {
+		return fmt.Errorf("invalid event structure")
+	}
+
+	competition := event.Competitions[0]
+
+	// Find home and away teams
+	var homeTeam, awayTeam *espn.Competitor
+	for i := range competition.Competitors {
+		if competition.Competitors[i].HomeAway == "home" {
+			homeTeam = &competition.Competitors[i]
+		} else {
+			awayTeam = &competition.Competitors[i]
+		}
+	}
+
+	if homeTeam == nil || awayTeam == nil {
+		return fmt.Errorf("could not identify home/away teams")
+	}
+
+	// Map team abbreviations to UUIDs
+	var homeTeamID, awayTeamID uuid.UUID
+
+	err := i.dbPool.QueryRow(i.ctx,
+		"SELECT id FROM teams WHERE abbreviation = $1",
+		homeTeam.Team.Abbreviation,
+	).Scan(&homeTeamID)
+	if err != nil {
+		return fmt.Errorf("home team %s not found: %w", homeTeam.Team.Abbreviation, err)
+	}
+
+	err = i.dbPool.QueryRow(i.ctx,
+		"SELECT id FROM teams WHERE abbreviation = $1",
+		awayTeam.Team.Abbreviation,
+	).Scan(&awayTeamID)
+	if err != nil {
+		return fmt.Errorf("away team %s not found: %w", awayTeam.Team.Abbreviation, err)
+	}
+
+	// Get scores
+	homeScore := 0
+	awayScore := 0
+	if homeTeam.Score != nil {
+		homeScore = *homeTeam.Score
+	}
+	if awayTeam.Score != nil {
+		awayScore = *awayTeam.Score
+	}
+
+	// Parse game date
+	gameDate := time.Time(event.Date)
+
+	// Status mapping
+	status := "scheduled"
+	if competition.Status.Type.Completed {
+		status = "final"
+	} else if competition.Status.Type.State == "in" {
+		status = "in_progress"
+	}
+
+	now := time.Now()
+	id := uuid.New()
+
+	_, err = i.dbPool.Exec(i.ctx,
+		`INSERT INTO games (
+			id, nfl_game_id, season, week, game_date, home_team_id, away_team_id,
+			home_score, away_score, status, venue_name,
+			created_at, updated_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+		ON CONFLICT (nfl_game_id) DO UPDATE SET
+			home_score = EXCLUDED.home_score,
+			away_score = EXCLUDED.away_score,
+			status = EXCLUDED.status,
+			updated_at = EXCLUDED.updated_at`,
+		id, event.ID, season, week, gameDate, homeTeamID, awayTeamID,
+		homeScore, awayScore, status, nilString(competition.Venue.FullName), now, now,
 	)
 
 	return err
