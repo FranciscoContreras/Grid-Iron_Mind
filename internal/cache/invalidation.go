@@ -153,12 +153,12 @@ func (m *InvalidationManager) InvalidateAfterSync(ctx context.Context, syncType 
 
 // invalidateByPattern removes all keys matching a pattern
 func (m *InvalidationManager) invalidateByPattern(ctx context.Context, pattern string) error {
-	if redisClient == nil {
+	if client == nil {
 		return fmt.Errorf("redis not initialized")
 	}
 
 	// Get all keys matching pattern
-	keys, err := redisClient.Keys(ctx, pattern).Result()
+	keys, err := client.Keys(ctx, pattern).Result()
 	if err != nil {
 		return fmt.Errorf("failed to get keys for pattern %s: %w", pattern, err)
 	}
@@ -169,7 +169,7 @@ func (m *InvalidationManager) invalidateByPattern(ctx context.Context, pattern s
 	}
 
 	// Delete all matching keys
-	deleted, err := redisClient.Del(ctx, keys...).Result()
+	deleted, err := client.Del(ctx, keys...).Result()
 	if err != nil {
 		return fmt.Errorf("failed to delete keys: %w", err)
 	}
@@ -180,11 +180,11 @@ func (m *InvalidationManager) invalidateByPattern(ctx context.Context, pattern s
 
 // invalidateAll removes all cache
 func (m *InvalidationManager) invalidateAll(ctx context.Context) error {
-	if redisClient == nil {
+	if client == nil {
 		return fmt.Errorf("redis not initialized")
 	}
 
-	if err := redisClient.FlushDB(ctx).Err(); err != nil {
+	if err := client.FlushDB(ctx).Err(); err != nil {
 		return fmt.Errorf("failed to flush cache: %w", err)
 	}
 
@@ -210,14 +210,14 @@ func (m *InvalidationManager) WarmCache(ctx context.Context, warmType string) er
 
 // CacheMetrics returns cache statistics
 func (m *InvalidationManager) CacheMetrics(ctx context.Context) (map[string]interface{}, error) {
-	if redisClient == nil {
+	if client == nil {
 		return map[string]interface{}{
 			"error": "redis not initialized",
 		}, nil
 	}
 
 	// Get cache info
-	info, err := redisClient.Info(ctx, "stats").Result()
+	info, err := client.Info(ctx, "stats").Result()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cache info: %w", err)
 	}
@@ -233,7 +233,7 @@ func (m *InvalidationManager) CacheMetrics(ctx context.Context) (map[string]inte
 	}
 
 	// Get key count
-	dbSize, err := redisClient.DBSize(ctx).Result()
+	dbSize, err := client.DBSize(ctx).Result()
 	if err == nil {
 		metrics["total_keys"] = dbSize
 	}

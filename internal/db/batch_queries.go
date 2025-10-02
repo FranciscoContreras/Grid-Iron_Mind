@@ -313,15 +313,19 @@ func (q *BatchQueries) BatchLoadTeamsForPlayers(ctx context.Context, players []m
 		teamIDs = append(teamIDs, id)
 	}
 
-	// Batch load teams
-	teams, err := q.GetTeamsByIDs(ctx, teamIDs)
+	// Batch load teams (for future use when Player model includes Team details)
+	_, err := q.GetTeamsByIDs(ctx, teamIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	// Attach teams to players (if you have a Team field in Player model)
-	// For now, this is just documentation of the pattern
-	// You would typically extend the Player model to include Team details
+	// NOTE: This loads teams but doesn't attach them to players yet
+	// To use this, extend the Player model to include a Team field
+	// Example:
+	//   type Player struct {
+	//     ...existing fields...
+	//     Team *Team `json:"team,omitempty"`
+	//   }
 
 	return players, nil
 }
