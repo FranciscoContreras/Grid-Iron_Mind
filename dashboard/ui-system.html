@@ -8,15 +8,38 @@
     <title>Grid Iron Mind - UI System Documentation</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* White Glass Table Aesthetic - Soft Tones */
+        :root {
+            --soft-white: #ffffff;
+            --soft-bg: #fafafa;
+            --soft-surface: rgba(255, 255, 255, 0.7);
+            --soft-border: rgba(0, 0, 0, 0.06);
+            --soft-border-subtle: rgba(0, 0, 0, 0.04);
+            --soft-text: #2c2c2c;
+            --soft-text-light: #6b6b6b;
+            --soft-text-lighter: #9a9a9a;
+            --soft-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --soft-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.06);
+            --soft-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --soft-accent: rgba(100, 120, 255, 0.08);
+            --soft-accent-border: rgba(100, 120, 255, 0.12);
+        }
+
+        body {
+            background: var(--soft-bg);
+        }
+
         /* Additional Styles for Documentation Page */
         .hero-section {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%);
-            color: white;
+            background: var(--soft-white);
+            color: var(--soft-text);
             padding: 80px 32px;
             border-radius: var(--radius-xl);
             margin-bottom: var(--spacing-xl);
             position: relative;
             overflow: hidden;
+            border: 1px solid var(--soft-border);
+            box-shadow: var(--soft-shadow-lg);
         }
 
         .hero-section::before {
@@ -26,7 +49,7 @@
             right: -10%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--soft-accent) 0%, transparent 70%);
             animation: float 6s ease-in-out infinite;
         }
 
@@ -37,7 +60,7 @@
             left: -5%;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--soft-accent) 0%, transparent 70%);
             animation: float 8s ease-in-out infinite reverse;
         }
 
@@ -56,15 +79,17 @@
 
         .hero-content h1 {
             font-size: 48px;
-            font-weight: 700;
+            font-weight: 300;
             margin-bottom: 16px;
             letter-spacing: -0.02em;
+            color: var(--soft-text);
         }
 
         .hero-content p {
             font-size: 20px;
-            opacity: 0.9;
+            color: var(--soft-text-light);
             margin-bottom: 32px;
+            font-weight: 300;
         }
 
         .hero-tags {
@@ -75,12 +100,14 @@
         }
 
         .hero-tag {
-            background: rgba(255,255,255,0.2);
+            background: var(--soft-white);
             padding: 8px 16px;
             border-radius: var(--radius-full);
             font-size: 14px;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
+            font-weight: 400;
+            border: 1px solid var(--soft-border);
+            color: var(--soft-text-light);
+            box-shadow: var(--soft-shadow);
         }
 
         .sidebar {
@@ -88,17 +115,17 @@
             top: 24px;
             height: calc(100vh - 48px);
             overflow-y: auto;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
             border-radius: var(--radius-xl);
             padding: var(--spacing-lg);
+            box-shadow: var(--soft-shadow-md);
         }
 
         .sidebar h3 {
             font-size: 14px;
-            font-weight: 600;
-            color: var(--gray-600);
+            font-weight: 400;
+            color: var(--soft-text-light);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 16px;
@@ -115,21 +142,23 @@
         .sidebar-nav a {
             display: block;
             padding: 8px 12px;
-            color: var(--gray-700);
+            color: var(--soft-text-light);
             text-decoration: none;
             border-radius: var(--radius-sm);
             transition: all 0.2s ease;
             font-size: 14px;
+            font-weight: 300;
         }
 
         .sidebar-nav a:hover {
-            background: rgba(0,0,0,0.04);
-            color: var(--gray-900);
+            background: var(--soft-accent);
+            color: var(--soft-text);
         }
 
         .sidebar-nav a.active {
-            background: var(--accent-blue);
-            color: white;
+            background: var(--soft-accent);
+            color: var(--soft-text);
+            border: 1px solid var(--soft-accent-border);
         }
 
         .doc-layout {
@@ -146,43 +175,47 @@
 
         .doc-section h2 {
             font-size: 32px;
-            font-weight: 700;
+            font-weight: 300;
             margin-bottom: 8px;
-            color: var(--gray-900);
+            color: var(--soft-text);
         }
 
         .doc-section p {
-            color: var(--gray-600);
+            color: var(--soft-text-light);
             margin-bottom: 32px;
             line-height: 1.6;
+            font-weight: 300;
         }
 
         .component-demo {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
             border-radius: var(--radius-lg);
             padding: 32px;
             margin-bottom: 24px;
+            box-shadow: var(--soft-shadow);
         }
 
         .demo-title {
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 16px;
-            color: var(--gray-900);
+            color: var(--soft-text);
         }
 
         .demo-description {
             font-size: 14px;
-            color: var(--gray-600);
+            color: var(--soft-text-light);
             margin-bottom: 24px;
+            font-weight: 300;
         }
 
         .demo-preview {
-            background: var(--gray-50);
+            background: var(--soft-bg);
             border-radius: var(--radius-md);
             padding: 32px;
             margin-bottom: 24px;
+            border: 1px solid var(--soft-border-subtle);
         }
 
         .code-block-container {
@@ -190,23 +223,25 @@
         }
 
         .code-block {
-            background: var(--gray-900);
-            color: #e4e4e7;
+            background: var(--soft-white);
+            color: var(--soft-text);
             padding: 20px;
             border-radius: var(--radius-md);
             overflow-x: auto;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 14px;
             line-height: 1.6;
+            border: 1px solid var(--soft-border);
+            box-shadow: var(--soft-shadow);
         }
 
         .copy-code-btn {
             position: absolute;
             top: 12px;
             right: 12px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
+            color: var(--soft-text-light);
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 12px;
@@ -215,12 +250,14 @@
         }
 
         .copy-code-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: var(--soft-accent);
+            border-color: var(--soft-accent-border);
         }
 
         .copy-code-btn.copied {
-            background: var(--accent-green);
-            border-color: var(--accent-green);
+            background: var(--soft-accent);
+            border-color: var(--soft-accent-border);
+            color: var(--soft-text);
         }
 
         .color-grid {
@@ -234,13 +271,14 @@
             cursor: pointer;
             border-radius: var(--radius-md);
             overflow: hidden;
-            border: 1px solid var(--gray-200);
+            border: 1px solid var(--soft-border);
             transition: all 0.2s ease;
+            box-shadow: var(--soft-shadow);
         }
 
         .color-swatch:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+            box-shadow: var(--soft-shadow-md);
         }
 
         .color-preview {
@@ -250,18 +288,19 @@
 
         .color-info {
             padding: 12px;
-            background: white;
+            background: var(--soft-white);
         }
 
         .color-name {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 4px;
+            color: var(--soft-text);
         }
 
         .color-value {
             font-size: 12px;
-            color: var(--gray-500);
+            color: var(--soft-text-light);
             font-family: 'Monaco', monospace;
         }
 
@@ -271,17 +310,18 @@
 
         .type-example {
             padding: 24px;
-            background: white;
-            border: 1px solid var(--gray-200);
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
             border-radius: var(--radius-md);
             margin-bottom: 16px;
+            box-shadow: var(--soft-shadow);
         }
 
         .type-label {
             font-size: 12px;
-            color: var(--gray-500);
+            color: var(--soft-text-light);
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 400;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -296,24 +336,26 @@
             align-items: center;
             gap: 16px;
             padding: 16px;
-            background: white;
+            background: var(--soft-white);
             border-radius: var(--radius-md);
-            border: 1px solid var(--gray-200);
+            border: 1px solid var(--soft-border);
+            box-shadow: var(--soft-shadow);
         }
 
         .spacing-visual {
-            background: var(--accent-blue);
+            background: var(--soft-accent);
+            border: 1px solid var(--soft-accent-border);
             height: 40px;
             border-radius: 4px;
         }
 
         .spacing-label {
-            font-weight: 600;
-            color: var(--gray-900);
+            font-weight: 400;
+            color: var(--soft-text);
         }
 
         .spacing-value {
-            color: var(--gray-500);
+            color: var(--soft-text-light);
             font-size: 14px;
             font-family: 'Monaco', monospace;
         }
@@ -331,30 +373,32 @@
         }
 
         .shadow-item {
-            background: white;
+            background: var(--soft-white);
             padding: 32px;
             border-radius: var(--radius-lg);
             text-align: center;
+            border: 1px solid var(--soft-border);
         }
 
         .shadow-label {
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 8px;
+            color: var(--soft-text);
         }
 
         .shadow-value {
             font-size: 12px;
-            color: var(--gray-500);
+            color: var(--soft-text-light);
             font-family: 'Monaco', monospace;
         }
 
         .live-editor {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
             border-radius: var(--radius-xl);
             padding: 24px;
             margin-bottom: 32px;
+            box-shadow: var(--soft-shadow-md);
         }
 
         .editor-container {
@@ -364,18 +408,19 @@
         }
 
         .editor-panel {
-            background: white;
+            background: var(--soft-white);
             border-radius: var(--radius-md);
             overflow: hidden;
-            border: 1px solid var(--gray-200);
+            border: 1px solid var(--soft-border);
         }
 
         .editor-header {
-            background: var(--gray-50);
+            background: var(--soft-bg);
             padding: 12px 16px;
-            border-bottom: 1px solid var(--gray-200);
-            font-weight: 600;
+            border-bottom: 1px solid var(--soft-border);
+            font-weight: 400;
             font-size: 14px;
+            color: var(--soft-text);
         }
 
         .editor-content {
@@ -397,18 +442,20 @@
         }
 
         .animation-demo {
-            background: white;
-            border: 1px solid var(--gray-200);
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
             border-radius: var(--radius-lg);
             padding: 48px;
             margin-bottom: 24px;
             text-align: center;
+            box-shadow: var(--soft-shadow);
         }
 
         .animation-box {
             width: 100px;
             height: 100px;
-            background: var(--accent-blue);
+            background: var(--soft-accent);
+            border: 1px solid var(--soft-accent-border);
             border-radius: var(--radius-md);
             margin: 0 auto 24px;
         }
@@ -451,10 +498,11 @@
         }
 
         .control-panel {
-            background: var(--gray-50);
+            background: var(--soft-bg);
             padding: 24px;
             border-radius: var(--radius-md);
             margin-bottom: 24px;
+            border: 1px solid var(--soft-border-subtle);
         }
 
         .control-group {
@@ -464,16 +512,16 @@
         .control-label {
             display: block;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 8px;
-            color: var(--gray-700);
+            color: var(--soft-text);
         }
 
         .slider {
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: var(--gray-200);
+            background: var(--soft-border);
             outline: none;
             -webkit-appearance: none;
         }
@@ -484,42 +532,48 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--accent-blue);
+            background: var(--soft-white);
+            border: 2px solid var(--soft-accent-border);
             cursor: pointer;
+            box-shadow: var(--soft-shadow);
         }
 
         .slider::-moz-range-thumb {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--accent-blue);
+            background: var(--soft-white);
+            border: 2px solid var(--soft-accent-border);
             cursor: pointer;
-            border: none;
+            box-shadow: var(--soft-shadow);
         }
 
         .glassmorphism-showcase {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
             padding: 48px;
             border-radius: var(--radius-xl);
             margin-bottom: 32px;
+            box-shadow: var(--soft-shadow-md);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--soft-surface);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--soft-border);
             border-radius: var(--radius-lg);
             padding: 24px;
-            color: white;
+            color: var(--soft-text);
+            box-shadow: var(--soft-shadow);
         }
 
         .best-practices {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            background: var(--soft-white);
+            border: 1px solid var(--soft-border);
             border-radius: var(--radius-lg);
             padding: 24px;
             margin-bottom: 24px;
+            box-shadow: var(--soft-shadow);
         }
 
         .practice-item {
@@ -535,18 +589,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--accent-green);
-            color: white;
+            background: var(--soft-accent);
+            color: var(--soft-text);
             border-radius: 50%;
             font-size: 14px;
+            border: 1px solid var(--soft-accent-border);
         }
 
         .practice-icon.warning {
-            background: var(--accent-orange);
+            background: rgba(255, 200, 100, 0.1);
+            border-color: rgba(255, 200, 100, 0.2);
         }
 
         .practice-icon.error {
-            background: var(--accent-red);
+            background: rgba(255, 100, 100, 0.1);
+            border-color: rgba(255, 100, 100, 0.2);
         }
 
         .form-grid {
@@ -571,9 +628,9 @@
             right: 32px;
             width: 48px;
             height: 48px;
-            background: var(--accent-blue);
-            color: white;
-            border: none;
+            background: var(--soft-white);
+            color: var(--soft-text);
+            border: 1px solid var(--soft-border);
             border-radius: 50%;
             font-size: 20px;
             cursor: pointer;
@@ -581,7 +638,7 @@
             transform: translateY(100px);
             transition: all 0.3s ease;
             z-index: 1000;
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--soft-shadow-lg);
         }
 
         .back-to-top.visible {
@@ -590,8 +647,9 @@
         }
 
         .back-to-top:hover {
-            background: var(--accent-blue-light);
-            transform: translateY(-4px);
+            background: var(--soft-accent);
+            border-color: var(--soft-accent-border);
+            transform: translateY(-2px);
         }
 
         /* Responsive */
@@ -630,14 +688,14 @@
             }
         }
 
-        /* Syntax Highlighting */
-        .hljs-tag { color: #e06c75; }
-        .hljs-attr { color: #d19a66; }
-        .hljs-string { color: #98c379; }
-        .hljs-selector-class { color: #61afef; }
-        .hljs-selector-id { color: #c678dd; }
-        .hljs-property { color: #56b6c2; }
-        .hljs-comment { color: #5c6370; font-style: italic; }
+        /* Syntax Highlighting - Soft Tones */
+        .hljs-tag { color: var(--soft-text); }
+        .hljs-attr { color: var(--soft-text-light); }
+        .hljs-string { color: #6b9b7c; }
+        .hljs-selector-class { color: #6b8bb5; }
+        .hljs-selector-id { color: #9b7bb5; }
+        .hljs-property { color: #5b9ba5; }
+        .hljs-comment { color: var(--soft-text-lighter); font-style: italic; }
     </style>
 </head>
 <body>
@@ -646,11 +704,11 @@
         <section class="hero-section">
             <div class="hero-content">
                 <h1>Grid Iron Mind UI System</h1>
-                <p>A complete, Apple-inspired design system for building beautiful, responsive applications with glassmorphism and ultra-minimal aesthetics.</p>
+                <p>A minimal design system with soft tones and subtle depth - like UI elements cut from white glass on a pristine table.</p>
                 <div class="hero-tags">
-                    <span class="hero-tag">Glassmorphism</span>
-                    <span class="hero-tag">Responsive</span>
-                    <span class="hero-tag">Accessible</span>
+                    <span class="hero-tag">Soft Tones</span>
+                    <span class="hero-tag">Minimal Depth</span>
+                    <span class="hero-tag">White Glass</span>
                     <span class="hero-tag">Production Ready</span>
                 </div>
             </div>
