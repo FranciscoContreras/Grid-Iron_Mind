@@ -86,10 +86,10 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px;
+    padding: 10px 24px;
     font-size: 14px;
     font-weight: 400;
-    border-radius: var(--radius-md);
+    border-radius: 9999px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
     backdrop-filter: blur(40px) saturate(200%);
@@ -146,12 +146,12 @@ body {
 }
 
 .btn-sm {
-    padding: 6px 12px;
+    padding: 6px 16px;
     font-size: 12px;
 }
 
 .btn-lg {
-    padding: 14px 28px;
+    padding: 14px 32px;
     font-size: 16px;
 }
 
@@ -236,7 +236,7 @@ body {
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     padding: var(--spacing-lg);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     transition: all 0.3s ease;
@@ -317,11 +317,11 @@ body {
 .form-textarea {
     position: relative;
     width: 100%;
-    padding: 10px 14px;
+    padding: 10px 16px;
     font-size: 14px;
     font-weight: 300;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--radius-md);
+    border-radius: 9999px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
@@ -343,6 +343,7 @@ body {
 .form-textarea {
     resize: vertical;
     min-height: 100px;
+    border-radius: var(--radius-xl);
 }
 
 .form-checkbox,
@@ -449,7 +450,7 @@ body {
 .alert {
     position: relative;
     padding: var(--spacing-md);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
     backdrop-filter: blur(40px) saturate(200%);
@@ -574,7 +575,7 @@ body {
 }
 
 .nav-tab {
-    padding: 10px 16px;
+    padding: 10px 20px;
     font-size: 14px;
     font-weight: 400;
     color: var(--soft-text-light);
@@ -583,6 +584,7 @@ body {
     border-bottom: 2px solid transparent;
     cursor: pointer;
     transition: all 0.2s ease;
+    border-radius: 9999px;
 }
 
 .nav-tab:hover {
@@ -591,7 +593,7 @@ body {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border-radius: var(--radius-sm);
+    border-radius: 9999px;
     overflow: hidden;
 }
 
@@ -612,7 +614,7 @@ body {
     position: relative;
     color: var(--soft-text);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
-    border-radius: var(--radius-sm);
+    border-radius: 9999px;
     border-bottom-color: transparent;
     overflow: hidden;
 }
