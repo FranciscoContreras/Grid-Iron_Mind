@@ -93,18 +93,7 @@ func (s *Service) syncGameTeamStats(ctx context.Context, gameID uuid.UUID, nflGa
 
 	// Process each team's stats
 	for _, teamBox := range gameDetail.BoxScore.Teams {
-		// Convert to our TeamBoxScore type
-		tb := TeamBoxScore{
-			Team:       make(map[string]interface{}),
-			Statistics: teamBox.Statistics,
-		}
-
-		// Extract team info from the boxscore team structure
-		if teamBox.Team.ID != "" {
-			tb.Team["id"] = teamBox.Team.ID
-		}
-
-		if err := s.insertOrUpdateTeamStats(ctx, gameID, tb); err != nil {
+		if err := s.insertOrUpdateTeamStats(ctx, gameID, teamBox); err != nil {
 			log.Printf("Failed to insert team stats: %v", err)
 			continue
 		}

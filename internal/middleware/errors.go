@@ -20,19 +20,19 @@ const (
 	StartTimeKey ContextKey = "start_time"
 )
 
-// responseWriter wraps http.ResponseWriter to capture status code
-type responseWriter struct {
+// loggingResponseWriter wraps http.ResponseWriter to capture status code and bytes written
+type loggingResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
 	written    int
 }
 
-func (rw *responseWriter) WriteHeader(code int) {
+func (rw *loggingResponseWriter) WriteHeader(code int) {
 	rw.statusCode = code
 	rw.ResponseWriter.WriteHeader(code)
 }
 
-func (rw *responseWriter) Write(b []byte) (int, error) {
+func (rw *loggingResponseWriter) Write(b []byte) (int, error) {
 	if rw.statusCode == 0 {
 		rw.statusCode = http.StatusOK
 	}
@@ -68,7 +68,7 @@ func LogRequest(next http.HandlerFunc) http.HandlerFunc {
 		r = r.WithContext(ctx)
 
 		// Wrap response writer to capture status code
-		rw := &responseWriter{ResponseWriter: w, statusCode: 0}
+		rw := &loggingResponseWriter{ResponseWriter: w, statusCode: 0}
 
 		// Add request ID to response headers
 		rw.Header().Set("X-Request-ID", requestID)

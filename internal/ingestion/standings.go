@@ -368,10 +368,10 @@ func (s *Service) calculateRankings(ctx context.Context, season, week int) error
 		})
 
 		// Assign division ranks
-		for rank, s := range standings {
+		for rank, standing := range standings {
 			_, err := s.dbPool.Exec(ctx,
 				`UPDATE team_standings SET division_rank = $1 WHERE team_id = $2 AND season = $3 AND week = $4`,
-				rank+1, s.TeamID, season, week)
+				rank+1, standing.TeamID, season, week)
 			if err != nil {
 				log.Printf("Failed to update division rank: %v", err)
 			}
@@ -409,7 +409,7 @@ func (s *Service) calculateRankings(ctx context.Context, season, week int) error
 		})
 
 		// Assign conference ranks and playoff seeds (top 7)
-		for rank, s := range standings {
+		for rank, standing := range standings {
 			var playoffSeed *int
 			if rank < 7 {
 				seed := rank + 1
@@ -418,7 +418,7 @@ func (s *Service) calculateRankings(ctx context.Context, season, week int) error
 
 			_, err := s.dbPool.Exec(ctx,
 				`UPDATE team_standings SET conference_rank = $1, playoff_seed = $2 WHERE team_id = $3 AND season = $4 AND week = $5`,
-				rank+1, playoffSeed, s.TeamID, season, week)
+				rank+1, playoffSeed, standing.TeamID, season, week)
 			if err != nil {
 				log.Printf("Failed to update conference rank: %v", err)
 			}
