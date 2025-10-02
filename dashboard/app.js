@@ -1869,3 +1869,210 @@ window.navigateToTeams = navigateToTeams;
 window.navigateToTeamDetail = navigateToTeamDetail;
 window.navigateToGameDetail = navigateToGameDetail;
 window.navigateBack = navigateBack;
+// ========================================
+// STATS LEADERS TAB
+// ========================================
+
+document.getElementById('refreshStatsLeaders')?.addEventListener('click', loadStatsLeaders);
+
+async function loadStatsLeaders() {
+    const category = document.getElementById('statCategory').value;
+    const season = document.getElementById('statsSeasonFilter').value;
+    const limit = document.getElementById('statsLimitFilter').value;
+    
+    const loading = document.getElementById('statsLeadersLoading');
+    const error = document.getElementById('statsLeadersError');
+    const tbody = document.getElementById('statsLeadersBody');
+    
+    loading.style.display = 'flex';
+    error.style.display = 'none';
+    
+    try {
+        const params = new URLSearchParams({ category, season, limit });
+        const response = await fetch(`${API_BASE_URL}/stats/leaders?${params}`);
+        
+        if (!response.ok) throw new Error('Failed to load stats leaders');
+        
+        const data = await response.json();
+        
+        // Update header
+        const categoryNames = {
+            passing_yards: 'Passing Yards',
+            passing_touchdowns: 'Passing TDs',
+            rushing_yards: 'Rushing Yards',
+            rushing_touchdowns: 'Rushing TDs',
+            receiving_yards: 'Receiving Yards',
+            receiving_touchdowns: 'Receiving TDs',
+            receptions: 'Receptions',
+            sacks: 'Sacks',
+            interceptions: 'Interceptions',
+            tackles: 'Tackles'
+        };
+        document.getElementById('statValueHeader').textContent = categoryNames[category] || 'Value';
+        
+        if (data.data && data.data.length > 0) {
+            tbody.innerHTML = data.data.map((leader, idx) => `
+                <tr>
+                    <td><strong>${idx + 1}</strong></td>
+                    <td>${escapeHtml(leader.player_name || 'Unknown')}</td>
+                    <td><span class="badge">${escapeHtml(leader.position || '')}</span></td>
+                    <td>${escapeHtml(leader.team_abbreviation || 'N/A')}</td>
+                    <td><strong>${leader[category] || 0}</strong></td>
+                    <td>${leader.games_played || 0}</td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">No data available</td></tr>';
+        }
+    } catch (err) {
+        console.error('Error loading stats leaders:', err);
+        error.textContent = err.message;
+        error.style.display = 'block';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Error loading data</td></tr>';
+    } finally {
+        loading.style.display = 'none';
+    }
+}
+
+// ========================================
+// STANDINGS TAB
+// ========================================
+
+document.getElementById('refreshStandings')?.addEventListener('click', loadStandings);
+
+async function loadStandings() {
+    const season = document.getElementById('standingsSeasonFilter').value;
+    const week = document.getElementById('standingsWeekFilter').value;
+    const conference = document.getElementById('standingsConferenceFilter').value;
+    const division = document.getElementById('standingsDivisionFilter').value;
+    
+    if (!season) {
+        alert('Please enter a season');
+        return;
+    }
+    
+    const loading = document.getElementById('standingsLoading');
+    const error = document.getElementById('standingsError');
+    const tbody = document.getElementById('standingsBody');
+    
+    loading.style.display = 'flex';
+    error.style.display = 'none';
+    
+    try {
+        const params = new URLSearchParams({ season });
+        if (week) params.append('week', week);
+        if (conference) params.append('conference', conference);
+        if (division) params.append('division', division);
+        
+        const response = await fetch(`${API_BASE_URL}/standings?${params}`);
+        
+        if (!response.ok) throw new Error('Failed to load standings');
+        
+        const data = await response.json();
+        
+        if (data.data && data.data.length > 0) {
+            tbody.innerHTML = data.data.map((team) => `
+                <tr>
+                    <td><strong>${team.playoff_seed || '-'}</strong></td>
+                    <td>
+                        <div style="font-weight: 600;">${escapeHtml(team.team_abbreviation || team.team_name)}</div>
+                        <div style="font-size: 12px; color: var(--gray-600);">${escapeHtml(team.division || '')}</div>
+                    </td>
+                    <td><strong>${team.wins}-${team.losses}-${team.ties}</strong></td>
+                    <td>${(team.win_percentage || 0).toFixed(3)}</td>
+                    <td>${team.points_for || 0}</td>
+                    <td>${team.points_against || 0}</td>
+                    <td style="color: ${team.point_differential >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                        ${team.point_differential > 0 ? '+' : ''}${team.point_differential || 0}
+                    </td>
+                    <td>${team.home_wins || 0}-${team.home_losses || 0}</td>
+                    <td>${team.away_wins || 0}-${team.away_losses || 0}</td>
+                    <td>${team.division_wins || 0}-${team.division_losses || 0}</td>
+                    <td>${team.conference_wins || 0}-${team.conference_losses || 0}</td>
+                    <td>
+                        <span class="badge ${team.current_streak?.startsWith('W') ? 'badge-success' : 'badge-danger'}">
+                            ${escapeHtml(team.current_streak || '-')}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 20px;">No standings data available</td></tr>';
+        }
+    } catch (err) {
+        console.error('Error loading standings:', err);
+        error.textContent = err.message;
+        error.style.display = 'block';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 20px;">Error loading data</td></tr>';
+    } finally {
+        loading.style.display = 'none';
+    }
+}
+
+// ========================================
+// DEFENSE TAB
+// ========================================
+
+document.getElementById('refreshDefense')?.addEventListener('click', loadDefenseRankings);
+
+async function loadDefenseRankings() {
+    const season = document.getElementById('defenseSeasonFilter').value;
+    const category = document.getElementById('defenseCategoryFilter').value;
+    
+    if (!season) {
+        alert('Please enter a season');
+        return;
+    }
+    
+    const loading = document.getElementById('defenseLoading');
+    const error = document.getElementById('defenseError');
+    const tbody = document.getElementById('defenseBody');
+    
+    loading.style.display = 'flex';
+    error.style.display = 'none';
+    
+    try {
+        const params = new URLSearchParams({ season, category });
+        const response = await fetch(`${API_BASE_URL}/defense/rankings?${params}`);
+        
+        if (!response.ok) throw new Error('Failed to load defensive rankings');
+        
+        const data = await response.json();
+        
+        if (data.data && data.data.length > 0) {
+            tbody.innerHTML = data.data.map((team) => `
+                <tr>
+                    <td><strong>#${team.rank}</strong></td>
+                    <td>
+                        <div style="font-weight: 600;">${escapeHtml(team.team_abbreviation || team.team_name)}</div>
+                    </td>
+                    <td>${team.games_played || 0}</td>
+                    <td><strong>${team.points_allowed || 0}</strong></td>
+                    <td>${team.yards_allowed || 0}</td>
+                    <td>${team.passing_yards_allowed || 0}</td>
+                    <td>${team.rushing_yards_allowed || 0}</td>
+                    <td>${team.sacks || 0}</td>
+                    <td>${team.interceptions || 0}</td>
+                    <td>${team.fumbles_recovered || 0}</td>
+                    <td>${team.touchdowns || 0}</td>
+                    <td>${team.yards_per_game ? team.yards_per_game.toFixed(1) : '0.0'}</td>
+                    <td>${team.points_per_game ? team.points_per_game.toFixed(1) : '0.0'}</td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="13" style="text-align: center; padding: 20px;">No defensive data available</td></tr>';
+        }
+    } catch (err) {
+        console.error('Error loading defensive rankings:', err);
+        error.textContent = err.message;
+        error.style.display = 'block';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align: center; padding: 20px;">Error loading data</td></tr>';
+    } finally {
+        loading.style.display = 'none';
+    }
+}
+
+// Initialize new tabs on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Enhanced dashboard loaded with new tabs');
+});

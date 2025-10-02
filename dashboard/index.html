@@ -28,6 +28,9 @@
                 <button class="tab active" data-tab="players">Players</button>
                 <button class="tab" data-tab="teams">Teams</button>
                 <button class="tab" data-tab="games">Games</button>
+                <button class="tab" data-tab="stats">Stats Leaders</button>
+                <button class="tab" data-tab="standings">Standings</button>
+                <button class="tab" data-tab="defense">Defense</button>
                 <button class="tab" data-tab="career">Career Stats</button>
                 <button class="tab" data-tab="weather">Weather</button>
                 <button class="tab" data-tab="fantasy">Fantasy</button>
@@ -254,6 +257,196 @@
                             </thead>
                             <tbody id="gamesTableBody">
                                 <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gray-500);">Select filters and click Refresh</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Leaders Tab -->
+            <section id="stats-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">NFL Statistical Leaders</h2>
+                        <button class="btn-refresh" id="refreshStatsLeaders">↻ Refresh</button>
+                    </div>
+
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label class="filter-label">Category</label>
+                            <select id="statCategory" class="select">
+                                <option value="passing_yards">Passing Yards</option>
+                                <option value="passing_touchdowns">Passing TDs</option>
+                                <option value="rushing_yards">Rushing Yards</option>
+                                <option value="rushing_touchdowns">Rushing TDs</option>
+                                <option value="receiving_yards">Receiving Yards</option>
+                                <option value="receiving_touchdowns">Receiving TDs</option>
+                                <option value="receptions">Receptions</option>
+                                <option value="sacks">Sacks</option>
+                                <option value="interceptions">Interceptions</option>
+                                <option value="tackles">Tackles</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Season</label>
+                            <input type="number" id="statsSeasonFilter" class="input" value="2024">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Limit</label>
+                            <input type="number" id="statsLimitFilter" class="input" value="25" min="5" max="100">
+                        </div>
+                    </div>
+
+                    <div class="loading" id="statsLeadersLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <span class="loading-text">Loading stats leaders...</span>
+                    </div>
+                    <div class="error" id="statsLeadersError" style="display: none;"></div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Position</th>
+                                    <th>Team</th>
+                                    <th id="statValueHeader">Value</th>
+                                    <th>Games Played</th>
+                                </tr>
+                            </thead>
+                            <tbody id="statsLeadersBody">
+                                <tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--gray-500);">Select category and click Refresh</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Standings Tab -->
+            <section id="standings-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">NFL Standings</h2>
+                        <button class="btn-refresh" id="refreshStandings">↻ Refresh</button>
+                    </div>
+
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label class="filter-label">Season</label>
+                            <input type="number" id="standingsSeasonFilter" class="input" value="2024" required>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Week</label>
+                            <input type="number" id="standingsWeekFilter" class="input" placeholder="Latest">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Conference</label>
+                            <select id="standingsConferenceFilter" class="select">
+                                <option value="">All</option>
+                                <option value="AFC">AFC</option>
+                                <option value="NFC">NFC</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Division</label>
+                            <select id="standingsDivisionFilter" class="select">
+                                <option value="">All</option>
+                                <option value="AFC East">AFC East</option>
+                                <option value="AFC North">AFC North</option>
+                                <option value="AFC South">AFC South</option>
+                                <option value="AFC West">AFC West</option>
+                                <option value="NFC East">NFC East</option>
+                                <option value="NFC North">NFC North</option>
+                                <option value="NFC South">NFC South</option>
+                                <option value="NFC West">NFC West</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="loading" id="standingsLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <span class="loading-text">Loading standings...</span>
+                    </div>
+                    <div class="error" id="standingsError" style="display: none;"></div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Seed</th>
+                                    <th>Team</th>
+                                    <th>W-L-T</th>
+                                    <th>Win %</th>
+                                    <th>PF</th>
+                                    <th>PA</th>
+                                    <th>Diff</th>
+                                    <th>Home</th>
+                                    <th>Away</th>
+                                    <th>Div</th>
+                                    <th>Conf</th>
+                                    <th>Streak</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standingsBody">
+                                <tr><td colspan="12" style="text-align: center; padding: 20px; color: var(--gray-500);">Enter season and click Refresh</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Defense Tab -->
+            <section id="defense-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Defensive Rankings</h2>
+                        <button class="btn-refresh" id="refreshDefense">↻ Refresh</button>
+                    </div>
+
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label class="filter-label">Season</label>
+                            <input type="number" id="defenseSeasonFilter" class="input" value="2024" required>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Category</label>
+                            <select id="defenseCategoryFilter" class="select">
+                                <option value="overall">Overall Defense</option>
+                                <option value="pass">Pass Defense</option>
+                                <option value="rush">Rush Defense</option>
+                                <option value="points_allowed">Points Allowed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="loading" id="defenseLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <span class="loading-text">Loading defensive rankings...</span>
+                    </div>
+                    <div class="error" id="defenseError" style="display: none;"></div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Team</th>
+                                    <th>GP</th>
+                                    <th>Pts Allowed</th>
+                                    <th>Yds Allowed</th>
+                                    <th>Pass Yds</th>
+                                    <th>Rush Yds</th>
+                                    <th>Sacks</th>
+                                    <th>INT</th>
+                                    <th>FR</th>
+                                    <th>TD</th>
+                                    <th>Yds/Game</th>
+                                    <th>Pts/Game</th>
+                                </tr>
+                            </thead>
+                            <tbody id="defenseBody">
+                                <tr><td colspan="13" style="text-align: center; padding: 20px; color: var(--gray-500);">Enter season and click Refresh</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -585,23 +778,51 @@
                     <div class="form-group">
                         <label>Endpoint</label>
                         <select id="apiEndpoint" class="select">
-                            <optgroup label="Players">
+                            <optgroup label="V2 Players">
+                                <option value="/api/v2/players">GET /api/v2/players</option>
+                                <option value="/api/v2/players/:id">GET /api/v2/players/:id</option>
+                                <option value="/api/v2/players/:id/career">GET /api/v2/players/:id/career</option>
+                                <option value="/api/v2/players/:id/history">GET /api/v2/players/:id/history</option>
+                                <option value="/api/v2/players/:id/injuries">GET /api/v2/players/:id/injuries</option>
+                                <option value="/api/v2/players/:id/advanced-stats">GET /api/v2/players/:id/advanced-stats</option>
+                                <option value="/api/v2/players/:id/vs-defense/:teamId">GET /api/v2/players/:id/vs-defense/:teamId</option>
+                            </optgroup>
+                            <optgroup label="V2 Teams">
+                                <option value="/api/v2/teams">GET /api/v2/teams</option>
+                                <option value="/api/v2/teams/:id">GET /api/v2/teams/:id</option>
+                                <option value="/api/v2/teams/:id/players">GET /api/v2/teams/:id/players</option>
+                                <option value="/api/v2/teams/:id/injuries">GET /api/v2/teams/:id/injuries</option>
+                                <option value="/api/v2/teams/:id/defense/stats">GET /api/v2/teams/:id/defense/stats</option>
+                            </optgroup>
+                            <optgroup label="V2 Games">
+                                <option value="/api/v2/games">GET /api/v2/games</option>
+                                <option value="/api/v2/games/:id">GET /api/v2/games/:id</option>
+                                <option value="/api/v2/games/:id/stats">GET /api/v2/games/:id/stats</option>
+                                <option value="/api/v2/games/:id/scoring-plays">GET /api/v2/games/:id/scoring-plays</option>
+                            </optgroup>
+                            <optgroup label="V2 Statistics">
+                                <option value="/api/v2/stats/leaders">GET /api/v2/stats/leaders</option>
+                                <option value="/api/v2/stats/game/:gameId">GET /api/v2/stats/game/:gameId</option>
+                            </optgroup>
+                            <optgroup label="V2 Standings">
+                                <option value="/api/v2/standings">GET /api/v2/standings</option>
+                            </optgroup>
+                            <optgroup label="V2 Defense">
+                                <option value="/api/v2/defense/rankings">GET /api/v2/defense/rankings</option>
+                            </optgroup>
+                            <optgroup label="V2 Weather">
+                                <option value="/api/v2/weather/current">GET /api/v2/weather/current</option>
+                                <option value="/api/v2/weather/historical">GET /api/v2/weather/historical</option>
+                                <option value="/api/v2/weather/forecast">GET /api/v2/weather/forecast</option>
+                            </optgroup>
+                            <optgroup label="V2 Metrics">
+                                <option value="/api/v2/metrics/database">GET /api/v2/metrics/database</option>
+                                <option value="/api/v2/health">GET /api/v2/health</option>
+                            </optgroup>
+                            <optgroup label="V1 (Legacy)">
                                 <option value="/api/v1/players">GET /api/v1/players</option>
-                                <option value="/api/v1/players/:id">GET /api/v1/players/:id</option>
-                                <option value="/api/v1/players/:id/career">GET /api/v1/players/:id/career</option>
-                                <option value="/api/v1/players/:id/history">GET /api/v1/players/:id/history</option>
-                            </optgroup>
-                            <optgroup label="Teams">
                                 <option value="/api/v1/teams">GET /api/v1/teams</option>
-                                <option value="/api/v1/teams/:id">GET /api/v1/teams/:id</option>
-                                <option value="/api/v1/teams/:id/players">GET /api/v1/teams/:id/players</option>
-                            </optgroup>
-                            <optgroup label="Games">
                                 <option value="/api/v1/games">GET /api/v1/games</option>
-                                <option value="/api/v1/games/:id">GET /api/v1/games/:id</option>
-                            </optgroup>
-                            <optgroup label="Stats">
-                                <option value="/api/v1/stats/leaders">GET /api/v1/stats/leaders</option>
                             </optgroup>
                         </select>
                     </div>
