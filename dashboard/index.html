@@ -3,868 +3,478 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grid Iron Mind - Dashboard</title>
-    <link rel="stylesheet" href="styles.css?v=3.0">
+    <title>Grid Iron Mind - NFL Data Explorer</title>
+    <link rel="stylesheet" href="ui-system.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--soft-text);
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: var(--soft-text-light);
+        }
+
+        /* Search Container */
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 9999px;
+            padding: 8px 8px 8px 60px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+        }
+
+        .search-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.08) 0%, rgba(100, 150, 255, 0.08) 50%, rgba(255, 200, 150, 0.05) 100%);
+            opacity: 1;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--soft-text-light);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: none;
+            background: transparent;
+            color: var(--soft-text);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--soft-text-lighter);
+        }
+
+        /* Results Container */
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .results-count {
+            font-size: 16px;
+            color: var(--soft-text-light);
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-pill {
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--soft-text-light);
+        }
+
+        .filter-pill.active {
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.15) 0%, rgba(100, 150, 255, 0.15) 50%, rgba(255, 200, 150, 0.1) 100%);
+            border-color: rgba(100, 150, 255, 0.3);
+            color: var(--soft-text);
+            font-weight: 500;
+        }
+
+        .filter-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .result-card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-2xl);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.08) 0%, rgba(100, 150, 255, 0.08) 50%, rgba(255, 200, 150, 0.05) 100%);
+            opacity: 1;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .result-card:hover::before {
+            opacity: 1.3;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: white;
+        }
+
+        .card-title {
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--soft-text);
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--soft-text-light);
+        }
+
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--soft-text-lighter);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--soft-text);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: rgba(100, 150, 255, 0.6);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: var(--soft-text-light);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--soft-text);
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: var(--soft-text-light);
+        }
+
+        /* Detail View */
+        .detail-view {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .detail-view.active {
+            display: block;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--soft-text);
+        }
+
+        .back-button:hover {
+            transform: translateX(-4px);
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-2xl);
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.08) 0%, rgba(100, 150, 255, 0.08) 50%, rgba(255, 200, 150, 0.05) 100%);
+            z-index: -1;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--soft-text);
+            margin-bottom: 16px;
+        }
+
+        .stats-table {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .stats-table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--soft-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .stats-table td {
+            font-size: 14px;
+            color: var(--soft-text);
+        }
+
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .stats-table tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1>🏈 Grid Iron Mind</h1>
-                <div class="header-status">
-                    <span class="status-indicator connected" id="statusIndicator">
-                        <span class="status-dot"></span>
-                        <span id="statusText">Connected</span>
-                    </span>
-                    <span class="status-indicator" id="responseTime">48ms</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Navigation Tabs -->
-        <nav class="navigation">
-            <div class="tabs">
-                <button class="tab active" data-tab="players">Players</button>
-                <button class="tab" data-tab="teams">Teams</button>
-                <button class="tab" data-tab="games">Games</button>
-                <button class="tab" data-tab="stats">Stats Leaders</button>
-                <button class="tab" data-tab="standings">Standings</button>
-                <button class="tab" data-tab="defense">Defense</button>
-                <button class="tab" data-tab="career">Career Stats</button>
-                <button class="tab" data-tab="weather">Weather</button>
-                <button class="tab" data-tab="fantasy">Fantasy</button>
-                <button class="tab" data-tab="admin">Admin</button>
-                <button class="tab" data-tab="api-test">API Test</button>
-            </div>
-        </nav>
-
-        <!-- Tab Content -->
-        <main class="content">
-            <!-- Players Tab -->
-            <section id="players-tab" class="tab-content active">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Players</h2>
-                        <button class="btn-refresh" id="refreshPlayers">↻ Refresh</button>
-                    </div>
-
-                <div class="filters">
-                    <input type="text" id="playerSearch" placeholder="Search by name..." class="input">
-                    <select id="positionFilter" class="select">
-                        <option value="">All Positions</option>
-                        <option value="QB">QB</option>
-                        <option value="RB">RB</option>
-                        <option value="WR">WR</option>
-                        <option value="TE">TE</option>
-                        <option value="OL">OL</option>
-                        <option value="DL">DL</option>
-                        <option value="LB">LB</option>
-                        <option value="CB">CB</option>
-                        <option value="S">S</option>
-                        <option value="K">K</option>
-                        <option value="P">P</option>
-                    </select>
-                    <select id="statusFilter" class="select">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="injured">Injured</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <select id="teamFilter" class="select">
-                        <option value="">All Teams</option>
-                    </select>
-                </div>
-
-                <div class="loading" id="playersLoading" style="display: none;">
-                    <div class="spinner"></div>
-                    <span class="loading-text">Loading players...</span>
-                </div>
-                <div class="error" id="playersError" style="display: none;"></div>
-
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Photo</th>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Team</th>
-                                <th>Jersey</th>
-                                <th>College</th>
-                                <th>Experience</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="playersTableBody">
-                        </tbody>
-                    </table>
-                </div>
-
-                    <div class="pagination">
-                        <span class="pagination-info" id="playersPageInfo">Page 1</span>
-                        <div class="pagination-controls">
-                            <button class="btn" id="prevPlayers" disabled>← Previous</button>
-                            <button class="btn" id="nextPlayers">Next →</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Teams Tab -->
-            <section id="teams-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Teams</h2>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn" id="backToTeams" style="display: none;">← Back to Teams</button>
-                            <button class="btn-refresh" id="refreshTeams">↻ Refresh</button>
-                        </div>
-                    </div>
-
-                    <!-- Breadcrumb Navigation -->
-                    <div class="breadcrumb" id="teamBreadcrumb" style="display: none; margin-bottom: 16px; padding: 8px 16px; background: rgba(0, 0, 0, 0.02); border-radius: 12px; font-size: 14px; color: var(--gray-600);">
-                        <span class="breadcrumb-item" data-level="teams" style="cursor: pointer;">Teams</span>
-                    </div>
-
-                    <div class="loading" id="teamsLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading teams...</span>
-                    </div>
-                    <div class="error" id="teamsError" style="display: none;"></div>
-
-                    <!-- Teams Grid (Level 1) -->
-                    <div class="cards-grid" id="teamsGrid"></div>
-
-                    <!-- Team Detail View (Level 2) -->
-                    <div id="teamDetailView" style="display: none;">
-                        <div style="margin-bottom: 32px;">
-                            <h3 id="teamDetailName" style="font-size: 24px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="teamDetailInfo" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📅 Games History</h4>
-                            <div class="filters" style="margin-bottom: 16px;">
-                                <div class="filter-group">
-                                    <label class="filter-label">Season</label>
-                                    <input type="number" id="teamGamesSeason" placeholder="Season" class="input" value="2024">
-                                </div>
-                                <button class="btn-primary" id="loadTeamGames">Load Games</button>
-                            </div>
-                            <div class="loading" id="teamGamesLoading" style="display: none;">
-                                <div class="spinner"></div>
-                                <span class="loading-text">Loading games...</span>
-                            </div>
-                            <div id="teamGamesList"></div>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">👥 Current Roster</h4>
-                            <div class="loading" id="teamRosterLoading" style="display: none;">
-                                <div class="spinner"></div>
-                                <span class="loading-text">Loading roster...</span>
-                            </div>
-                            <div id="teamRosterList"></div>
-                        </div>
-                    </div>
-
-                    <!-- Game Detail View (Level 3) -->
-                    <div id="gameDetailView" style="display: none;">
-                        <div style="margin-bottom: 32px;">
-                            <h3 id="gameDetailTitle" style="font-size: 24px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="gameDetailInfo" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">🌡️ Game Conditions</h4>
-                            <div id="gameWeatherDetails"></div>
-                        </div>
-
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📊 Team Statistics</h4>
-                            <div class="loading" id="gamePlayersLoading" style="display: none;">
-                                <div class="spinner"></div>
-                                <span class="loading-text">Loading statistics...</span>
-                            </div>
-                            <div id="gamePlayersList"></div>
-                        </div>
-                    </div>
-
-                    <!-- Player Historical View (Level 4) -->
-                    <div id="playerHistoricalView" style="display: none;">
-                        <div style="margin-bottom: 32px;">
-                            <h3 id="playerHistoricalName" style="font-size: 24px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="playerHistoricalInfo" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <div class="loading" id="playerHistoricalLoading" style="display: none;">
-                            <div class="spinner"></div>
-                            <span class="loading-text">Loading player data...</span>
-                        </div>
-                        <div id="playerHistoricalData"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Games Tab -->
-            <section id="games-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Games & Schedule</h2>
-                        <button class="btn-refresh" id="refreshGames">↻ Refresh</button>
-                    </div>
-
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label class="filter-label">Season</label>
-                            <input type="number" id="seasonFilter" placeholder="2024" class="input" value="2024">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Week</label>
-                            <input type="number" id="weekFilter" placeholder="1-18" class="input" min="1" max="18">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Status</label>
-                            <select id="gameStatusFilter" class="select">
-                                <option value="">All Status</option>
-                                <option value="scheduled">Scheduled</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="final">Final</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="loading" id="gamesLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading games...</span>
-                    </div>
-                    <div class="error" id="gamesError" style="display: none;"></div>
-
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Away Team</th>
-                                    <th>Score</th>
-                                    <th>Home Team</th>
-                                    <th>Status</th>
-                                    <th>Weather</th>
-                                    <th>Venue</th>
-                                </tr>
-                            </thead>
-                            <tbody id="gamesTableBody">
-                                <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--gray-500);">Select filters and click Refresh</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Stats Leaders Tab -->
-            <section id="stats-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">NFL Statistical Leaders</h2>
-                        <button class="btn-refresh" id="refreshStatsLeaders">↻ Refresh</button>
-                    </div>
-
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label class="filter-label">Category</label>
-                            <select id="statCategory" class="select">
-                                <option value="passing_yards">Passing Yards</option>
-                                <option value="passing_touchdowns">Passing TDs</option>
-                                <option value="rushing_yards">Rushing Yards</option>
-                                <option value="rushing_touchdowns">Rushing TDs</option>
-                                <option value="receiving_yards">Receiving Yards</option>
-                                <option value="receiving_touchdowns">Receiving TDs</option>
-                                <option value="receptions">Receptions</option>
-                                <option value="sacks">Sacks</option>
-                                <option value="interceptions">Interceptions</option>
-                                <option value="tackles">Tackles</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Season</label>
-                            <input type="number" id="statsSeasonFilter" class="input" value="2023">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Limit</label>
-                            <input type="number" id="statsLimitFilter" class="input" value="25" min="5" max="100">
-                        </div>
-                    </div>
-
-                    <div class="loading" id="statsLeadersLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading stats leaders...</span>
-                    </div>
-                    <div class="error" id="statsLeadersError" style="display: none;"></div>
-
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Player</th>
-                                    <th>Position</th>
-                                    <th>Team</th>
-                                    <th id="statValueHeader">Value</th>
-                                    <th>Games Played</th>
-                                </tr>
-                            </thead>
-                            <tbody id="statsLeadersBody">
-                                <tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--gray-500);">Select category and click Refresh</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Standings Tab -->
-            <section id="standings-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">NFL Standings</h2>
-                        <button class="btn-refresh" id="refreshStandings">↻ Refresh</button>
-                    </div>
-
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label class="filter-label">Season</label>
-                            <input type="number" id="standingsSeasonFilter" class="input" value="2023" required>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Week</label>
-                            <input type="number" id="standingsWeekFilter" class="input" placeholder="Latest">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Conference</label>
-                            <select id="standingsConferenceFilter" class="select">
-                                <option value="">All</option>
-                                <option value="AFC">AFC</option>
-                                <option value="NFC">NFC</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Division</label>
-                            <select id="standingsDivisionFilter" class="select">
-                                <option value="">All</option>
-                                <option value="AFC East">AFC East</option>
-                                <option value="AFC North">AFC North</option>
-                                <option value="AFC South">AFC South</option>
-                                <option value="AFC West">AFC West</option>
-                                <option value="NFC East">NFC East</option>
-                                <option value="NFC North">NFC North</option>
-                                <option value="NFC South">NFC South</option>
-                                <option value="NFC West">NFC West</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="loading" id="standingsLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading standings...</span>
-                    </div>
-                    <div class="error" id="standingsError" style="display: none;"></div>
-
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Seed</th>
-                                    <th>Team</th>
-                                    <th>W-L-T</th>
-                                    <th>Win %</th>
-                                    <th>PF</th>
-                                    <th>PA</th>
-                                    <th>Diff</th>
-                                    <th>Home</th>
-                                    <th>Away</th>
-                                    <th>Div</th>
-                                    <th>Conf</th>
-                                    <th>Streak</th>
-                                </tr>
-                            </thead>
-                            <tbody id="standingsBody">
-                                <tr><td colspan="12" style="text-align: center; padding: 20px; color: var(--gray-500);">Enter season and click Refresh</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Defense Tab -->
-            <section id="defense-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Defensive Rankings</h2>
-                        <button class="btn-refresh" id="refreshDefense">↻ Refresh</button>
-                    </div>
-
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label class="filter-label">Season</label>
-                            <input type="number" id="defenseSeasonFilter" class="input" value="2023" required>
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Category</label>
-                            <select id="defenseCategoryFilter" class="select">
-                                <option value="overall">Overall Defense</option>
-                                <option value="pass">Pass Defense</option>
-                                <option value="rush">Rush Defense</option>
-                                <option value="points_allowed">Points Allowed</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="loading" id="defenseLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading defensive rankings...</span>
-                    </div>
-                    <div class="error" id="defenseError" style="display: none;"></div>
-
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Team</th>
-                                    <th>GP</th>
-                                    <th>Pts Allowed</th>
-                                    <th>Yds Allowed</th>
-                                    <th>Pass Yds</th>
-                                    <th>Rush Yds</th>
-                                    <th>Sacks</th>
-                                    <th>INT</th>
-                                    <th>FR</th>
-                                    <th>TD</th>
-                                    <th>Yds/Game</th>
-                                    <th>Pts/Game</th>
-                                </tr>
-                            </thead>
-                            <tbody id="defenseBody">
-                                <tr><td colspan="13" style="text-align: center; padding: 20px; color: var(--gray-500);">Enter season and click Refresh</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Career Stats Tab -->
-            <section id="career-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Player Career Statistics</h2>
-                    </div>
-
-                    <div class="filters" style="margin-bottom: 24px;">
-                        <div class="filter-group" style="flex: 2;">
-                            <label class="filter-label">Player ID (UUID)</label>
-                            <input type="text" id="careerPlayerId" class="input" placeholder="Enter player UUID">
-                        </div>
-                        <button class="btn-primary" id="loadCareerStats" style="align-self: flex-end;">Load Career Stats</button>
-                    </div>
-
-                    <div class="loading" id="careerLoading" style="display: none;">
-                        <div class="spinner"></div>
-                        <span class="loading-text">Loading career stats...</span>
-                    </div>
-                    <div class="error" id="careerError" style="display: none;"></div>
-
-                    <div id="careerStatsContainer" style="display: none;">
-                        <div style="margin-bottom: 32px; padding: 20px; background: rgba(0, 122, 255, 0.05); border-radius: 16px; border: 1px solid rgba(0, 122, 255, 0.1);">
-                            <h3 id="careerPlayerName" style="font-size: 18px; font-weight: 600; margin-bottom: 8px;"></h3>
-                            <p id="careerSummary" style="color: var(--gray-600); font-size: 14px;"></p>
-                        </div>
-
-                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Team History</h4>
-                        <div class="table-container" style="margin-bottom: 32px;">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Team</th>
-                                        <th>Position</th>
-                                        <th>Seasons</th>
-                                        <th>Current</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="teamHistoryBody"></tbody>
-                            </table>
-                        </div>
-
-                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Season-by-Season Stats</h4>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Season</th>
-                                        <th>Team</th>
-                                        <th>GP</th>
-                                        <th>Pass Yds</th>
-                                        <th>Pass TD</th>
-                                        <th>Rush Yds</th>
-                                        <th>Rush TD</th>
-                                        <th>Rec</th>
-                                        <th>Rec Yds</th>
-                                        <th>Rec TD</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="careerStatsBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Weather Analysis Tab -->
-            <section id="weather-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Weather Impact Analysis</h2>
-                        <button class="btn-refresh" id="refreshWeather">↻ Refresh</button>
-                    </div>
-
-                <div class="filters">
-                    <input type="number" id="weatherSeason" placeholder="Season (e.g., 2024)" class="input" value="2024">
-                    <select id="weatherCondition" class="select">
-                        <option value="">All Conditions</option>
-                        <option value="clear">Clear</option>
-                        <option value="cloudy">Cloudy</option>
-                        <option value="rain">Rain</option>
-                        <option value="snow">Snow</option>
-                    </select>
-                    <select id="tempRange" class="select">
-                        <option value="">All Temperatures</option>
-                        <option value="cold">Cold (< 40°F)</option>
-                        <option value="moderate">Moderate (40-70°F)</option>
-                        <option value="hot">Hot (> 70°F)</option>
-                    </select>
-                </div>
-
-                <div class="loading" id="weatherLoading" style="display: none;">Loading...</div>
-                <div class="error" id="weatherError" style="display: none;"></div>
-
-                <div class="weather-grid" id="weatherGrid">
-                    <div class="weather-card">
-                        <h3>🌡️ Temperature Stats</h3>
-                        <div id="tempStats">
-                            <p>Average: --°F</p>
-                            <p>High: --°F</p>
-                            <p>Low: --°F</p>
-                        </div>
-                    </div>
-                    <div class="weather-card">
-                        <h3>💨 Wind Impact</h3>
-                        <div id="windStats">
-                            <p>Average Wind: -- mph</p>
-                            <p>High Wind Games: --</p>
-                        </div>
-                    </div>
-                    <div class="weather-card">
-                        <h3>🏟️ Venue Types</h3>
-                        <div id="venueStats">
-                            <p>Indoor: --</p>
-                            <p>Outdoor: --</p>
-                            <p>Retractable: --</p>
-                        </div>
-                    </div>
-                </div>
-
-                <h3>Games by Weather Conditions</h3>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Teams</th>
-                                <th>Temp</th>
-                                <th>Condition</th>
-                                <th>Wind</th>
-                                <th>Venue</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-                        <tbody id="weatherGamesBody">
-                            <tr><td colspan="7" style="text-align: center; padding: 20px;">Select filters and click Refresh</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                </div>
-            </section>
-
-            <!-- Fantasy Stats Tab -->
-            <section id="fantasy-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">Fantasy Football Stats</h2>
-                        <button class="btn-refresh" id="refreshFantasy">↻ Refresh</button>
-                    </div>
-
-                <div class="filters">
-                    <input type="number" id="fantasySeason" placeholder="Season" class="input" value="2024">
-                    <input type="number" id="fantasyWeek" placeholder="Week (optional)" class="input">
-                    <select id="fantasyPosition" class="select">
-                        <option value="">All Positions</option>
-                        <option value="QB">QB</option>
-                        <option value="RB">RB</option>
-                        <option value="WR">WR</option>
-                        <option value="TE">TE</option>
-                    </select>
-                    <select id="fantasyScoring" class="select">
-                        <option value="standard">Standard</option>
-                        <option value="ppr">PPR</option>
-                        <option value="half_ppr">Half PPR</option>
-                    </select>
-                </div>
-
-                <div class="loading" id="fantasyLoading" style="display: none;">Loading...</div>
-                <div class="error" id="fantasyError" style="display: none;"></div>
-
-                <div class="fantasy-leaders">
-                    <h3>Top Fantasy Performers</h3>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Player</th>
-                                    <th>Position</th>
-                                    <th>Team</th>
-                                    <th>Fantasy Points</th>
-                                    <th>Pass Yds</th>
-                                    <th>Pass TD</th>
-                                    <th>Rush Yds</th>
-                                    <th>Rush TD</th>
-                                    <th>Rec</th>
-                                    <th>Rec Yds</th>
-                                    <th>Rec TD</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fantasyLeadersBody">
-                                <tr><td colspan="12" style="text-align: center; padding: 20px;">Select filters and click Refresh</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                </div>
-            </section>
-
-            <!-- Admin Sync Tab -->
-            <section id="admin-tab" class="tab-content">
-                <div class="content-card">
-                <div class="section-header">
-                    <h2>Admin Data Synchronization</h2>
-                </div>
-
-                <div class="admin-section">
-                    <h3>ESPN Data Sync</h3>
-                    <div class="admin-actions">
-                        <button class="btn" id="syncTeams">Sync Teams</button>
-                        <button class="btn" id="syncRosters">Sync Rosters</button>
-                        <button class="btn" id="syncGames">Sync Current Games</button>
-                        <button class="btn btn-primary" id="syncFull">Full Sync</button>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>Historical Data Sync</h3>
-                    <div class="form-group">
-                        <label>Season Year</label>
-                        <input type="number" id="historicalYear" class="input" placeholder="e.g., 2023" value="2023">
-                        <button class="btn" id="syncHistoricalSeason">Sync Season</button>
-                    </div>
-                    <div class="form-group">
-                        <label>Season Range</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="number" id="multiSeasonStart" class="input" placeholder="Start year" value="2020">
-                            <input type="number" id="multiSeasonEnd" class="input" placeholder="End year" value="2023">
-                            <button class="btn" id="syncMultipleSeasons">Sync Range</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>NFLverse Data Enrichment</h3>
-                    <div class="form-group">
-                        <label>Season for Stats Sync</label>
-                        <input type="number" id="nflverseStatsSeason" class="input" placeholder="e.g., 2024" value="2024">
-                        <button class="btn" id="syncNFLverseStats">Sync Player Stats</button>
-                    </div>
-                    <div class="form-group">
-                        <label>Season for Schedule Sync (Weather & Venue)</label>
-                        <input type="number" id="nflverseScheduleSeason" class="input" placeholder="e.g., 2024" value="2024">
-                        <button class="btn" id="syncNFLverseSchedule">Sync Schedule</button>
-                    </div>
-                    <div class="form-group">
-                        <label>Next Gen Stats</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="number" id="nflverseNextGenSeason" class="input" placeholder="Season" value="2024">
-                            <select id="nflverseStatType" class="select">
-                                <option value="passing">Passing</option>
-                                <option value="rushing">Rushing</option>
-                                <option value="receiving">Receiving</option>
-                            </select>
-                            <button class="btn" id="syncNFLverseNextGen">Sync Next Gen</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>Weather Data Enrichment</h3>
-                    <div class="form-group">
-                        <label>Season for Weather Enrichment</label>
-                        <input type="number" id="weatherSyncSeason" class="input" placeholder="e.g., 2024" value="2024">
-                        <button class="btn" id="syncWeather">Enrich with Weather Data</button>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>📊 Database Status</h3>
-                    <div id="dbStatus" class="sync-status" style="background: var(--bg-primary); padding: 20px; border-radius: 8px;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">TEAMS</div>
-                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbTeamsCount">--</div>
-                            </div>
-                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">PLAYERS</div>
-                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbPlayersCount">--</div>
-                            </div>
-                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">GAMES</div>
-                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbGamesCount">--</div>
-                            </div>
-                            <div style="background: var(--bg-secondary); padding: 15px; border-radius: 6px;">
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">WEATHER DATA</div>
-                                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="dbWeatherCount">--</div>
-                            </div>
-                        </div>
-                        <button class="btn" id="refreshDbStatus" style="width: 100%;">↻ Refresh Database Status</button>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>🔄 Sync Status & Log</h3>
-                    <div id="syncStatus" class="sync-status" style="min-height: 150px; max-height: 400px; overflow-y: auto;">
-                        <p style="color: var(--text-secondary);">Ready to sync data. Click any sync button above to start.</p>
-                    </div>
-                    <button class="btn" id="clearSyncLog" style="margin-top: 10px;">Clear Log</button>
-                </div>
-
-                <div class="admin-section">
-                    <h3>⚡ Quick Actions</h3>
-                    <div class="admin-actions">
-                        <button class="btn btn-primary" id="quickSyncAll">🚀 Sync Everything (2020-2024)</button>
-                        <button class="btn" id="syncCurrent2024">📅 Sync 2024 Season Only</button>
-                    </div>
-                    <p style="margin-top: 10px; color: var(--text-secondary); font-size: 14px;">
-                        Quick sync runs: Teams → Rosters → Historical Games (2020-2024) → NFLverse Stats → Weather Data
-                    </p>
-                </div>
-                </div>
-            </section>
-
-            <!-- API Testing Tab -->
-            <section id="api-test-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">API Testing</h2>
-                </div>
-
-                <div class="api-test-form">
-                    <div class="form-group">
-                        <label>Endpoint</label>
-                        <select id="apiEndpoint" class="select">
-                            <optgroup label="V2 Players">
-                                <option value="/api/v2/players">GET /api/v2/players</option>
-                                <option value="/api/v2/players/:id">GET /api/v2/players/:id</option>
-                                <option value="/api/v2/players/:id/career">GET /api/v2/players/:id/career</option>
-                                <option value="/api/v2/players/:id/history">GET /api/v2/players/:id/history</option>
-                                <option value="/api/v2/players/:id/injuries">GET /api/v2/players/:id/injuries</option>
-                                <option value="/api/v2/players/:id/advanced-stats">GET /api/v2/players/:id/advanced-stats</option>
-                                <option value="/api/v2/players/:id/vs-defense/:teamId">GET /api/v2/players/:id/vs-defense/:teamId</option>
-                            </optgroup>
-                            <optgroup label="V2 Teams">
-                                <option value="/api/v2/teams">GET /api/v2/teams</option>
-                                <option value="/api/v2/teams/:id">GET /api/v2/teams/:id</option>
-                                <option value="/api/v2/teams/:id/players">GET /api/v2/teams/:id/players</option>
-                                <option value="/api/v2/teams/:id/injuries">GET /api/v2/teams/:id/injuries</option>
-                                <option value="/api/v2/teams/:id/defense/stats">GET /api/v2/teams/:id/defense/stats</option>
-                            </optgroup>
-                            <optgroup label="V2 Games">
-                                <option value="/api/v2/games">GET /api/v2/games</option>
-                                <option value="/api/v2/games/:id">GET /api/v2/games/:id</option>
-                                <option value="/api/v2/games/:id/stats">GET /api/v2/games/:id/stats</option>
-                                <option value="/api/v2/games/:id/scoring-plays">GET /api/v2/games/:id/scoring-plays</option>
-                            </optgroup>
-                            <optgroup label="V2 Statistics">
-                                <option value="/api/v2/stats/leaders">GET /api/v2/stats/leaders</option>
-                                <option value="/api/v2/stats/game/:gameId">GET /api/v2/stats/game/:gameId</option>
-                            </optgroup>
-                            <optgroup label="V2 Standings">
-                                <option value="/api/v2/standings">GET /api/v2/standings</option>
-                            </optgroup>
-                            <optgroup label="V2 Defense">
-                                <option value="/api/v2/defense/rankings">GET /api/v2/defense/rankings</option>
-                            </optgroup>
-                            <optgroup label="V2 Weather">
-                                <option value="/api/v2/weather/current">GET /api/v2/weather/current</option>
-                                <option value="/api/v2/weather/historical">GET /api/v2/weather/historical</option>
-                                <option value="/api/v2/weather/forecast">GET /api/v2/weather/forecast</option>
-                            </optgroup>
-                            <optgroup label="V2 Metrics">
-                                <option value="/api/v2/metrics/database">GET /api/v2/metrics/database</option>
-                                <option value="/api/v2/health">GET /api/v2/health</option>
-                            </optgroup>
-                            <optgroup label="V1 (Legacy)">
-                                <option value="/api/v1/players">GET /api/v1/players</option>
-                                <option value="/api/v1/teams">GET /api/v1/teams</option>
-                                <option value="/api/v1/games">GET /api/v1/games</option>
-                            </optgroup>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="apiIdField" style="display: none;">
-                        <label>ID (UUID)</label>
-                        <input type="text" id="apiId" class="input" placeholder="Enter UUID">
-                    </div>
-
-                    <div class="form-group" id="apiParamsField">
-                        <label>Query Parameters (JSON)</label>
-                        <textarea id="apiParams" class="textarea" rows="4" placeholder='{"limit": 10, "position": "QB"}'></textarea>
-                    </div>
-
-                    <button class="btn btn-primary" id="executeApiCall">Execute Request</button>
-                </div>
-
-                <div class="api-response">
-                    <div class="response-header">
-                        <h3>Response</h3>
-                        <div>
-                            <span id="apiStatusCode" class="status-badge"></span>
-                            <span id="apiResponseTime" class="response-time-badge"></span>
-                            <button class="btn-icon" id="copyResponse" title="Copy to clipboard">📋</button>
-                        </div>
-                    </div>
-                    <pre id="apiResponseBody" class="response-body">No request executed yet</pre>
-                </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Player Detail Modal -->
-        <div id="playerModal" class="modal">
-            <div class="modal-content">
-                <span class="modal-close">&times;</span>
-                <h2 id="modalPlayerName"></h2>
-                <div id="modalPlayerDetails"></div>
-            </div>
+    <!-- Header -->
+    <div class="header">
+        <h1>🏈 Grid Iron Mind</h1>
+        <p>Explore NFL players and teams</p>
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+                type="text"
+                class="search-input"
+                id="searchInput"
+                placeholder="Search for players or teams..."
+                autocomplete="off"
+            >
         </div>
     </div>
 
-    <script src="app.js?v=3.3"></script>
+    <!-- Results Container -->
+    <div class="results-container" id="resultsContainer">
+        <div class="results-header">
+            <div class="results-count" id="resultsCount">Search for players or teams to get started</div>
+            <div class="filter-pills">
+                <div class="filter-pill active" data-filter="all">All</div>
+                <div class="filter-pill" data-filter="players">Players</div>
+                <div class="filter-pill" data-filter="teams">Teams</div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState" style="display: none;">
+            <div class="spinner"></div>
+            <div class="loading-text">Searching...</div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🏈</div>
+            <div class="empty-title">Ready to explore</div>
+            <div class="empty-text">Start typing to search for your favorite players and teams</div>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="results-grid" id="resultsGrid" style="display: none;"></div>
+    </div>
+
+    <!-- Detail View (Player) -->
+    <div class="detail-view" id="playerDetailView">
+        <button class="back-button" onclick="goBack()">← Back to search</button>
+
+        <div class="detail-header" id="playerDetailHeader"></div>
+
+        <div class="section-title">Latest Stats (2023 Season)</div>
+        <table class="stats-table" id="playerStatsTable"></table>
+
+        <div class="section-title">Game History</div>
+        <div id="playerGameHistory"></div>
+    </div>
+
+    <!-- Detail View (Team) -->
+    <div class="detail-view" id="teamDetailView">
+        <button class="back-button" onclick="goBack()">← Back to search</button>
+
+        <div class="detail-header" id="teamDetailHeader"></div>
+
+        <div class="section-title">Current Schedule (2024)</div>
+        <table class="stats-table" id="teamScheduleTable"></table>
+
+        <div class="section-title">Past Seasons</div>
+        <div id="teamPastSeasons"></div>
+    </div>
+
+    <script src="search.js"></script>
 </body>
 </html>

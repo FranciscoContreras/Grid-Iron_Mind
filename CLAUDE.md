@@ -142,11 +142,38 @@ heroku ps
 ### Testing
 
 ```bash
-# No test files currently exist in the codebase
-# When adding tests, use:
+# Run all tests (80+ test cases across 7 test files)
 go test ./...
-go test -v -run TestName ./internal/handlers/
+
+# Run with verbose output
+go test ./... -v
+
+# Run with coverage
+go test ./... -cover
+go test ./... -coverprofile=coverage.out
+go tool cover -html=coverage.out
+
+# Run specific package tests
+go test ./pkg/validation/... -v
+go test ./internal/handlers/... -v
+go test ./internal/middleware/... -v
+
+# Run specific test
+go test -run TestValidatePosition ./pkg/validation/
 ```
+
+**Test Coverage:**
+- pkg/validation/ - Input validation (28 test cases)
+- pkg/response/ - JSON response formatting (7 test cases)
+- internal/handlers/ - API handlers (12 test cases)
+- internal/middleware/ - Auth, CORS, errors (25 test cases)
+- internal/db/ - Database query validation (21 test cases)
+
+**Test Patterns:**
+- Table-driven tests for comprehensive coverage
+- HTTP handler testing with httptest
+- Mock dependencies for database-independent testing
+- Environment variable testing for auth/config
 
 ## API Design
 
@@ -646,6 +673,15 @@ Static web dashboard served at root path:
 
 Access locally: `http://localhost:8080`
 
+**Design System:**
+- Uses "Frost" glassmorphic design system (ui-system.css)
+- Glassmorphism with frosted glass backgrounds and backdrop blur
+- Purple → Blue → Orange signature gradient overlay
+- Pill-shaped buttons (border-radius: 9999px)
+- Rounded containers (border-radius: 24px)
+- Soft tones palette with white/off-white backgrounds
+- Comprehensive component library documented at `/ui-system.html`
+
 ## Deployment Targets
 
 ### Heroku (Primary)
@@ -665,9 +701,91 @@ Access locally: `http://localhost:8080`
 - **Database:** Use connection pool, limit queries to 5s timeout, select only needed columns
 - **Caching:** Check cache first, set appropriate TTLs, include X-Cache headers
 - **Pagination:** Default 50/page, max 100/page, always include total count
-- **Indexes:** Query optimizer relies on indexes in schema.sql
+- **Indexes:** 45+ indexes added in migration 007 for optimal performance
 - **AI:** Cache aggressively (15-60min), implement timeouts, fallback to stats if slow
 - **Logging:** Log slow queries >100ms, track error rates, monitor pool stats
+
+### Database Optimization
+
+**Index Strategy:**
+- 45+ indexes across 11 tables (migration 007)
+- Composite indexes for multi-column filters
+- Covering indexes for frequently selected columns
+- Partial indexes for subset queries (e.g., active players only)
+- Text search indexes with trigram support (pg_trgm)
+
+**N+1 Query Prevention:**
+- Use JOINs instead of separate queries for related data
+- Batch loading pattern for collections
+- Example: Load player stats with team details in single query
+
+**Connection Pooling:**
+- MaxConns: 25 (default), MinConns: 5
+- MaxConnLifetime: 1 hour
+- MaxConnIdleTime: 30 minutes
+- HealthCheckPeriod: 1 minute
+- Pool stats accessible via `db.GetPool().Stat()`
+
+### Logging & Tracing
+
+**Request ID System:**
+- Every request gets unique UUID
+- Propagated via context throughout request lifecycle
+- Returned in X-Request-ID response header
+- Use `logging.GetRequestID(ctx)` to access in code
+
+**Log Levels:**
+- `logging.Info(ctx, msg, args...)` - Normal operations
+- `logging.Warn(ctx, msg, args...)` - Client errors, recoverable issues
+- `logging.Error(ctx, msg, args...)` - Server errors, failed operations
+- `logging.Debug(ctx, msg, args...)` - Development details
+
+**Special Log Tags:**
+- `[SLOW]` - Requests >100ms
+- `[SLOW-QUERY]` - Database queries >100ms
+- `[CACHE-HIT]` / `[CACHE-MISS]` - Cache operations
+- `[AUTO-FETCH]` - Automatic data fetching operations
+
+**Specialized Logging:**
+```go
+logging.SlowQuery(ctx, query, durationMs)
+logging.APICall(ctx, service, endpoint, duration, statusCode)
+logging.CacheHit(ctx, key) / logging.CacheMiss(ctx, key)
+logging.AutoFetch(ctx, resource, details)
+```
+
+### SQL Security
+
+**Parameterized Queries:**
+- ALL queries use $1, $2, $3 placeholders
+- NO string concatenation of user input
+- pgx/v5 driver with prepared statement support
+- Input validation before database queries
+
+**Safe Pattern:**
+```go
+query := `SELECT * FROM players WHERE position = $1 AND status = $2`
+rows, err := pool.Query(ctx, query, position, status)
+```
+
+**Dynamic WHERE Clauses:**
+```go
+whereClause := " WHERE 1=1"
+args := []interface{}{}
+argCount := 1
+if position != "" {
+    whereClause += fmt.Sprintf(" AND position = $%d", argCount)
+    args = append(args, position)
+    argCount++
+}
+query := "SELECT * FROM players" + whereClause
+rows, err := pool.Query(ctx, query, args...)
+```
+
+**Input Validation Layers:**
+1. Handler validation (position, status, limits)
+2. Type safety (UUID parsing, integer validation)
+3. Database driver (automatic escaping)
 
 ## Auto-Fetch System
 
