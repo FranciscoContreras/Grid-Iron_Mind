@@ -20,10 +20,13 @@ func InitYahooOAuth(cfg *config.Config) {
 		return // OAuth not configured
 	}
 
+	// Use environment variable for redirect URL, or default to Heroku URL
+	redirectURL := "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/yahoo/callback"
+
 	yahooOAuthConfig = &oauth2.Config{
 		ClientID:     cfg.YahooClientID,
 		ClientSecret: cfg.YahooClientSecret,
-		RedirectURL:  "https://grid-iron-mind-71cc9734eaf4.herokuapp.com/yahoo/callback",
+		RedirectURL:  redirectURL,
 		Scopes:       []string{},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://api.login.yahoo.com/oauth2/request_auth",
@@ -34,7 +37,19 @@ func InitYahooOAuth(cfg *config.Config) {
 
 // HandleYahooAuthHome shows the OAuth start page
 func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
-	html := `
+	// Show config info for debugging
+	configInfo := "Not configured"
+	if yahooOAuthConfig != nil {
+		configInfo = fmt.Sprintf(`
+			<p><strong>Current Configuration:</strong></p>
+			<ul>
+				<li>Client ID: %s...</li>
+				<li>Redirect URL: %s</li>
+			</ul>
+		`, yahooOAuthConfig.ClientID[:20], yahooOAuthConfig.RedirectURL)
+	}
+
+	html := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
 <head>
@@ -96,10 +111,12 @@ func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
         <p style="margin-top: 40px; font-size: 12px; opacity: 0.8;">
             Make sure Yahoo credentials are configured in your environment variables.
         </p>
+
+        %s
     </div>
 </body>
 </html>
-`
+`, configInfo)
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, html)
 }
