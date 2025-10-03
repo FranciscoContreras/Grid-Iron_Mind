@@ -39,7 +39,14 @@ func InitYahooOAuth(cfg *config.Config) {
 func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
 	// Show config info for debugging
 	configInfo := "Not configured"
+	clientID := ""
+	redirectURL := ""
+	state := ""
+
 	if yahooOAuthConfig != nil {
+		clientID = yahooOAuthConfig.ClientID
+		redirectURL = yahooOAuthConfig.RedirectURL
+		state = yahooState
 		configInfo = fmt.Sprintf(`
 			<p><strong>Current Configuration:</strong></p>
 			<ul>
@@ -108,6 +115,17 @@ func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
 
         <a href="/yahoo/auth" class="btn">🔐 Start OAuth Flow</a>
 
+        <div style="margin-top: 30px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px;">
+            <h3>🔍 Debug Information:</h3>
+            <p style="font-size: 12px; word-break: break-all;">
+                <strong>OAuth URL that will be generated:</strong><br>
+                <code style="font-size: 11px;">https://api.login.yahoo.com/oauth2/request_auth?client_id=%s&redirect_uri=%s&response_type=code&state=%s</code>
+            </p>
+            <p style="font-size: 11px; margin-top: 10px;">
+                ℹ️ This is what we'll send to Yahoo. Make sure the redirect_uri matches EXACTLY what's in your Yahoo app settings.
+            </p>
+        </div>
+
         <p style="margin-top: 40px; font-size: 12px; opacity: 0.8;">
             Make sure Yahoo credentials are configured in your environment variables.
         </p>
@@ -116,7 +134,7 @@ func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
     </div>
 </body>
 </html>
-`, configInfo)
+`, clientID, redirectURL, state, configInfo)
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, html)
 }
