@@ -13,21 +13,20 @@ echo "📅 Date: $(date)"
 
 # Check if initial import has been done
 if [ ! -f "$INIT_FLAG" ]; then
-    echo "🚀 FIRST RUN: Importing 2025 season rosters..."
+    echo "🚀 FIRST RUN: Importing 15 years of NFL data (2010-2025)..."
+    echo "⏱️  This will take 30-60 minutes. Please be patient."
+    echo ""
 
-    # Import current season (2025)
-    if $PIPELINE --mode year --year 2025; then
-        echo "✅ 2025 season import complete!"
+    # Full historical import: 2010-2025 (15 years)
+    if $PIPELINE --mode full --start-year 2010 --end-year 2025; then
+        echo "✅ Historical data import complete!"
+        echo "📊 Imported 15 seasons (2010-2025)"
         touch "$INIT_FLAG"
         echo "$(date)" > "$INIT_FLAG"
     else
-        echo "⚠️  Initial import failed, will retry next run"
+        echo "⚠️  Full import failed, will retry next run"
         exit 1
     fi
-
-    # Optional: Import previous season for historical context
-    echo "📚 Importing 2024 season for context..."
-    $PIPELINE --mode year --year 2024 || echo "⚠️  2024 import failed, continuing..."
 
     echo "✅ Initial data population complete!"
     echo ""
