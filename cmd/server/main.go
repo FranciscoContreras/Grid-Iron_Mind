@@ -69,6 +69,9 @@ func main() {
 	autoScheduler.Start()
 	defer autoScheduler.Stop()
 
+	// Initialize Yahoo OAuth
+	handlers.InitYahooOAuth(cfg)
+
 	// Initialize handlers
 	playersHandler := handlers.NewPlayersHandler()
 	teamsHandler := handlers.NewTeamsHandler()
@@ -211,6 +214,11 @@ func main() {
 	mux.HandleFunc("/api/v1/style/rules", applyMiddleware(styleAgentHandler.HandleStyleRules))
 	mux.HandleFunc("/api/v1/style/example", applyMiddleware(styleAgentHandler.HandleStyleExample))
 	mux.HandleFunc("/style-guide.html", styleAgentHandler.HandleStyleGuide)
+
+	// Yahoo OAuth endpoints (for one-time setup)
+	mux.HandleFunc("/yahoo", handlers.HandleYahooAuthHome)
+	mux.HandleFunc("/yahoo/auth", handlers.HandleYahooAuth)
+	mux.HandleFunc("/yahoo/callback", handlers.HandleYahooCallback)
 
 	// Serve dashboard static files
 	fs := http.FileServer(http.Dir("./dashboard"))
