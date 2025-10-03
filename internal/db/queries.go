@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/francisco/gridironmind/internal/models"
@@ -19,19 +20,51 @@ func (q *PlayerQueries) ListPlayers(ctx context.Context, filters PlayerFilters) 
 	defer cancel()
 
 	// Build query with filters
-	query := `
+	baseSelect := `
 		SELECT p.id, p.nfl_id, p.name, p.position, p.team_id, p.jersey_number,
 		       p.height_inches, p.weight_pounds, p.birth_date, p.college,
 		       p.draft_year, p.draft_round, p.draft_pick, p.status,
 		       p.created_at, p.updated_at
+	`
+
+	// Add relevance scoring if search is provided
+	var query string
+	if filters.Search != "" {
+		query = baseSelect + `,
+		CASE
+			WHEN LOWER(p.name) = $1 THEN 100
+			WHEN LOWER(p.name) LIKE $2 THEN 80
+			WHEN LOWER(p.name) LIKE $3 THEN 60
+			ELSE 0
+		END as relevance_score
+		FROM players p
+		WHERE LOWER(p.name) LIKE $3
+		`
+	} else {
+		query = baseSelect + `
 		FROM players p
 		WHERE 1=1
-	`
+		`
+	}
+
 	countQuery := `SELECT COUNT(*) FROM players p WHERE 1=1`
 	args := []interface{}{}
 	argCount := 1
 
-	// Apply filters
+	// Add search filter
+	if filters.Search != "" {
+		searchLower := strings.ToLower(strings.TrimSpace(filters.Search))
+		// Add search args for relevance scoring
+		args = append(args, searchLower)                  // $1 - exact match
+		args = append(args, searchLower+"%")              // $2 - starts with
+		args = append(args, "%"+searchLower+"%")          // $3 - contains
+		argCount = 4 // Next arg starts at $4
+
+		// Add search to count query
+		countQuery += fmt.Sprintf(" AND LOWER(p.name) LIKE $%d", 1)
+	}
+
+	// Apply other filters
 	if filters.Position != "" {
 		query += fmt.Sprintf(" AND p.position = $%d", argCount)
 		countQuery += fmt.Sprintf(" AND p.position = $%d", argCount)
@@ -53,15 +86,37 @@ func (q *PlayerQueries) ListPlayers(ctx context.Context, filters PlayerFilters) 
 		argCount++
 	}
 
-	// Get total count
+	// Get total count (use separate args for count query)
 	var total int
-	err := pool.QueryRow(ctx, countQuery, args...).Scan(&total)
+	var countArgs []interface{}
+	if filters.Search != "" {
+		searchLower := strings.ToLower(strings.TrimSpace(filters.Search))
+		countArgs = append(countArgs, "%"+searchLower+"%")
+	}
+	countArgIdx := len(countArgs) + 1
+	if filters.Position != "" {
+		countArgs = append(countArgs, filters.Position)
+	}
+	if filters.TeamID != uuid.Nil {
+		countArgs = append(countArgs, filters.TeamID)
+	}
+	if filters.Status != "" {
+		countArgs = append(countArgs, filters.Status)
+	}
+
+	err := pool.QueryRow(ctx, countQuery, countArgs...).Scan(&total)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to count players: %w", err)
 	}
 
 	// Add ordering and pagination
-	query += fmt.Sprintf(" ORDER BY p.name LIMIT $%d OFFSET $%d", argCount, argCount+1)
+	if filters.Search != "" {
+		// Order by relevance score first, then name
+		query += fmt.Sprintf(" ORDER BY relevance_score DESC, p.name ASC LIMIT $%d OFFSET $%d", argCount, argCount+1)
+	} else {
+		// No search - just order by name
+		query += fmt.Sprintf(" ORDER BY p.name ASC LIMIT $%d OFFSET $%d", argCount, argCount+1)
+	}
 	args = append(args, filters.Limit, filters.Offset)
 
 	// Execute query
@@ -74,14 +129,28 @@ func (q *PlayerQueries) ListPlayers(ctx context.Context, filters PlayerFilters) 
 	players := []models.Player{}
 	for rows.Next() {
 		var p models.Player
-		err := rows.Scan(
-			&p.ID, &p.NFLID, &p.Name, &p.Position, &p.TeamID, &p.JerseyNumber,
-			&p.HeightInches, &p.WeightPounds, &p.BirthDate, &p.College,
-			&p.DraftYear, &p.DraftRound, &p.DraftPick, &p.Status,
-			&p.CreatedAt, &p.UpdatedAt,
-		)
-		if err != nil {
-			return nil, 0, fmt.Errorf("failed to scan player: %w", err)
+		var relevanceScore *int // Ignore relevance score in scan
+
+		if filters.Search != "" {
+			err := rows.Scan(
+				&p.ID, &p.NFLID, &p.Name, &p.Position, &p.TeamID, &p.JerseyNumber,
+				&p.HeightInches, &p.WeightPounds, &p.BirthDate, &p.College,
+				&p.DraftYear, &p.DraftRound, &p.DraftPick, &p.Status,
+				&p.CreatedAt, &p.UpdatedAt, &relevanceScore,
+			)
+			if err != nil {
+				return nil, 0, fmt.Errorf("failed to scan player: %w", err)
+			}
+		} else {
+			err := rows.Scan(
+				&p.ID, &p.NFLID, &p.Name, &p.Position, &p.TeamID, &p.JerseyNumber,
+				&p.HeightInches, &p.WeightPounds, &p.BirthDate, &p.College,
+				&p.DraftYear, &p.DraftRound, &p.DraftPick, &p.Status,
+				&p.CreatedAt, &p.UpdatedAt,
+			)
+			if err != nil {
+				return nil, 0, fmt.Errorf("failed to scan player: %w", err)
+			}
 		}
 		players = append(players, p)
 	}
@@ -292,6 +361,7 @@ func (q *TeamQueries) GetTeamPlayers(ctx context.Context, teamID uuid.UUID) ([]m
 
 // PlayerFilters holds filter parameters for player queries
 type PlayerFilters struct {
+	Search   string
 	Position string
 	TeamID   uuid.UUID
 	Status   string

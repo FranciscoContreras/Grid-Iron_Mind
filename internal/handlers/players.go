@@ -70,12 +70,14 @@ func (h *PlayersHandler) listPlayers(w http.ResponseWriter, r *http.Request) {
 
 	limit := validation.ValidateLimit(validation.ParseIntParam(query.Get("limit"), 50))
 	offset := validation.ValidateOffset(validation.ParseIntParam(query.Get("offset"), 0))
+	search := strings.TrimSpace(query.Get("search"))
 	position := strings.TrimSpace(query.Get("position"))
 	status := strings.TrimSpace(query.Get("status"))
 	teamIDStr := strings.TrimSpace(query.Get("team"))
 
 	// Build filters
 	filters := db.PlayerFilters{
+		Search: search,
 		Limit:  limit,
 		Offset: offset,
 	}
