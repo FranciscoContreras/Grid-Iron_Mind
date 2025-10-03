@@ -170,6 +170,13 @@ func (h *YahooTestHandler) makeRawRequest(ctx context.Context, endpoint string) 
 	baseURL := "https://fantasysports.yahooapis.com/fantasy/v2"
 	reqURL := fmt.Sprintf("%s%s", baseURL, endpoint)
 
+	// Add format=json to force JSON response
+	if strings.Contains(reqURL, "?") {
+		reqURL += "&format=json"
+	} else {
+		reqURL += "?format=json"
+	}
+
 	req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -195,7 +202,11 @@ func (h *YahooTestHandler) makeRawRequest(ctx context.Context, endpoint string) 
 
 	var data interface{}
 	if err := json.Unmarshal(bodyBytes, &data); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+		// If JSON parsing fails, return the raw body for debugging
+		return map[string]interface{}{
+			"raw_response": string(bodyBytes),
+			"error":        "Failed to parse as JSON - Yahoo returned non-JSON response",
+		}, nil
 	}
 
 	return data, nil
