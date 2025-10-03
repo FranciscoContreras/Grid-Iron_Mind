@@ -64,8 +64,8 @@ This guide explains how to complete the Yahoo Fantasy Sports API integration for
    - **Callback Domain:** `https://nfl.wearemachina.com` (or your domain)
    - **API Permissions:** Fantasy Sports (Read)
 4. Get your credentials:
-   - **Client ID:** `dj0yJmk9Z1l5eGU0T0FTczI4JmQ9WVdrOVpWbERPRWsyYVhFbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTU5`
-   - **Client Secret:** `d5a7529ea91e162ead045e86ec1ddcd8f3dd8157`
+   - **Client ID:** `your_yahoo_client_id_here`
+   - **Client Secret:** `your_yahoo_client_secret_here`
 
 ### Step 2: OAuth2 Flow Options
 
@@ -78,8 +78,8 @@ Yahoo requires OAuth2 for API access. You have 3 options:
 **Implementation:**
 ```go
 // 1. Set up OAuth config in environment
-YAHOO_CLIENT_ID=dj0yJmk9Z1l5eGU0T0FTczI4...
-YAHOO_CLIENT_SECRET=d5a7529ea91e162ead045e86ec1ddcd8f3dd8157
+YAHOO_CLIENT_ID=your_client_id_here
+YAHOO_CLIENT_SECRET=your_client_secret_here
 YAHOO_REDIRECT_URL=https://nfl.wearemachina.com/auth/yahoo/callback
 
 // 2. One-time manual auth to get refresh token
@@ -191,8 +191,8 @@ psql $DATABASE_URL -f migrations/011_add_yahoo_fantasy_data.sql
 
 ```bash
 # On Heroku
-heroku config:set YAHOO_CLIENT_ID=dj0yJmk9Z1l5eGU0T0FTczI4JmQ9WVdrOVpWbERPRWsyYVhFbWNHbzlNQT09JnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PTU5
-heroku config:set YAHOO_CLIENT_SECRET=d5a7529ea91e162ead045e86ec1ddcd8f3dd8157
+heroku config:set YAHOO_CLIENT_ID=your_client_id_here
+heroku config:set YAHOO_CLIENT_SECRET=your_client_secret_here
 heroku config:set YAHOO_REDIRECT_URL=https://nfl.wearemachina.com/auth/yahoo/callback
 
 # After getting refresh token (one-time setup)
@@ -272,7 +272,7 @@ func (s *Scheduler) syncYahooData(seasonInfo utils.SeasonInfo) error {
 
 ❌ **DON'T:**
 ```go
-const clientSecret = "d5a7529ea91e162ead045e86ec1ddcd8f3dd8157" // NO!
+const clientSecret = "hardcoded-secret-value-here" // NO!
 ```
 
 ✅ **DO:**
