@@ -1,6 +1,6 @@
 module github.com/francisco/gridironmind
 
-// +heroku install ./cmd/server ./cmd/import_historical
+// +heroku install ./cmd/server ./cmd/import_historical ./cmd/yahoo_oauth_helper
 
 go 1.21
 
