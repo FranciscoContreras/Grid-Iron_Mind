@@ -150,7 +150,8 @@ func HandleYahooAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := yahooOAuthConfig.AuthCodeURL(yahooState, oauth2.AccessTypeOffline)
+	// Yahoo OAuth doesn't support access_type parameter, use default
+	url := yahooOAuthConfig.AuthCodeURL(yahooState)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
