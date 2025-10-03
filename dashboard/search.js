@@ -363,7 +363,7 @@ async function showTeamDetail(team) {
 
     // Load current season games
     try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/games?season=2024`);
+        const response = await fetch(`${API_BASE_URL}/api/v1/games?season=2025`);
         const data = await response.json();
         const games = data.data || [];
 
@@ -416,7 +416,7 @@ function renderTeamSchedule(table, games, team) {
 }
 
 function renderPastSeasons(container, team) {
-    const seasons = [2023, 2022, 2021, 2020];
+    const seasons = [2024, 2023, 2022, 2021];
 
     container.innerHTML = '';
 
