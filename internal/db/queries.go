@@ -93,7 +93,6 @@ func (q *PlayerQueries) ListPlayers(ctx context.Context, filters PlayerFilters) 
 		searchLower := strings.ToLower(strings.TrimSpace(filters.Search))
 		countArgs = append(countArgs, "%"+searchLower+"%")
 	}
-	countArgIdx := len(countArgs) + 1
 	if filters.Position != "" {
 		countArgs = append(countArgs, filters.Position)
 	}
