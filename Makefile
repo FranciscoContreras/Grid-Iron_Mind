@@ -1,4 +1,4 @@
-.PHONY: help build build-importer sync-full sync-update sync-live sync-stats sync-injuries clean install-cron logs
+.PHONY: help build build-importer build-diagnose sync-full sync-update sync-live sync-stats sync-injuries diagnose-players clean install-cron logs
 
 # Default target
 help:
@@ -12,6 +12,11 @@ help:
 	@echo "  make sync-stats    - Sync player stats only"
 	@echo "  make sync-injuries - Sync injury reports only"
 	@echo "  make install-cron  - Install automated cron schedule"
+	@echo ""
+	@echo "Diagnostic Commands:"
+	@echo "  make diagnose-players    - Check for missing players (SQL, local)"
+	@echo "  make diagnose-heroku     - Check for missing players (Heroku)"
+	@echo "  make diagnose-players-go - Check for missing players (Go binary)"
 	@echo ""
 	@echo "Historical Import Commands (2010-2024):"
 	@echo "  make build-importer       - Build historical import tool"
@@ -36,6 +41,28 @@ build:
 	@mkdir -p bin logs
 	@go build -o bin/sync2025 cmd/sync2025/main.go
 	@echo "✓ Build complete: bin/sync2025"
+
+# Build diagnostic tool
+build-diagnose:
+	@echo "Building player diagnostic tool..."
+	@mkdir -p bin logs
+	@go build -o bin/diagnose-players cmd/diagnose-players/main.go
+	@echo "✓ Build complete: bin/diagnose-players"
+
+# Run player diagnostic (SQL-based - works without Go)
+diagnose-players:
+	@echo "Running player diagnostic (SQL)..."
+	@psql $(DATABASE_URL) -f scripts/diagnose-missing-players.sql 2>&1 | tee logs/diagnose-players.log
+
+# Run player diagnostic (Go binary - requires Go installed)
+diagnose-players-go: build-diagnose
+	@echo "Running player diagnostic (Go)..."
+	@./bin/diagnose-players 2>&1 | tee -a logs/diagnose-players-go.log
+
+# Run player diagnostic on Heroku production database
+diagnose-heroku:
+	@echo "Running player diagnostic on Heroku..."
+	@bash scripts/heroku-diagnose.sh
 
 # Run full initial sync
 sync-full: build
@@ -116,7 +143,7 @@ import-stats: build-importer
 # Clean built files
 clean:
 	@echo "Cleaning built files..."
-	@rm -f bin/sync2025 bin/import-historical
+	@rm -f bin/sync2025 bin/import-historical bin/diagnose-players
 	@echo "✓ Clean complete"
 
 # Development helpers

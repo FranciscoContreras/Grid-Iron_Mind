@@ -562,6 +562,42 @@ heroku pg:psql < schema.sql
 
 See [HEROKU_DEPLOY.md](HEROKU_DEPLOY.md) for complete deployment guide.
 
+## Data Diagnostics & Health Checks
+
+The project includes comprehensive diagnostic tools to ensure data completeness:
+
+### Check for Missing Players
+
+```bash
+# Run diagnostic on Heroku production database
+make diagnose-heroku
+
+# Or locally (if DATABASE_URL is set)
+make diagnose-players
+```
+
+### What It Checks
+
+- ✅ Top 30 fantasy players for current season
+- ✅ Player count by position
+- ✅ Team roster completeness
+- ✅ Name mismatch detection
+
+### Fix Missing Players
+
+If diagnostic shows missing players:
+
+```bash
+# Sync all team rosters from ESPN
+curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/rosters \
+  -H "X-API-Key: YOUR_API_KEY"
+
+# Or use the sync tool
+make sync-update
+```
+
+See [DIAGNOSTICS.md](DIAGNOSTICS.md) for complete diagnostic guide.
+
 ## Database Schema
 
 Run the schema to create all tables:
