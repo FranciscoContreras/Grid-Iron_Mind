@@ -14,6 +14,7 @@ import (
 	"github.com/francisco/gridironmind/internal/db"
 	"github.com/francisco/gridironmind/internal/handlers"
 	"github.com/francisco/gridironmind/internal/middleware"
+	"github.com/francisco/gridironmind/internal/scheduler"
 	"github.com/francisco/gridironmind/internal/weather"
 	"github.com/francisco/gridironmind/pkg/response"
 )
@@ -55,6 +56,19 @@ func main() {
 		log.Println("Redis URL not configured (caching disabled)")
 	}
 
+	// Initialize and start auto-sync scheduler
+	schedulerConfig := scheduler.DefaultConfig(cfg.WeatherAPIKey)
+
+	// Check for scheduler override from environment
+	if os.Getenv("ENABLE_AUTO_SYNC") == "false" {
+		schedulerConfig.Enabled = false
+		log.Println("Auto-sync scheduler disabled via ENABLE_AUTO_SYNC=false")
+	}
+
+	autoScheduler := scheduler.NewScheduler(schedulerConfig)
+	autoScheduler.Start()
+	defer autoScheduler.Stop()
+
 	// Initialize handlers
 	playersHandler := handlers.NewPlayersHandler()
 	teamsHandler := handlers.NewTeamsHandler()
@@ -66,6 +80,7 @@ func main() {
 	weatherHandler := handlers.NewWeatherHandler(weather.NewClient(cfg.WeatherAPIKey))
 	styleAgentHandler := handlers.NewStyleAgentHandler()
 	metricsHandler := handlers.NewMetricsHandler()
+	schedulerHandler := handlers.NewSchedulerHandler(autoScheduler)
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -119,6 +134,11 @@ func main() {
 
 	// Standings calculation endpoint (POST)
 	mux.HandleFunc("/api/v1/admin/calc/standings", applyPOSTAdminMiddleware(adminHandler.HandleCalculateStandings))
+
+	// Scheduler control endpoints (GET and POST)
+	mux.HandleFunc("/api/v1/admin/scheduler/status", applyGETAdminMiddleware(schedulerHandler.HandleSchedulerStatus))
+	mux.HandleFunc("/api/v1/admin/scheduler/trigger", applyPOSTAdminMiddleware(schedulerHandler.HandleSchedulerTrigger))
+	mux.HandleFunc("/api/v1/admin/scheduler/configure", applyPOSTAdminMiddleware(schedulerHandler.HandleSchedulerConfigure))
 
 	// Weather API endpoints (GET)
 	mux.HandleFunc("/api/v1/weather/current", applyGETMiddleware(weatherHandler.HandleCurrentWeather))
@@ -278,6 +298,21 @@ func applyPOSTAdminMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 			middleware.RecoverPanic(
 				middleware.AdminAuth(
 					middleware.POST(
+						middleware.StandardRateLimit(handler),
+					),
+				),
+			),
+		),
+	)
+}
+
+// applyGETAdminMiddleware applies admin middleware + GET method validation
+func applyGETAdminMiddleware(handler http.HandlerFunc) http.HandlerFunc {
+	return middleware.CORS(
+		middleware.LogRequest(
+			middleware.RecoverPanic(
+				middleware.AdminAuth(
+					middleware.GET(
 						middleware.StandardRateLimit(handler),
 					),
 				),
