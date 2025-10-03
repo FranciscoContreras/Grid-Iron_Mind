@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Analytics - Grid Iron Mind</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@shopify/react-native-skia@1.0.0/dist/index.umd.js"></script>
     <link rel="stylesheet" href="ui-system.css">
     <style>
         * {
@@ -283,338 +279,306 @@
             border-color: rgba(255, 255, 255, 0.4);
         }
 
-        canvas {
-            width: 100%;
-            height: 300px;
-            border-radius: 12px;
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
         }
 
-        .momentum-chart {
-            height: 200px;
-            position: relative;
-        }
-
-        .chart-line {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            border-radius: 9999px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #667eea;
             border-radius: 50%;
-            background: #ef4444;
-            animation: pulse 2s ease-in-out infinite;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="container">
+        <a href="/" class="back-link">
+            <span>←</span>
+            Back to Dashboard
+        </a>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+        <div class="header">
+            <h1>🏈 Game Analytics</h1>
+            <p style="font-size: 18px; opacity: 0.7; margin-top: 12px;">
+                Week 5 • 2025 NFL Season
+            </p>
+        </div>
 
-        const GameAnalytics = () => {
-            const [gameData, setGameData] = useState(null);
-            const [loading, setLoading] = useState(true);
+        <div id="content" class="loading">
+            <div class="spinner"></div>
+            <div style="font-size: 24px;">Loading game analytics...</div>
+        </div>
+    </div>
 
-            useEffect(() => {
-                fetchGameData();
-            }, []);
+    <script>
+        // Fetch and display game data
+        async function loadGameAnalytics() {
+            try {
+                const response = await fetch('/api/v1/games?season=2025&week=5');
+                const data = await response.json();
 
-            const fetchGameData = async () => {
-                try {
-                    const response = await fetch('/api/v1/games?season=2025&week=5');
-                    const data = await response.json();
+                // Find today's game (Oct 3rd)
+                const todayGame = data.data.find(game =>
+                    game.game_date.startsWith('2025-10-03') && game.status === 'completed'
+                );
 
-                    // Find today's game (Oct 3rd)
-                    const todayGame = data.data.find(game =>
-                        game.game_date.startsWith('2025-10-03') && game.status === 'completed'
-                    );
-
-                    setGameData(todayGame);
-                    setLoading(false);
-                } catch (error) {
-                    console.error('Failed to fetch game data:', error);
-                    setLoading(false);
+                if (!todayGame) {
+                    document.getElementById('content').innerHTML = `
+                        <div style="text-align: center; padding: 100px 20px;">
+                            <div style="font-size: 64px; margin-bottom: 20px;">❌</div>
+                            <div style="font-size: 24px;">No completed games found</div>
+                        </div>
+                    `;
+                    return;
                 }
-            };
 
-            if (loading) {
-                return (
-                    <div className="container" style={{textAlign: 'center', paddingTop: '100px'}}>
-                        <div style={{fontSize: '48px', marginBottom: '20px'}}>🏈</div>
-                        <div style={{fontSize: '24px'}}>Loading game analytics...</div>
+                renderGameAnalytics(todayGame);
+            } catch (error) {
+                console.error('Error loading game:', error);
+                document.getElementById('content').innerHTML = `
+                    <div style="text-align: center; padding: 100px 20px;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+                        <div style="font-size: 24px;">Failed to load game data</div>
+                        <div style="font-size: 16px; opacity: 0.6; margin-top: 12px;">${error.message}</div>
                     </div>
-                );
+                `;
             }
+        }
 
-            if (!gameData) {
-                return (
-                    <div className="container" style={{textAlign: 'center', paddingTop: '100px'}}>
-                        <div style={{fontSize: '48px', marginBottom: '20px'}}>❌</div>
-                        <div style={{fontSize: '24px'}}>No game data available</div>
-                    </div>
-                );
-            }
+        function renderGameAnalytics(game) {
+            const winner = game.away_score > game.home_score ? 'away' : 'home';
+            const totalPoints = game.home_score + game.away_score;
+            const awayPercentage = (game.away_score / totalPoints * 100).toFixed(1);
+            const homePercentage = (game.home_score / totalPoints * 100).toFixed(1);
+            const margin = Math.abs(game.away_score - game.home_score);
 
-            const winner = gameData.away_score > gameData.home_score ? 'away' : 'home';
-            const totalPoints = gameData.home_score + gameData.away_score;
-            const awayPercentage = (gameData.away_score / totalPoints * 100).toFixed(1);
-            const homePercentage = (gameData.home_score / totalPoints * 100).toFixed(1);
+            const gameDate = new Date(game.game_date);
+            const formattedDate = gameDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
-            return (
-                <div className="container">
-                    <a href="/" className="back-link">
-                        <span>←</span>
-                        Back to Dashboard
-                    </a>
+            let competitiveness = 'Dominant Victory';
+            if (margin <= 3) competitiveness = 'Extremely Close';
+            else if (margin <= 7) competitiveness = 'Competitive';
+            else if (margin <= 14) competitiveness = 'Decisive';
 
-                    <div className="header">
-                        <h1>🏈 Game Analytics</h1>
-                        <p style={{fontSize: '18px', opacity: 0.7', marginTop: '12px'}}>
-                            Week 5 • 2025 NFL Season
-                        </p>
-                    </div>
+            let gameType = 'Shootout';
+            if (totalPoints < 35) gameType = 'Defensive Battle';
+            else if (totalPoints < 45) gameType = 'Balanced Game';
+            else if (totalPoints < 55) gameType = 'High Scoring';
 
-                    {/* Game Header */}
-                    <div className="game-header">
-                        <div className="game-teams">
-                            <div className="team">
-                                <div className="team-logo">{gameData.away_team_abbr}</div>
-                                <div className="team-name">{gameData.away_team_name}</div>
-                                <div className="team-score">{gameData.away_score}</div>
-                                {winner === 'away' && (
-                                    <div className="winner-badge">WINNER</div>
-                                )}
-                            </div>
-
-                            <div className="vs">VS</div>
-
-                            <div className="team">
-                                <div className="team-logo">{gameData.home_team_abbr}</div>
-                                <div className="team-name">{gameData.home_team_name}</div>
-                                <div className="team-score">{gameData.home_score}</div>
-                                {winner === 'home' && (
-                                    <div className="winner-badge">WINNER</div>
-                                )}
-                            </div>
+            document.getElementById('content').innerHTML = `
+                <!-- Game Header -->
+                <div class="game-header">
+                    <div class="game-teams">
+                        <div class="team">
+                            <div class="team-logo">${game.away_team_abbr}</div>
+                            <div class="team-name">${game.away_team_name}</div>
+                            <div class="team-score">${game.away_score}</div>
+                            ${winner === 'away' ? '<div class="winner-badge">WINNER</div>' : ''}
                         </div>
 
-                        <div className="game-meta">
-                            {new Date(gameData.game_date).toLocaleDateString('en-US', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })} • {gameData.status.toUpperCase()}
+                        <div class="vs">VS</div>
+
+                        <div class="team">
+                            <div class="team-logo">${game.home_team_abbr}</div>
+                            <div class="team-name">${game.home_team_name}</div>
+                            <div class="team-score">${game.home_score}</div>
+                            ${winner === 'home' ? '<div class="winner-badge">WINNER</div>' : ''}
                         </div>
                     </div>
 
-                    {/* Analytics Grid */}
-                    <div className="analytics-grid">
-                        {/* Score Distribution */}
-                        <div className="analytics-card">
-                            <div className="card-content">
-                                <div className="card-title">
-                                    <div className="card-icon">📊</div>
-                                    Score Distribution
-                                </div>
+                    <div class="game-meta">
+                        ${formattedDate} • ${game.status.toUpperCase()}
+                    </div>
+                </div>
 
-                                <div className="stat-bar-container">
-                                    <div className="stat-label">
-                                        <span>{gameData.away_team_name}</span>
-                                        <span>{awayPercentage}%</span>
-                                    </div>
-                                    <div className="stat-bar">
-                                        <div className="stat-fill" style={{
-                                            width: `${awayPercentage}%`,
-                                            background: 'linear-gradient(90deg, #f093fb 0%, #f5576c 100%)'
-                                        }}></div>
-                                    </div>
-                                </div>
+                <!-- Analytics Grid -->
+                <div class="analytics-grid">
+                    <!-- Score Distribution -->
+                    <div class="analytics-card">
+                        <div class="card-content">
+                            <div class="card-title">
+                                <div class="card-icon">📊</div>
+                                Score Distribution
+                            </div>
 
-                                <div className="stat-bar-container">
-                                    <div className="stat-label">
-                                        <span>{gameData.home_team_name}</span>
-                                        <span>{homePercentage}%</span>
-                                    </div>
-                                    <div className="stat-bar">
-                                        <div className="stat-fill" style={{
-                                            width: `${homePercentage}%`,
-                                            background: 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)'
-                                        }}></div>
-                                    </div>
+                            <div class="stat-bar-container">
+                                <div class="stat-label">
+                                    <span>${game.away_team_name}</span>
+                                    <span>${awayPercentage}%</span>
                                 </div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" style="width: ${awayPercentage}%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);"></div>
+                                </div>
+                            </div>
 
-                                <div style={{marginTop: '32px', padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px'}}>
-                                    <div style={{fontSize: '14px', opacity: 0.8', marginBottom: '8px'}}>Total Points</div>
-                                    <div style={{fontSize: '48px', fontWeight: '900', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
-                                        {totalPoints}
+                            <div class="stat-bar-container">
+                                <div class="stat-label">
+                                    <span>${game.home_team_name}</span>
+                                    <span>${homePercentage}%</span>
+                                </div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill" style="width: ${homePercentage}%; background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);"></div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 32px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 8px;">Total Points</div>
+                                <div style="font-size: 48px; font-weight: 900; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                    ${totalPoints}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Point Difference -->
+                    <div class="analytics-card">
+                        <div class="card-content">
+                            <div class="card-title">
+                                <div class="card-icon">🎯</div>
+                                Game Margin
+                            </div>
+
+                            <div style="text-align: center; padding: 40px 0;">
+                                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 12px;">
+                                    Victory Margin
+                                </div>
+                                <div style="font-size: 96px; font-weight: 900; background: linear-gradient(135deg, #00d4ff 0%, #00c6ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1;">
+                                    ${margin}
+                                </div>
+                                <div style="font-size: 18px; opacity: 0.7; margin-top: 12px;">
+                                    points
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+                                <div style="padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px;">Average Score</div>
+                                    <div style="font-size: 24px; font-weight: 700;">${(totalPoints / 2).toFixed(1)}</div>
+                                </div>
+                                <div style="padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px;">Margin %</div>
+                                    <div style="font-size: 24px; font-weight: 700;">
+                                        ${(margin / totalPoints * 100).toFixed(1)}%
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Point Difference */}
-                        <div className="analytics-card">
-                            <div className="card-content">
-                                <div className="card-title">
-                                    <div className="card-icon">🎯</div>
-                                    Game Margin
+                    <!-- Scoring Pace -->
+                    <div class="analytics-card">
+                        <div class="card-content">
+                            <div class="card-title">
+                                <div class="card-icon">⚡</div>
+                                Scoring Analysis
+                            </div>
+
+                            <div class="comparison-bars">
+                                <div class="comparison-row">
+                                    <div class="stat-name">Quarter Avg</div>
+                                    <div class="bars-container">
+                                        <div class="bar bar-away" style="width: ${game.away_score / 4 * 10}%;">
+                                            ${(game.away_score / 4).toFixed(1)}
+                                        </div>
+                                        <div class="bar bar-home" style="width: ${game.home_score / 4 * 10}%;">
+                                            ${(game.home_score / 4).toFixed(1)}
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div style={{textAlign: 'center', padding: '40px 0'}}>
-                                    <div style={{fontSize: '14px', opacity: 0.8', marginBottom: '12px'}}>
-                                        Victory Margin
-                                    </div>
-                                    <div style={{fontSize: '96px', fontWeight: '900', background: 'linear-gradient(135deg, #00d4ff 0%, #00c6ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: '1'}}>
-                                        {Math.abs(gameData.away_score - gameData.home_score)}
-                                    </div>
-                                    <div style={{fontSize: '18px', opacity: 0.7', marginTop: '12px'}}>
-                                        points
-                                    </div>
-                                </div>
-
-                                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '20px'}}>
-                                    <div style={{padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', textAlign: 'center'}}>
-                                        <div style={{fontSize: '12px', opacity: 0.7', marginBottom: '4px'}}>Average Score</div>
-                                        <div style={{fontSize: '24px', fontWeight: '700'}}>{(totalPoints / 2).toFixed(1)}</div>
-                                    </div>
-                                    <div style={{padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', textAlign: 'center'}}>
-                                        <div style={{fontSize: '12px', opacity: 0.7', marginBottom: '4px'}}>Margin %</div>
-                                        <div style={{fontSize: '24px', fontWeight: '700'}}>
-                                            {(Math.abs(gameData.away_score - gameData.home_score) / totalPoints * 100).toFixed(1)}%
+                                <div class="comparison-row">
+                                    <div class="stat-name">Half Avg</div>
+                                    <div class="bars-container">
+                                        <div class="bar bar-away" style="width: ${game.away_score / 2 * 5}%;">
+                                            ${(game.away_score / 2).toFixed(1)}
+                                        </div>
+                                        <div class="bar bar-home" style="width: ${game.home_score / 2 * 5}%;">
+                                            ${(game.home_score / 2).toFixed(1)}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Scoring Pace */}
-                        <div className="analytics-card">
-                            <div className="card-content">
-                                <div className="card-title">
-                                    <div className="card-icon">⚡</div>
-                                    Scoring Analysis
-                                </div>
-
-                                <div className="comparison-bars">
-                                    <div className="comparison-row">
-                                        <div className="stat-name">Quarter Avg</div>
-                                        <div className="bars-container">
-                                            <div className="bar bar-away" style={{width: `${gameData.away_score / 4 * 10}%`}}>
-                                                {(gameData.away_score / 4).toFixed(1)}
-                                            </div>
-                                            <div className="bar bar-home" style={{width: `${gameData.home_score / 4 * 10}%`}}>
-                                                {(gameData.home_score / 4).toFixed(1)}
-                                            </div>
-                                        </div>
+                            <div style="margin-top: 32px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 12px;">Estimated Possessions</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 12px; opacity: 0.6; margin-bottom: 4px;">${game.away_team_abbr}</div>
+                                        <div style="font-size: 32px; font-weight: 700;">~${Math.ceil(game.away_score / 7)}</div>
                                     </div>
-
-                                    <div className="comparison-row">
-                                        <div className="stat-name">Half Avg</div>
-                                        <div className="bars-container">
-                                            <div className="bar bar-away" style={{width: `${gameData.away_score / 2 * 5}%`}}>
-                                                {(gameData.away_score / 2).toFixed(1)}
-                                            </div>
-                                            <div className="bar bar-home" style={{width: `${gameData.home_score / 2 * 5}%`}}>
-                                                {(gameData.home_score / 2).toFixed(1)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div style={{marginTop: '32px', padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px'}}>
-                                    <div style={{fontSize: '14px', opacity: 0.8', marginBottom: '12px'}}>Estimated Possessions</div>
-                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                        <div>
-                                            <div style={{fontSize: '12px', opacity: 0.6', marginBottom: '4px'}}>{gameData.away_team_abbr}</div>
-                                            <div style={{fontSize: '32px', fontWeight: '700'}}>~{Math.ceil(gameData.away_score / 7)}</div>
-                                        </div>
-                                        <div style={{fontSize: '24px', opacity: 0.3'}}>|</div>
-                                        <div style={{textAlign: 'right'}}>
-                                            <div style={{fontSize: '12px', opacity: 0.6', marginBottom: '4px'}}>{gameData.home_team_abbr}</div>
-                                            <div style={{fontSize: '32px', fontWeight: '700'}}>~{Math.ceil(gameData.home_score / 7)}</div>
-                                        </div>
+                                    <div style="font-size: 24px; opacity: 0.3;">|</div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 12px; opacity: 0.6; margin-bottom: 4px;">${game.home_team_abbr}</div>
+                                        <div style="font-size: 32px; font-weight: 700;">~${Math.ceil(game.home_score / 7)}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Game Flow */}
-                        <div className="analytics-card">
-                            <div className="card-content">
-                                <div className="card-title">
-                                    <div className="card-icon">📈</div>
-                                    Game Insights
+                    <!-- Game Flow -->
+                    <div class="analytics-card">
+                        <div class="card-content">
+                            <div class="card-title">
+                                <div class="card-icon">📈</div>
+                                Game Insights
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 20px;">
+                                <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                    <div style="font-size: 14px; opacity: 0.8; margin-bottom: 8px;">Offensive Efficiency</div>
+                                    <div style="font-size: 18px; font-weight: 600;">
+                                        ${winner === 'away' ? game.away_team_name : game.home_team_name} dominated
+                                    </div>
+                                    <div style="font-size: 14px; opacity: 0.6; margin-top: 8px;">
+                                        Winner averaged ${winner === 'away' ? (game.away_score / 4).toFixed(1) : (game.home_score / 4).toFixed(1)} points per quarter
+                                    </div>
                                 </div>
 
-                                <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-                                    <div style={{padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px'}}>
-                                        <div style={{fontSize: '14px', opacity: 0.8', marginBottom: '8px'}}>Offensive Efficiency</div>
-                                        <div style={{fontSize: '18px', fontWeight: '600'}}>
-                                            {gameData.away_score > gameData.home_score ? gameData.away_team_name : gameData.home_team_name} dominated
-                                        </div>
-                                        <div style={{fontSize: '14px', opacity: 0.6', marginTop: '8px'}}>
-                                            Winner averaged {winner === 'away' ? (gameData.away_score / 4).toFixed(1) : (gameData.home_score / 4).toFixed(1)} points per quarter
-                                        </div>
+                                <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                    <div style="font-size: 14px; opacity: 0.8; margin-bottom: 8px;">Competitive Balance</div>
+                                    <div style="font-size: 18px; font-weight: 600;">
+                                        ${competitiveness}
                                     </div>
-
-                                    <div style={{padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px'}}>
-                                        <div style={{fontSize: '14px', opacity: 0.8', marginBottom: '8px'}}>Competitive Balance</div>
-                                        <div style={{fontSize: '18px', fontWeight: '600'}}>
-                                            {Math.abs(gameData.away_score - gameData.home_score) <= 3 ? 'Extremely Close' :
-                                             Math.abs(gameData.away_score - gameData.home_score) <= 7 ? 'Competitive' :
-                                             Math.abs(gameData.away_score - gameData.home_score) <= 14 ? 'Decisive' :
-                                             'Dominant Victory'}
-                                        </div>
-                                        <div style={{fontSize: '14px', opacity: 0.6', marginTop: '8px'}}>
-                                            {Math.abs(gameData.away_score - gameData.home_score)} point margin
-                                        </div>
+                                    <div style="font-size: 14px; opacity: 0.6; margin-top: 8px;">
+                                        ${margin} point margin
                                     </div>
+                                </div>
 
-                                    <div style={{padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px'}}>
-                                        <div style={{fontSize: '14px', opacity: 0.8', marginBottom: '8px'}}>Total Points Classification</div>
-                                        <div style={{fontSize: '18px', fontWeight: '600'}}>
-                                            {totalPoints < 35 ? 'Defensive Battle' :
-                                             totalPoints < 45 ? 'Balanced Game' :
-                                             totalPoints < 55 ? 'High Scoring' :
-                                             'Shootout'}
-                                        </div>
-                                        <div style={{fontSize: '14px', opacity: 0.6', marginTop: '8px'}}>
-                                            {totalPoints} combined points
-                                        </div>
+                                <div style="padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                    <div style="font-size: 14px; opacity: 0.8; margin-bottom: 8px;">Total Points Classification</div>
+                                    <div style="font-size: 18px; font-weight: 600;">
+                                        ${gameType}
+                                    </div>
+                                    <div style="font-size: 14px; opacity: 0.6; margin-top: 8px;">
+                                        ${totalPoints} combined points
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            );
-        };
+            `;
+        }
 
-        ReactDOM.render(<GameAnalytics />, document.getElementById('root'));
+        // Load on page load
+        window.addEventListener('DOMContentLoaded', loadGameAnalytics);
     </script>
 </body>
 </html>
