@@ -396,6 +396,7 @@
             <h3>Resources</h3>
 
             <div class="nav-section">
+                <a href="#yahoo" class="nav-link">Yahoo Fantasy API</a>
                 <a href="#errors" class="nav-link">Error Handling</a>
                 <a href="#rate-limits" class="nav-link">Rate Limits</a>
                 <a href="#pagination" class="nav-link">Pagination</a>
@@ -1035,6 +1036,215 @@
   "query": "Who are the top 5 rushing leaders this season?"
 }</code></pre>
                     </div>
+                </div>
+            </section>
+
+            <!-- Yahoo Fantasy API -->
+            <section id="yahoo" class="section">
+                <h2>🏈 Yahoo Fantasy API Integration</h2>
+                <p>Test and explore Yahoo Fantasy Sports API integration. Access user data, leagues, teams, and more from Yahoo Fantasy Football.</p>
+
+                <div class="info-box" style="margin: 1.5rem 0;">
+                    <p><strong>OAuth Setup Required:</strong> Yahoo Fantasy API requires OAuth authentication. Complete the one-time setup at <a href="/yahoo" style="color: var(--accent-blue);">/yahoo</a> to authorize the application.</p>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/v1/yahoo/user</span>
+                    </div>
+                    <p class="endpoint-description">Get authenticated Yahoo user information.</p>
+
+                    <h4>Response Example</h4>
+                    <div class="code-block">
+                        <pre><code>{
+  "data": {
+    "fantasy_content": {
+      "users": {
+        "0": {
+          "user": {
+            "guid": "USER_GUID",
+            "games": [...],
+            "...": "..."
+          }
+        }
+      }
+    }
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/v1/yahoo/leagues</span>
+                    </div>
+                    <p class="endpoint-description">Get all fantasy leagues for the authenticated user.</p>
+
+                    <h4>Response Example</h4>
+                    <div class="code-block">
+                        <pre><code>{
+  "data": {
+    "fantasy_content": {
+      "users": {
+        "0": {
+          "user": {
+            "games": {
+              "0": {
+                "game": {
+                  "leagues": {
+                    "0": {
+                      "league": {
+                        "league_key": "449.l.123456",
+                        "name": "My League",
+                        "...": "..."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/v1/yahoo/league/:leagueKey</span>
+                    </div>
+                    <p class="endpoint-description">Get detailed information about a specific league.</p>
+
+                    <h4>Path Parameters</h4>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>leagueKey</code></td>
+                                <td>string</td>
+                                <td>Yahoo league key (e.g., "449.l.123456")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/v1/yahoo/team/:teamKey</span>
+                    </div>
+                    <p class="endpoint-description">Get roster information for a specific team.</p>
+
+                    <h4>Path Parameters</h4>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>teamKey</code></td>
+                                <td>string</td>
+                                <td>Yahoo team key (e.g., "449.l.123456.t.1")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-header">
+                        <span class="method-badge get">GET</span>
+                        <span class="endpoint-path">/api/v1/yahoo/raw</span>
+                    </div>
+                    <p class="endpoint-description">Make a raw Yahoo Fantasy API call with a custom endpoint.</p>
+
+                    <h4>Query Parameters</h4>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>url</code></td>
+                                <td>string</td>
+                                <td>Yahoo API endpoint path (e.g., "users;use_login=1/games")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Example Request</h4>
+                    <div class="code-block">
+                        <pre><code>curl "https://nfl.wearemachina.com/api/v1/yahoo/raw?url=users;use_login=1/games"</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 1.5rem; background: rgba(0, 122, 255, 0.05); border-left: 4px solid var(--accent-blue);">
+                    <p><strong>🧪 Interactive Test Page:</strong> Visit <a href="/yahoo-test.html" style="color: var(--accent-blue);">/yahoo-test.html</a> for an interactive testing interface where you can explore all Yahoo Fantasy API endpoints.</p>
+                </div>
+
+                <h3 style="margin-top: 2rem;">Yahoo Fantasy Data Tables</h3>
+                <p style="color: var(--gray-600); margin-bottom: 1rem;">The following database tables store enriched Yahoo Fantasy data:</p>
+
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>yahoo_player_rankings</code></td>
+                            <td>Weekly fantasy rankings by position and scoring format</td>
+                        </tr>
+                        <tr>
+                            <td><code>yahoo_player_projections</code></td>
+                            <td>Fantasy point projections for upcoming games</td>
+                        </tr>
+                        <tr>
+                            <td><code>yahoo_fantasy_leagues</code></td>
+                            <td>League metadata and settings</td>
+                        </tr>
+                        <tr>
+                            <td><code>yahoo_player_matchup_advice</code></td>
+                            <td>Start/sit recommendations and matchup analysis</td>
+                        </tr>
+                        <tr>
+                            <td><code>yahoo_player_news</code></td>
+                            <td>Player news, injury updates, and analysis</td>
+                        </tr>
+                        <tr>
+                            <td><code>yahoo_transaction_trends</code></td>
+                            <td>Add/drop activity and waiver wire trends</td>
+                        </tr>
+                        <tr>
+                            <td><code>yahoo_oauth_tokens</code></td>
+                            <td>Encrypted OAuth tokens for API access</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box" style="margin-top: 1.5rem;">
+                    <p><strong>Note:</strong> Yahoo Fantasy data enriches existing player and game data. All Yahoo tables link to the main <code>players</code> table via <code>player_id</code> for seamless integration with NFL statistics.</p>
                 </div>
             </section>
 
