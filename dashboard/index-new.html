@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Iron Mind - NFL Data Explorer</title>
+    <link rel="stylesheet" href="ui-system.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--soft-text);
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: var(--soft-text-light);
+        }
+
+        /* Search Container */
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 9999px;
+            padding: 8px 8px 8px 60px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+        }
+
+        .search-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.08) 0%, rgba(100, 150, 255, 0.08) 50%, rgba(255, 200, 150, 0.05) 100%);
+            opacity: 1;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--soft-text-light);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: none;
+            background: transparent;
+            color: var(--soft-text);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--soft-text-lighter);
+        }
+
+        /* Results Container */
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .results-count {
+            font-size: 16px;
+            color: var(--soft-text-light);
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-pill {
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--soft-text-light);
+        }
+
+        .filter-pill.active {
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.15) 0%, rgba(100, 150, 255, 0.15) 50%, rgba(255, 200, 150, 0.1) 100%);
+            border-color: rgba(100, 150, 255, 0.3);
+            color: var(--soft-text);
+            font-weight: 500;
+        }
+
+        .filter-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .result-card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-2xl);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.08) 0%, rgba(100, 150, 255, 0.08) 50%, rgba(255, 200, 150, 0.05) 100%);
+            opacity: 1;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .result-card:hover::before {
+            opacity: 1.3;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: white;
+        }
+
+        .card-title {
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--soft-text);
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--soft-text-light);
+        }
+
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--soft-text-lighter);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--soft-text);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: rgba(100, 150, 255, 0.6);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: var(--soft-text-light);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--soft-text);
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: var(--soft-text-light);
+        }
+
+        /* Detail View */
+        .detail-view {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .detail-view.active {
+            display: block;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--soft-text);
+        }
+
+        .back-button:hover {
+            transform: translateX(-4px);
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-2xl);
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(150, 130, 200, 0.08) 0%, rgba(100, 150, 255, 0.08) 50%, rgba(255, 200, 150, 0.05) 100%);
+            z-index: -1;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--soft-text);
+            margin-bottom: 16px;
+        }
+
+        .stats-table {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .stats-table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--soft-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .stats-table td {
+            font-size: 14px;
+            color: var(--soft-text);
+        }
+
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .stats-table tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🏈 Grid Iron Mind</h1>
+        <p>Explore NFL players and teams</p>
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+                type="text"
+                class="search-input"
+                id="searchInput"
+                placeholder="Search for players or teams..."
+                autocomplete="off"
+            >
+        </div>
+    </div>
+
+    <!-- Results Container -->
+    <div class="results-container" id="resultsContainer">
+        <div class="results-header">
+            <div class="results-count" id="resultsCount">Search for players or teams to get started</div>
+            <div class="filter-pills">
+                <div class="filter-pill active" data-filter="all">All</div>
+                <div class="filter-pill" data-filter="players">Players</div>
+                <div class="filter-pill" data-filter="teams">Teams</div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState" style="display: none;">
+            <div class="spinner"></div>
+            <div class="loading-text">Searching...</div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🏈</div>
+            <div class="empty-title">Ready to explore</div>
+            <div class="empty-text">Start typing to search for your favorite players and teams</div>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="results-grid" id="resultsGrid" style="display: none;"></div>
+    </div>
+
+    <!-- Detail View (Player) -->
+    <div class="detail-view" id="playerDetailView">
+        <button class="back-button" onclick="goBack()">← Back to search</button>
+
+        <div class="detail-header" id="playerDetailHeader"></div>
+
+        <div class="section-title">Latest Stats (2023 Season)</div>
+        <table class="stats-table" id="playerStatsTable"></table>
+
+        <div class="section-title">Game History</div>
+        <div id="playerGameHistory"></div>
+    </div>
+
+    <!-- Detail View (Team) -->
+    <div class="detail-view" id="teamDetailView">
+        <button class="back-button" onclick="goBack()">← Back to search</button>
+
+        <div class="detail-header" id="teamDetailHeader"></div>
+
+        <div class="section-title">Current Schedule (2024)</div>
+        <table class="stats-table" id="teamScheduleTable"></table>
+
+        <div class="section-title">Past Seasons</div>
+        <div id="teamPastSeasons"></div>
+    </div>
+
+    <script src="search.js"></script>
+</body>
+</html>

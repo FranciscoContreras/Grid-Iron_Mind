@@ -10,14 +10,26 @@ import (
 
 // Config holds all application configuration
 type Config struct {
-	Environment     string
-	DatabaseURL     string
-	RedisURL        string
-	APIKey          string
-	UnlimitedAPIKey string
-	WeatherAPIKey   string
-	DBMaxConns      int32
-	DBMinConns      int32
+	Environment       string
+	DatabaseURL       string
+	RedisURL          string
+	APIKey            string
+	UnlimitedAPIKey   string
+	WeatherAPIKey     string
+	YahooClientID     string
+	YahooClientSecret string
+	YahooRefreshToken string
+	DBMaxConns        int32
+	DBMinConns        int32
+}
+
+// LoadConfig reads configuration from environment variables (convenience wrapper)
+func LoadConfig() *Config {
+	cfg, err := Load()
+	if err != nil {
+		panic(fmt.Sprintf("Failed to load config: %v", err))
+	}
+	return cfg
 }
 
 // Load reads configuration from environment variables
@@ -26,14 +38,17 @@ func Load() (*Config, error) {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		Environment:     getEnv("ENVIRONMENT", "development"),
-		DatabaseURL:     getEnv("DATABASE_URL", ""),
-		RedisURL:        getEnv("REDIS_URL", ""),
-		APIKey:          getEnv("API_KEY", ""),
-		UnlimitedAPIKey: getEnv("UNLIMITED_API_KEY", ""),
-		WeatherAPIKey:   getEnv("WEATHER_API_KEY", ""),
-		DBMaxConns:      int32(getEnvInt("DB_MAX_CONNS", 25)),
-		DBMinConns:      int32(getEnvInt("DB_MIN_CONNS", 5)),
+		Environment:       getEnv("ENVIRONMENT", "development"),
+		DatabaseURL:       getEnv("DATABASE_URL", ""),
+		RedisURL:          getEnv("REDIS_URL", ""),
+		APIKey:            getEnv("API_KEY", ""),
+		UnlimitedAPIKey:   getEnv("UNLIMITED_API_KEY", ""),
+		WeatherAPIKey:     getEnv("WEATHER_API_KEY", ""),
+		YahooClientID:     getEnv("YAHOO_CLIENT_ID", ""),
+		YahooClientSecret: getEnv("YAHOO_CLIENT_SECRET", ""),
+		YahooRefreshToken: getEnv("YAHOO_REFRESH_TOKEN", ""),
+		DBMaxConns:        int32(getEnvInt("DB_MAX_CONNS", 25)),
+		DBMinConns:        int32(getEnvInt("DB_MIN_CONNS", 5)),
 	}
 
 	// Validate required fields

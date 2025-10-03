@@ -55,6 +55,27 @@ func NewClient(cfg Config) *Client {
 	}
 }
 
+// NewClientWithToken creates a new Yahoo client with an existing OAuth2 token
+func NewClientWithToken(clientID, clientSecret string, token *oauth2.Token) *Client {
+	oauth2Config := &oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  authURL,
+			TokenURL: tokenURL,
+		},
+		Scopes: []string{},
+	}
+
+	client := &Client{
+		config: oauth2Config,
+		token:  token,
+	}
+	client.httpClient = oauth2Config.Client(context.Background(), token)
+
+	return client
+}
+
 // SetToken sets the OAuth2 token for authenticated requests
 func (c *Client) SetToken(token *oauth2.Token) {
 	c.token = token
