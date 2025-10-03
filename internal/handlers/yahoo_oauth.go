@@ -56,6 +56,10 @@ func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
 		`, yahooOAuthConfig.ClientID[:20], yahooOAuthConfig.RedirectURL)
 	}
 
+	// Build the OAuth URL for debugging
+	oauthURL := fmt.Sprintf("https://api.login.yahoo.com/oauth2/request_auth?client_id=%s&redirect_uri=%s&response_type=code&state=%s",
+		clientID, redirectURL, state)
+
 	html := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -125,7 +129,7 @@ func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
             <h3>🔍 Debug Information:</h3>
             <p style="font-size: 12px; word-break: break-all;">
                 <strong>OAuth URL that will be generated:</strong><br>
-                <code style="font-size: 11px;">https://api.login.yahoo.com/oauth2/request_auth?client_id=%s&redirect_uri=%s&response_type=code&state=%s</code>
+                <code style="font-size: 11px;">%s</code>
             </p>
             <p style="font-size: 11px; margin-top: 10px;">
                 ℹ️ This is what we'll send to Yahoo. Make sure the redirect_uri matches EXACTLY what's in your Yahoo app settings.
@@ -134,7 +138,7 @@ func HandleYahooAuthHome(w http.ResponseWriter, r *http.Request) {
     </div>
 </body>
 </html>
-`, configInfo, clientID, redirectURL, state)
+`, configInfo, oauthURL)
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, html)
 }
