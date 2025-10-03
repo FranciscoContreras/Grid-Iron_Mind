@@ -21,6 +21,7 @@
    - [Injuries](#injury-endpoints)
    - [Career Stats](#career-endpoints)
    - [Weather](#weather-endpoints)
+   - [Yahoo Fantasy](#yahoo-fantasy-endpoints)
    - [AI Features](#ai-endpoints)
    - [AI Data Garden](#ai-data-garden-endpoints)
    - [Admin](#admin-endpoints)
@@ -39,7 +40,8 @@ Grid Iron Mind is a high-performance NFL data API providing:
 - 🤖 AI-powered predictions and insights
 - 🌡️ Weather data and game conditions
 - 🏥 Injury reports and tracking
-- 📈 Fantasy football analytics
+- 📈 Fantasy football analytics powered by Yahoo Sports API
+- 🏆 Player rankings, projections, and ownership data
 - 🎯 Defensive matchup analysis
 
 ### Key Features
@@ -797,6 +799,229 @@ GET /api/v1/weather/forecast
 **Query Parameters:**
 - `location` OR `lat`+`lon` (required)
 - `days` (int, optional) - Forecast days (default: 7, max: 14)
+
+---
+
+## Yahoo Fantasy Endpoints
+
+**🏆 Fantasy Football Data from Yahoo Sports API**
+
+The Yahoo Fantasy endpoints provide comprehensive fantasy football data including player rankings, projections, ownership percentages, and matchup advice powered by Yahoo's official Fantasy Sports API.
+
+### Get Player Rankings
+
+```http
+GET /api/v1/fantasy/rankings
+```
+
+**Query Parameters:**
+- `position` (string, optional) - Filter by position (QB, RB, WR, TE, K, DEF)
+- `limit` (int, optional) - Results per page (default: 50, max: 100)
+- `season` (int, optional) - Season year (default: current season)
+- `week` (int, optional) - Week number (default: current week)
+
+**Example:**
+```http
+GET /api/v1/fantasy/rankings?position=RB&limit=25&week=5
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "season": 2025,
+    "week": 5,
+    "position": "RB",
+    "count": 25,
+    "players": [
+      {
+        "id": "uuid",
+        "name": "Christian McCaffrey",
+        "position": "RB",
+        "team": "SF",
+        "overall_rank": 1,
+        "position_rank": 1,
+        "percent_owned": 99.8,
+        "yahoo_player_key": "nfl.p.31046"
+      }
+    ]
+  },
+  "meta": {
+    "timestamp": "2025-10-03T19:00:00Z"
+  }
+}
+```
+
+---
+
+### Get Player Projection
+
+```http
+GET /api/v1/fantasy/projections/:playerId
+```
+
+**Path Parameters:**
+- `playerId` (uuid, required) - Player UUID
+
+**Query Parameters:**
+- `season` (int, optional) - Season year (default: current season)
+- `week` (int, optional) - Week number (default: current week)
+
+**Example:**
+```http
+GET /api/v1/fantasy/projections/a1b2c3d4-e5f6-7890-abcd-ef1234567890?week=5
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "player_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "season": 2025,
+    "week": 5,
+    "projection": {
+      "projected_points": 18.7,
+      "projected_passing_yards": 285,
+      "projected_passing_tds": 2,
+      "projected_rushing_yards": 35,
+      "projected_rushing_tds": 0,
+      "projected_receptions": null,
+      "projected_receiving_yards": null,
+      "projected_receiving_tds": null
+    }
+  },
+  "meta": {
+    "timestamp": "2025-10-03T19:00:00Z"
+  }
+}
+```
+
+---
+
+### Get Top Projected Players
+
+```http
+GET /api/v1/fantasy/projections
+```
+
+**Query Parameters:**
+- `position` (string, optional) - Filter by position (QB, RB, WR, TE, K, DEF)
+- `limit` (int, optional) - Results per page (default: 25, max: 100)
+- `season` (int, optional) - Season year (default: current season)
+- `week` (int, optional) - Week number (default: current week)
+
+**Example:**
+```http
+GET /api/v1/fantasy/projections?position=WR&limit=20&week=5
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "season": 2025,
+    "week": 5,
+    "position": "WR",
+    "count": 20,
+    "players": [
+      {
+        "id": "uuid",
+        "name": "Tyreek Hill",
+        "position": "WR",
+        "team": "MIA",
+        "projected_points": 16.8,
+        "projected_receptions": 7,
+        "projected_receiving_yards": 92,
+        "projected_receiving_tds": 1
+      }
+    ]
+  },
+  "meta": {
+    "timestamp": "2025-10-03T19:00:00Z"
+  }
+}
+```
+
+---
+
+### Get Ownership Data
+
+```http
+GET /api/v1/fantasy/ownership
+```
+
+**Query Parameters:**
+- `position` (string, optional) - Filter by position
+- `min_owned` (float, optional) - Minimum ownership percentage (default: 0.0)
+- `limit` (int, optional) - Results per page (default: 50, max: 100)
+- `season` (int, optional) - Season year (default: current season)
+- `week` (int, optional) - Week number (default: current week)
+
+**Example:**
+```http
+GET /api/v1/fantasy/ownership?position=QB&min_owned=50.0&limit=20
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "season": 2025,
+    "week": 5,
+    "position": "QB",
+    "count": 20,
+    "players": [
+      {
+        "id": "uuid",
+        "name": "Patrick Mahomes",
+        "position": "QB",
+        "team": "KC",
+        "percent_owned": 98.5,
+        "overall_rank": 3,
+        "position_rank": 1
+      }
+    ]
+  },
+  "meta": {
+    "timestamp": "2025-10-03T19:00:00Z"
+  }
+}
+```
+
+---
+
+### Fantasy Data Features
+
+**Data Sources:**
+- Official Yahoo Fantasy Sports API
+- Real-time rankings and ownership percentages
+- Weekly projections for all positions
+- Matchup advice and trend analysis
+
+**Supported Positions:**
+- QB (Quarterback)
+- RB (Running Back)
+- WR (Wide Receiver)
+- TE (Tight End)
+- K (Kicker)
+- DEF (Team Defense/Special Teams)
+
+**Scoring Formats:**
+- Standard scoring (default)
+- PPR (Points Per Reception) - coming soon
+- Half-PPR - coming soon
+
+**Update Frequency:**
+- Rankings: Updated hourly during game days
+- Projections: Updated daily, more frequently near game time
+- Ownership: Updated every 15 minutes during active periods
+
+**Use Cases:**
+- Fantasy lineup optimization
+- Waiver wire decisions
+- Trade value analysis
+- Start/sit decisions
+- Sleeper identification
 
 ---
 
