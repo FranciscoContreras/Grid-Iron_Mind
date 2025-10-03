@@ -139,8 +139,68 @@ func HandleYahooCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.URL.Query().Get("state") != yahooState {
-		http.Error(w, "State mismatch", http.StatusBadRequest)
+	receivedState := r.URL.Query().Get("state")
+	if receivedState != yahooState {
+		// More helpful error message
+		html := fmt.Sprintf(`
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Error - Grid Iron Mind</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%%, #ee5a6f 100%%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #fff;
+            color: #ee5a6f;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>❌ OAuth State Mismatch</h1>
+        <p>The OAuth state parameter doesn't match. This usually happens if:</p>
+        <ul>
+            <li>You refreshed the page or went back in your browser</li>
+            <li>The OAuth flow timed out</li>
+            <li>You tried multiple times</li>
+        </ul>
+        <p><strong>Solution:</strong> Start the OAuth flow from the beginning.</p>
+        <a href="/yahoo" class="btn">🔄 Try Again</a>
+        <p style="margin-top: 30px; font-size: 12px; opacity: 0.8;">
+            Expected state: <code>%s</code><br>
+            Received state: <code>%s</code>
+        </p>
+    </div>
+</body>
+</html>
+`, yahooState, receivedState)
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, html)
 		return
 	}
 
