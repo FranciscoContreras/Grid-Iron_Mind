@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yahoo API Test - Grid Iron Mind</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #764ba2;
+            margin-top: 0;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .test-section h3 {
+            color: #764ba2;
+            margin-top: 0;
+        }
+
+        .test-section p {
+            color: #666;
+            margin: 10px 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .response-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+
+        .response-box.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .endpoint-info {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .endpoint-info code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        .clear-btn {
+            background: #6c757d;
+            font-size: 14px;
+            padding: 8px 20px;
+        }
+
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏈 Yahoo Fantasy Sports API - Test Dashboard</h1>
+        <p>Test your Yahoo API integration by calling various endpoints. All requests use your configured refresh token.</p>
+
+        <!-- Test 1: User Info -->
+        <div class="test-section">
+            <h3>1. Get User Info <span class="status pending" id="status-user">Not Tested</span></h3>
+            <p>Retrieves information about the authenticated Yahoo user.</p>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>GET /api/v1/yahoo/user</code>
+            </div>
+            <button onclick="testUserInfo()">Test User Info</button>
+            <button class="clear-btn" onclick="clearResponse('user')">Clear</button>
+            <div class="loading" id="loading-user">⏳ Loading...</div>
+            <div class="response-box" id="response-user"></div>
+        </div>
+
+        <!-- Test 2: User Leagues -->
+        <div class="test-section">
+            <h3>2. Get User Leagues <span class="status pending" id="status-leagues">Not Tested</span></h3>
+            <p>Retrieves all fantasy leagues for the authenticated user.</p>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>GET /api/v1/yahoo/leagues</code>
+            </div>
+            <button onclick="testUserLeagues()">Test User Leagues</button>
+            <button class="clear-btn" onclick="clearResponse('leagues')">Clear</button>
+            <div class="loading" id="loading-leagues">⏳ Loading...</div>
+            <div class="response-box" id="response-leagues"></div>
+        </div>
+
+        <!-- Test 3: League Info -->
+        <div class="test-section">
+            <h3>3. Get League Info <span class="status pending" id="status-league">Not Tested</span></h3>
+            <p>Retrieves details about a specific league (requires league key from step 2).</p>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>GET /api/v1/yahoo/league/:leagueKey</code>
+            </div>
+            <input type="text" id="league-key" placeholder="Enter league key (e.g., 449.l.123456)" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; width: 300px; margin-right: 10px;">
+            <button onclick="testLeagueInfo()">Test League Info</button>
+            <button class="clear-btn" onclick="clearResponse('league')">Clear</button>
+            <div class="loading" id="loading-league">⏳ Loading...</div>
+            <div class="response-box" id="response-league"></div>
+        </div>
+
+        <!-- Test 4: Team Info -->
+        <div class="test-section">
+            <h3>4. Get Team Roster <span class="status pending" id="status-team">Not Tested</span></h3>
+            <p>Retrieves roster for a specific team (requires team key).</p>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>GET /api/v1/yahoo/team/:teamKey</code>
+            </div>
+            <input type="text" id="team-key" placeholder="Enter team key (e.g., 449.l.123456.t.1)" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; width: 300px; margin-right: 10px;">
+            <button onclick="testTeamInfo()">Test Team Roster</button>
+            <button class="clear-btn" onclick="clearResponse('team')">Clear</button>
+            <div class="loading" id="loading-team">⏳ Loading...</div>
+            <div class="response-box" id="response-team"></div>
+        </div>
+
+        <!-- Test 5: Raw Yahoo API Test -->
+        <div class="test-section">
+            <h3>5. Raw Yahoo API Call <span class="status pending" id="status-raw">Not Tested</span></h3>
+            <p>Make a direct call to Yahoo Fantasy API with custom endpoint.</p>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>GET /api/v1/yahoo/raw</code><br>
+                <strong>Query Param:</strong> <code>url</code> - Full Yahoo API URL
+            </div>
+            <input type="text" id="raw-url" placeholder="Yahoo API URL (e.g., users;use_login=1/games)" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd; width: 500px; margin-right: 10px;">
+            <button onclick="testRawAPI()">Test Raw API</button>
+            <button class="clear-btn" onclick="clearResponse('raw')">Clear</button>
+            <div class="loading" id="loading-raw">⏳ Loading...</div>
+            <div class="response-box" id="response-raw"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        function showLoading(testName) {
+            document.getElementById(`loading-${testName}`).classList.add('show');
+            document.getElementById(`status-${testName}`).className = 'status pending';
+            document.getElementById(`status-${testName}`).textContent = 'Testing...';
+        }
+
+        function hideLoading(testName) {
+            document.getElementById(`loading-${testName}`).classList.remove('show');
+        }
+
+        function showResponse(testName, data, isError = false) {
+            const responseBox = document.getElementById(`response-${testName}`);
+            const statusBox = document.getElementById(`status-${testName}`);
+
+            responseBox.innerHTML = syntaxHighlight(JSON.stringify(data, null, 2));
+            responseBox.classList.add('show');
+
+            if (isError) {
+                statusBox.className = 'status error';
+                statusBox.textContent = 'Failed';
+            } else {
+                statusBox.className = 'status success';
+                statusBox.textContent = 'Success';
+            }
+        }
+
+        function clearResponse(testName) {
+            document.getElementById(`response-${testName}`).classList.remove('show');
+            document.getElementById(`status-${testName}`).className = 'status pending';
+            document.getElementById(`status-${testName}`).textContent = 'Not Tested';
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        async function testUserInfo() {
+            const testName = 'user';
+            showLoading(testName);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/yahoo/user`);
+                const data = await response.json();
+
+                hideLoading(testName);
+                showResponse(testName, data, !response.ok);
+            } catch (error) {
+                hideLoading(testName);
+                showResponse(testName, { error: error.message }, true);
+            }
+        }
+
+        async function testUserLeagues() {
+            const testName = 'leagues';
+            showLoading(testName);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/yahoo/leagues`);
+                const data = await response.json();
+
+                hideLoading(testName);
+                showResponse(testName, data, !response.ok);
+            } catch (error) {
+                hideLoading(testName);
+                showResponse(testName, { error: error.message }, true);
+            }
+        }
+
+        async function testLeagueInfo() {
+            const testName = 'league';
+            const leagueKey = document.getElementById('league-key').value.trim();
+
+            if (!leagueKey) {
+                alert('Please enter a league key');
+                return;
+            }
+
+            showLoading(testName);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/yahoo/league/${encodeURIComponent(leagueKey)}`);
+                const data = await response.json();
+
+                hideLoading(testName);
+                showResponse(testName, data, !response.ok);
+            } catch (error) {
+                hideLoading(testName);
+                showResponse(testName, { error: error.message }, true);
+            }
+        }
+
+        async function testTeamInfo() {
+            const testName = 'team';
+            const teamKey = document.getElementById('team-key').value.trim();
+
+            if (!teamKey) {
+                alert('Please enter a team key');
+                return;
+            }
+
+            showLoading(testName);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/yahoo/team/${encodeURIComponent(teamKey)}`);
+                const data = await response.json();
+
+                hideLoading(testName);
+                showResponse(testName, data, !response.ok);
+            } catch (error) {
+                hideLoading(testName);
+                showResponse(testName, { error: error.message }, true);
+            }
+        }
+
+        async function testRawAPI() {
+            const testName = 'raw';
+            const rawUrl = document.getElementById('raw-url').value.trim();
+
+            if (!rawUrl) {
+                alert('Please enter a Yahoo API URL');
+                return;
+            }
+
+            showLoading(testName);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/yahoo/raw?url=${encodeURIComponent(rawUrl)}`);
+                const data = await response.json();
+
+                hideLoading(testName);
+                showResponse(testName, data, !response.ok);
+            } catch (error) {
+                hideLoading(testName);
+                showResponse(testName, { error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -84,6 +84,7 @@ func main() {
 	styleAgentHandler := handlers.NewStyleAgentHandler()
 	metricsHandler := handlers.NewMetricsHandler()
 	schedulerHandler := handlers.NewSchedulerHandler(autoScheduler)
+	yahooTestHandler := handlers.NewYahooTestHandler(cfg)
 
 	// Setup router
 	mux := http.NewServeMux()
@@ -219,6 +220,13 @@ func main() {
 	mux.HandleFunc("/yahoo", handlers.HandleYahooAuthHome)
 	mux.HandleFunc("/yahoo/auth", handlers.HandleYahooAuth)
 	mux.HandleFunc("/yahoo/callback", handlers.HandleYahooCallback)
+
+	// Yahoo API test endpoints
+	mux.HandleFunc("/api/v1/yahoo/user", applyGETMiddleware(yahooTestHandler.HandleUserInfo))
+	mux.HandleFunc("/api/v1/yahoo/leagues", applyGETMiddleware(yahooTestHandler.HandleUserLeagues))
+	mux.HandleFunc("/api/v1/yahoo/league/", applyGETMiddleware(yahooTestHandler.HandleLeagueInfo))
+	mux.HandleFunc("/api/v1/yahoo/team/", applyGETMiddleware(yahooTestHandler.HandleTeamRoster))
+	mux.HandleFunc("/api/v1/yahoo/raw", applyGETMiddleware(yahooTestHandler.HandleRawAPI))
 
 	// Serve dashboard static files
 	fs := http.FileServer(http.Dir("./dashboard"))
