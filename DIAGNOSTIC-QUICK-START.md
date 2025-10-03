@@ -27,16 +27,30 @@ make diagnose-heroku
 
 ### Step 2: Fix (2-5 minutes)
 
+**Option A: Use Rust Pipeline (Recommended - ALL players from NFLverse)**
+
+```bash
+cd nfl-data-pipeline
+
+# Import 2025 season rosters (comprehensive)
+make sync-year YEAR=2025
+
+# Or update current week
+make sync-update
+```
+
+**Option B: Use Go API Sync (ESPN rosters only)**
+
 ```bash
 # Get your API key
 heroku config:get API_KEY --app grid-iron-mind
 
-# Sync rosters
+# Sync rosters from ESPN
 curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/rosters \
   -H "X-API-Key: YOUR_API_KEY_HERE"
 ```
 
-**Wait for:** `{"message": "Rosters sync started in background", "status": "processing"}`
+**⚠️ Important:** The Rust pipeline imports **ALL active NFL players** from NFLverse (most comprehensive). The Go API only syncs from ESPN which may have gaps.
 
 ### Step 3: Verify (30 seconds)
 
@@ -47,15 +61,26 @@ make diagnose-heroku
 # Should show: missing_count | 0
 ```
 
-## Alternative: Use Sync Tool
+## Alternative: Use Rust Pipeline (Complete Player Data)
 
 ```bash
-# Sync everything (recommended for first-time setup)
-make sync-full
+cd nfl-data-pipeline
 
-# Daily update (faster, for ongoing maintenance)
-make sync-update
+# Full import (2010-2025) - ALL players, ALL seasons
+make sync-full  # Takes 30-60 min
+
+# Single season (2025) - Current year only
+make sync-year YEAR=2025  # Takes 2-3 min
+
+# Update current week
+make sync-update  # Takes 30-60 sec
 ```
+
+**Why use the Rust pipeline?**
+- ✅ NFLverse data has **ALL active players** (more comprehensive than ESPN)
+- ✅ Historical data back to 2010
+- ✅ Fast, parallel processing
+- ✅ Handles 1800+ players reliably
 
 ## Common Issues
 

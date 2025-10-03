@@ -77,24 +77,44 @@ make diagnose-players-go
 
 ## Fix Options
 
-### Option 1: Full Roster Sync (Recommended)
+### Option 1: Rust Pipeline Import (Recommended - Most Comprehensive)
 
-Sync all team rosters from ESPN to catch missing players:
+The **best solution** is to use the Rust data pipeline which imports **ALL active players** from NFLverse (more comprehensive than ESPN):
 
-**Via Heroku:**
+```bash
+cd nfl-data-pipeline
+
+# Import 2025 season (recommended)
+make sync-year YEAR=2025
+
+# Or full historical import (2010-2025)
+make sync-full
+```
+
+**Why Rust pipeline?**
+- ✅ NFLverse has comprehensive roster data (1800+ players)
+- ✅ Includes all active players like Saquon Barkley
+- ✅ Fast parallel processing
+- ✅ Historical data back to 2010
+
+**Expected Time:**
+- Single season: 2-3 minutes
+- Full import: 30-60 minutes
+
+### Option 2: ESPN API Sync (Alternative, May Have Gaps)
+
+Sync team rosters from ESPN API:
+
+**Via API:**
 ```bash
 # Trigger roster sync via API
 curl -X POST https://nfl.wearemachina.com/api/v1/admin/sync/rosters \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
-**Via Heroku Run:**
-```bash
-# If you have a sync CLI tool
-heroku run --app grid-iron-mind "make sync-update"
-```
-
 **Expected Time:** 2-5 minutes
+
+⚠️ **Note:** ESPN API may not have all players. Use Rust pipeline for complete coverage.
 
 ### Option 2: Check Specific Player via API
 
