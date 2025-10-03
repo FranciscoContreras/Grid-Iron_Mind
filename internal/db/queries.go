@@ -47,61 +47,59 @@ func (q *PlayerQueries) ListPlayers(ctx context.Context, filters PlayerFilters) 
 		`
 	}
 
+	// Build separate count query with its own parameter indices
 	countQuery := `SELECT COUNT(*) FROM players p WHERE 1=1`
+	countArgs := []interface{}{}
+	countArgIdx := 1
+
 	args := []interface{}{}
 	argCount := 1
 
 	// Add search filter
 	if filters.Search != "" {
 		searchLower := strings.ToLower(strings.TrimSpace(filters.Search))
-		// Add search args for relevance scoring
+		// Add search args for relevance scoring in main query
 		args = append(args, searchLower)                  // $1 - exact match
 		args = append(args, searchLower+"%")              // $2 - starts with
 		args = append(args, "%"+searchLower+"%")          // $3 - contains
 		argCount = 4 // Next arg starts at $4
 
-		// Add search to count query
-		countQuery += fmt.Sprintf(" AND LOWER(p.name) LIKE $%d", 1)
+		// Add search to count query with its own index
+		countQuery += fmt.Sprintf(" AND LOWER(p.name) LIKE $%d", countArgIdx)
+		countArgs = append(countArgs, "%"+searchLower+"%")
+		countArgIdx++
 	}
 
 	// Apply other filters
 	if filters.Position != "" {
 		query += fmt.Sprintf(" AND p.position = $%d", argCount)
-		countQuery += fmt.Sprintf(" AND p.position = $%d", argCount)
+		countQuery += fmt.Sprintf(" AND p.position = $%d", countArgIdx)
 		args = append(args, filters.Position)
+		countArgs = append(countArgs, filters.Position)
 		argCount++
+		countArgIdx++
 	}
 
 	if filters.TeamID != uuid.Nil {
 		query += fmt.Sprintf(" AND p.team_id = $%d", argCount)
-		countQuery += fmt.Sprintf(" AND p.team_id = $%d", argCount)
+		countQuery += fmt.Sprintf(" AND p.team_id = $%d", countArgIdx)
 		args = append(args, filters.TeamID)
+		countArgs = append(countArgs, filters.TeamID)
 		argCount++
+		countArgIdx++
 	}
 
 	if filters.Status != "" {
 		query += fmt.Sprintf(" AND p.status = $%d", argCount)
-		countQuery += fmt.Sprintf(" AND p.status = $%d", argCount)
+		countQuery += fmt.Sprintf(" AND p.status = $%d", countArgIdx)
 		args = append(args, filters.Status)
+		countArgs = append(countArgs, filters.Status)
 		argCount++
+		countArgIdx++
 	}
 
-	// Get total count (use separate args for count query)
+	// Get total count
 	var total int
-	var countArgs []interface{}
-	if filters.Search != "" {
-		searchLower := strings.ToLower(strings.TrimSpace(filters.Search))
-		countArgs = append(countArgs, "%"+searchLower+"%")
-	}
-	if filters.Position != "" {
-		countArgs = append(countArgs, filters.Position)
-	}
-	if filters.TeamID != uuid.Nil {
-		countArgs = append(countArgs, filters.TeamID)
-	}
-	if filters.Status != "" {
-		countArgs = append(countArgs, filters.Status)
-	}
 
 	err := pool.QueryRow(ctx, countQuery, countArgs...).Scan(&total)
 	if err != nil {
