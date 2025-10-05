@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grid Iron Mind API v2 Documentation</title>
+    <title>Grid Iron Mind API Documentation - Enhanced</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Prism.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css">
     <style>
         /* API v2 Documentation Specific Styles */
         .api-layout {
@@ -341,6 +344,111 @@
             font-size: 0.875rem;
         }
 
+        /* Search Bar */
+        .search-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: white;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-full);
+            padding: 12px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e4e4e4;
+        }
+
+        body.dark-mode .api-sidebar,
+        body.dark-mode .api-header,
+        body.dark-mode .section,
+        body.dark-mode .endpoint-card,
+        body.dark-mode .feature-card {
+            background: rgba(30, 30, 50, 0.7);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .nav-link:hover {
+            background: rgba(100, 122, 255, 0.2);
+        }
+
+        body.dark-mode .search-input {
+            background: rgba(30, 30, 50, 0.5);
+            color: #e4e4e4;
+        }
+
+        /* Copy Button */
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 122, 255, 0.8);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .code-block {
+            position: relative;
+        }
+
+        .code-block:hover .copy-button {
+            opacity: 1;
+        }
+
+        .copy-button:hover {
+            background: var(--accent-blue);
+        }
+
+        .copy-button.copied {
+            background: var(--accent-green);
+        }
+
         @media (max-width: 1024px) {
             .api-layout {
                 flex-direction: column;
@@ -349,6 +457,11 @@
             .api-sidebar {
                 width: 100%;
                 position: static;
+            }
+
+            .theme-toggle {
+                bottom: 16px;
+                right: 16px;
             }
         }
     </style>
@@ -371,6 +484,11 @@
     <div class="api-layout">
         <!-- Sidebar Navigation -->
         <aside class="api-sidebar">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search endpoints...">
+            </div>
+
             <h3>Navigation</h3>
 
             <div class="nav-section">
@@ -408,8 +526,8 @@
         <main class="api-content">
             <!-- Header Section -->
             <div class="api-header">
-                <span class="version-badge">Version 2.0</span>
-                <h1>Grid Iron Mind API v2</h1>
+                <span class="version-badge">API v1 - Enhanced Docs</span>
+                <h1>Grid Iron Mind API</h1>
                 <p>Comprehensive NFL data API with real-time stats, AI-powered predictions, and historical analytics. Built for developers who demand speed, accuracy, and comprehensive coverage.</p>
             </div>
 
@@ -428,7 +546,7 @@
                 </ul>
 
                 <div class="info-box" style="margin-top: 1.5rem;">
-                    <p><strong>Base URL:</strong> <code>https://nfl.wearemachina.com/api/v2</code></p>
+                    <p><strong>Base URL:</strong> <code>https://nfl.wearemachina.com/api/v1</code></p>
                 </div>
             </section>
 
@@ -476,18 +594,18 @@
 
                 <h3>Example: Get All Teams</h3>
                 <div class="code-block">
-                    <pre><code>curl https://nfl.wearemachina.com/api/v2/teams</code></pre>
+                    <pre><code class="language-bash">curl https://nfl.wearemachina.com/api/v1/teams</code></pre>
                 </div>
 
                 <h3>Example: Get Player Stats</h3>
                 <div class="code-block">
-                    <pre><code>curl https://nfl.wearemachina.com/api/v2/stats/leaders?category=passing_yards&season=2025&limit=10</code></pre>
+                    <pre><code class="language-bash">curl https://nfl.wearemachina.com/api/v1/stats/leaders?category=passing_yards&season=2025&limit=10</code></pre>
                 </div>
 
                 <h3>Response Format</h3>
                 <p style="margin-bottom: 1rem;">All successful responses follow this format:</p>
                 <div class="code-block">
-                    <pre><code>{
+                    <pre><code class="language-json">{
   "data": [...],
   "meta": {
     "total": 100,
@@ -511,8 +629,8 @@
                 <p style="color: var(--gray-600); margin-bottom: 1rem;">Require API key authentication. Subject to strict rate limits (10 requests/minute).</p>
 
                 <div class="code-block">
-                    <pre><code>curl -H "X-API-Key: your_api_key_here" \
-  https://nfl.wearemachina.com/api/v2/ai/predict/game/[game-id]</code></pre>
+                    <pre><code class="language-bash">curl -H "X-API-Key: your_api_key_here" \
+  https://nfl.wearemachina.com/api/v1/ai/predict/game/[game-id]</code></pre>
                 </div>
 
                 <div class="info-box" style="margin-top: 1rem;">
@@ -527,7 +645,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/players</span>
+                        <span class="endpoint-path">/api/v1/players</span>
                     </div>
                     <p class="endpoint-description">List all NFL players with optional filtering.</p>
 
@@ -569,14 +687,14 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/players?limit=5', 'response-players-list')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/players?limit=5', 'response-players-list')">Try It Now</button>
                     <div id="response-players-list" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/players/:id</span>
+                        <span class="endpoint-path">/api/v1/players/:id</span>
                     </div>
                     <p class="endpoint-description">Get detailed information for a specific player.</p>
 
@@ -602,7 +720,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/players/:id/career</span>
+                        <span class="endpoint-path">/api/v1/players/:id/career</span>
                     </div>
                     <p class="endpoint-description">Get career statistics for a player across all seasons.</p>
                 </div>
@@ -610,7 +728,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/players/:id/injuries</span>
+                        <span class="endpoint-path">/api/v1/players/:id/injuries</span>
                     </div>
                     <p class="endpoint-description">Get injury history and current status for a player.</p>
                 </div>
@@ -618,7 +736,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/players/:id/advanced-stats</span>
+                        <span class="endpoint-path">/api/v1/players/:id/advanced-stats</span>
                     </div>
                     <p class="endpoint-description">Get advanced statistics including Next Gen Stats for a player.</p>
 
@@ -659,18 +777,18 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/teams</span>
+                        <span class="endpoint-path">/api/v1/teams</span>
                     </div>
                     <p class="endpoint-description">List all 32 NFL teams with stadium information.</p>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/teams', 'response-teams-list')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/teams', 'response-teams-list')">Try It Now</button>
                     <div id="response-teams-list" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/teams/:id</span>
+                        <span class="endpoint-path">/api/v1/teams/:id</span>
                     </div>
                     <p class="endpoint-description">Get detailed information for a specific team.</p>
                 </div>
@@ -678,7 +796,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/teams/:id/roster</span>
+                        <span class="endpoint-path">/api/v1/teams/:id/roster</span>
                     </div>
                     <p class="endpoint-description">Get current roster for a team.</p>
                 </div>
@@ -686,7 +804,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/teams/:id/injuries</span>
+                        <span class="endpoint-path">/api/v1/teams/:id/injuries</span>
                     </div>
                     <p class="endpoint-description">Get current injury report for a team.</p>
                 </div>
@@ -694,7 +812,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/teams/:id/schedule</span>
+                        <span class="endpoint-path">/api/v1/teams/:id/schedule</span>
                     </div>
                     <p class="endpoint-description">Get game schedule for a team.</p>
 
@@ -725,7 +843,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/games</span>
+                        <span class="endpoint-path">/api/v1/games</span>
                     </div>
                     <p class="endpoint-description">List games with flexible filtering options.</p>
 
@@ -767,14 +885,14 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/games?season=2025&week=1', 'response-games-list')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/games?season=2025&week=1', 'response-games-list')">Try It Now</button>
                     <div id="response-games-list" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/games/:id</span>
+                        <span class="endpoint-path">/api/v1/games/:id</span>
                     </div>
                     <p class="endpoint-description">Get detailed information for a specific game.</p>
                 </div>
@@ -782,7 +900,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/games/:id/stats</span>
+                        <span class="endpoint-path">/api/v1/games/:id/stats</span>
                     </div>
                     <p class="endpoint-description">Get team statistics for a specific game.</p>
                 </div>
@@ -790,7 +908,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/games/:id/scoring-plays</span>
+                        <span class="endpoint-path">/api/v1/games/:id/scoring-plays</span>
                     </div>
                     <p class="endpoint-description">Get scoring plays timeline for a game.</p>
                 </div>
@@ -798,7 +916,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/games/:id/play-by-play</span>
+                        <span class="endpoint-path">/api/v1/games/:id/play-by-play</span>
                     </div>
                     <p class="endpoint-description">Get complete play-by-play data for a game.</p>
                 </div>
@@ -811,7 +929,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/stats/leaders</span>
+                        <span class="endpoint-path">/api/v1/stats/leaders</span>
                     </div>
                     <p class="endpoint-description">Get statistical leaders for various categories.</p>
 
@@ -843,14 +961,14 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/stats/leaders?category=passing_yards&season=2025&limit=10', 'response-stats-leaders')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/stats/leaders?category=passing_yards&season=2025&limit=10', 'response-stats-leaders')">Try It Now</button>
                     <div id="response-stats-leaders" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/stats/game/:gameID</span>
+                        <span class="endpoint-path">/api/v1/stats/game/:gameID</span>
                     </div>
                     <p class="endpoint-description">Get player statistics for a specific game.</p>
                 </div>
@@ -863,7 +981,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/standings</span>
+                        <span class="endpoint-path">/api/v1/standings</span>
                     </div>
                     <p class="endpoint-description">Get current league standings.</p>
 
@@ -890,7 +1008,7 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/standings?season=2025', 'response-standings')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/standings?season=2025', 'response-standings')">Try It Now</button>
                     <div id="response-standings" class="response-box"></div>
                 </div>
             </section>
@@ -902,7 +1020,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/defense/rankings</span>
+                        <span class="endpoint-path">/api/v1/defense/rankings</span>
                     </div>
                     <p class="endpoint-description">Get defensive rankings by various metrics.</p>
 
@@ -938,7 +1056,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/weather/current</span>
+                        <span class="endpoint-path">/api/v1/weather/current</span>
                     </div>
                     <p class="endpoint-description">Get current weather conditions for NFL stadiums.</p>
 
@@ -969,7 +1087,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/weather/forecast</span>
+                        <span class="endpoint-path">/api/v1/weather/forecast</span>
                     </div>
                     <p class="endpoint-description">Get weather forecast for upcoming games.</p>
                 </div>
@@ -977,7 +1095,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/weather/historical</span>
+                        <span class="endpoint-path">/api/v1/weather/historical</span>
                     </div>
                     <p class="endpoint-description">Get historical weather data for past games.</p>
                 </div>
@@ -994,7 +1112,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/ai/predict/game/:id</span>
+                        <span class="endpoint-path">/api/v1/ai/predict/game/:id</span>
                     </div>
                     <p class="endpoint-description">Get AI-powered prediction for a specific game outcome.</p>
 
@@ -1010,7 +1128,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/ai/predict/player/:id</span>
+                        <span class="endpoint-path">/api/v1/ai/predict/player/:id</span>
                     </div>
                     <p class="endpoint-description">Get AI-powered performance prediction for a player.</p>
                 </div>
@@ -1018,7 +1136,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v2/ai/insights/player/:id</span>
+                        <span class="endpoint-path">/api/v1/ai/insights/player/:id</span>
                     </div>
                     <p class="endpoint-description">Get comprehensive AI analysis of a player's performance.</p>
                 </div>
@@ -1026,13 +1144,13 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge post">POST</span>
-                        <span class="endpoint-path">/api/v2/ai/query</span>
+                        <span class="endpoint-path">/api/v1/ai/query</span>
                     </div>
                     <p class="endpoint-description">Make natural language queries about NFL data.</p>
 
                     <h4>Request Body</h4>
                     <div class="code-block">
-                        <pre><code>{
+                        <pre><code class="language-json">{
   "query": "Who are the top 5 rushing leaders this season?"
 }</code></pre>
                     </div>
@@ -1057,7 +1175,7 @@
 
                     <h4>Response Example</h4>
                     <div class="code-block">
-                        <pre><code>{
+                        <pre><code class="language-json">{
   "data": {
     "fantasy_content": {
       "users": {
@@ -1084,7 +1202,7 @@
 
                     <h4>Response Example</h4>
                     <div class="code-block">
-                        <pre><code>{
+                        <pre><code class="language-json">{
   "data": {
     "fantasy_content": {
       "users": {
@@ -1193,7 +1311,7 @@
 
                     <h4>Example Request</h4>
                     <div class="code-block">
-                        <pre><code>curl "https://nfl.wearemachina.com/api/v1/yahoo/raw?url=users;use_login=1/games"</code></pre>
+                        <pre><code class="language-bash">curl "https://nfl.wearemachina.com/api/v1/yahoo/raw?url=users;use_login=1/games"</code></pre>
                     </div>
                 </div>
 
@@ -1254,7 +1372,7 @@
                 <p style="margin-bottom: 1rem;">All errors follow a consistent format:</p>
 
                 <div class="code-block">
-                    <pre><code>{
+                    <pre><code class="language-json">{
   "error": {
     "code": "NOT_FOUND",
     "message": "Player not found",
@@ -1357,12 +1475,12 @@
 
                 <h3>Example</h3>
                 <div class="code-block">
-                    <pre><code>GET /api/v2/players?limit=25&offset=50</code></pre>
+                    <pre><code class="language-bash">GET /api/v1/players?limit=25&offset=50</code></pre>
                 </div>
 
                 <h3>Response</h3>
                 <div class="code-block">
-                    <pre><code>{
+                    <pre><code class="language-json">{
   "data": [...],
   "meta": {
     "total": 2515,
@@ -1376,20 +1494,107 @@
         </main>
     </div>
 
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+        <span id="themeIcon">🌙</span>
+    </button>
+
+    <!-- Prism.js Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
     <script>
         const BASE_URL = 'https://nfl.wearemachina.com';
 
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            themeIcon.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', isDark);
+        });
+
+        // Search Functionality
+        const searchInput = document.getElementById('searchInput');
+        const allSections = document.querySelectorAll('section[id]');
+        const allNavLinks = document.querySelectorAll('.nav-link');
+        const allEndpointCards = document.querySelectorAll('.endpoint-card');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+
+            if (query === '') {
+                // Show all
+                allSections.forEach(s => s.style.display = 'block');
+                allNavLinks.forEach(l => l.style.display = 'block');
+                allEndpointCards.forEach(c => c.style.display = 'block');
+                return;
+            }
+
+            // Filter sections
+            allSections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                section.style.display = text.includes(query) ? 'block' : 'none';
+            });
+
+            // Filter nav links
+            allNavLinks.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                link.style.display = text.includes(query) ? 'block' : 'none';
+            });
+
+            // Filter endpoint cards
+            allEndpointCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        });
+
+        // Copy to Clipboard for code blocks (manual implementation)
+        document.querySelectorAll('.code-block').forEach(block => {
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.textContent = 'Copy';
+            button.addEventListener('click', () => {
+                const code = block.querySelector('code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+            block.appendChild(button);
+        });
+
+        // Try Endpoint Functionality
         async function tryEndpoint(endpoint, responseId) {
             const responseBox = document.getElementById(responseId);
             responseBox.classList.add('active');
-            responseBox.innerHTML = '<pre>Loading...</pre>';
+            responseBox.innerHTML = '<pre class="language-json"><code>Loading...</code></pre>';
 
             try {
                 const response = await fetch(BASE_URL + endpoint);
                 const data = await response.json();
-                responseBox.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                const formattedJSON = JSON.stringify(data, null, 2);
+                responseBox.innerHTML = `<pre class="language-json"><code>${Prism.highlight(formattedJSON, Prism.languages.json, 'json')}</code></pre>`;
             } catch (error) {
-                responseBox.innerHTML = `<pre style="color: var(--accent-red);">Error: ${error.message}</pre>`;
+                responseBox.innerHTML = `<pre style="color: var(--accent-red);"><code>Error: ${error.message}</code></pre>`;
             }
         }
 
@@ -1428,6 +1633,11 @@
                     link.classList.add('active');
                 }
             });
+        });
+
+        // Apply syntax highlighting to code blocks on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            Prism.highlightAll();
         });
     </script>
 </body>
