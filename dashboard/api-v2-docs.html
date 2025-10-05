@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grid Iron Mind API Documentation - Enhanced</title>
+    <title>Grid Iron Mind API v2 Documentation</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Prism.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
@@ -526,8 +526,8 @@
         <main class="api-content">
             <!-- Header Section -->
             <div class="api-header">
-                <span class="version-badge">API v1 - Enhanced Docs</span>
-                <h1>Grid Iron Mind API</h1>
+                <span class="version-badge">Version 2.0</span>
+                <h1>Grid Iron Mind API v2</h1>
                 <p>Comprehensive NFL data API with real-time stats, AI-powered predictions, and historical analytics. Built for developers who demand speed, accuracy, and comprehensive coverage.</p>
             </div>
 
@@ -546,7 +546,7 @@
                 </ul>
 
                 <div class="info-box" style="margin-top: 1.5rem;">
-                    <p><strong>Base URL:</strong> <code>https://nfl.wearemachina.com/api/v1</code></p>
+                    <p><strong>Base URL:</strong> <code>https://nfl.wearemachina.com/api/v2</code></p>
                 </div>
             </section>
 
@@ -594,12 +594,12 @@
 
                 <h3>Example: Get All Teams</h3>
                 <div class="code-block">
-                    <pre><code class="language-bash">curl https://nfl.wearemachina.com/api/v1/teams</code></pre>
+                    <pre><code class="language-bash">curl https://nfl.wearemachina.com/api/v2/teams</code></pre>
                 </div>
 
                 <h3>Example: Get Player Stats</h3>
                 <div class="code-block">
-                    <pre><code class="language-bash">curl https://nfl.wearemachina.com/api/v1/stats/leaders?category=passing_yards&season=2025&limit=10</code></pre>
+                    <pre><code class="language-bash">curl https://nfl.wearemachina.com/api/v2/stats/leaders?category=passing_yards&season=2025&limit=10</code></pre>
                 </div>
 
                 <h3>Response Format</h3>
@@ -630,7 +630,7 @@
 
                 <div class="code-block">
                     <pre><code class="language-bash">curl -H "X-API-Key: your_api_key_here" \
-  https://nfl.wearemachina.com/api/v1/ai/predict/game/[game-id]</code></pre>
+  https://nfl.wearemachina.com/api/v2/ai/predict/game/[game-id]</code></pre>
                 </div>
 
                 <div class="info-box" style="margin-top: 1rem;">
@@ -645,7 +645,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/players</span>
+                        <span class="endpoint-path">/api/v2/players</span>
                     </div>
                     <p class="endpoint-description">List all NFL players with optional filtering.</p>
 
@@ -687,14 +687,14 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/players?limit=5', 'response-players-list')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/players?limit=5', 'response-players-list')">Try It Now</button>
                     <div id="response-players-list" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/players/:id</span>
+                        <span class="endpoint-path">/api/v2/players/:id</span>
                     </div>
                     <p class="endpoint-description">Get detailed information for a specific player.</p>
 
@@ -720,7 +720,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/players/:id/career</span>
+                        <span class="endpoint-path">/api/v2/players/:id/career</span>
                     </div>
                     <p class="endpoint-description">Get career statistics for a player across all seasons.</p>
                 </div>
@@ -728,7 +728,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/players/:id/injuries</span>
+                        <span class="endpoint-path">/api/v2/players/:id/injuries</span>
                     </div>
                     <p class="endpoint-description">Get injury history and current status for a player.</p>
                 </div>
@@ -736,7 +736,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/players/:id/advanced-stats</span>
+                        <span class="endpoint-path">/api/v2/players/:id/advanced-stats</span>
                     </div>
                     <p class="endpoint-description">Get advanced statistics including Next Gen Stats for a player.</p>
 
@@ -777,18 +777,18 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/teams</span>
+                        <span class="endpoint-path">/api/v2/teams</span>
                     </div>
                     <p class="endpoint-description">List all 32 NFL teams with stadium information.</p>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/teams', 'response-teams-list')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/teams', 'response-teams-list')">Try It Now</button>
                     <div id="response-teams-list" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/teams/:id</span>
+                        <span class="endpoint-path">/api/v2/teams/:id</span>
                     </div>
                     <p class="endpoint-description">Get detailed information for a specific team.</p>
                 </div>
@@ -796,7 +796,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/teams/:id/roster</span>
+                        <span class="endpoint-path">/api/v2/teams/:id/roster</span>
                     </div>
                     <p class="endpoint-description">Get current roster for a team.</p>
                 </div>
@@ -804,7 +804,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/teams/:id/injuries</span>
+                        <span class="endpoint-path">/api/v2/teams/:id/injuries</span>
                     </div>
                     <p class="endpoint-description">Get current injury report for a team.</p>
                 </div>
@@ -812,7 +812,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/teams/:id/schedule</span>
+                        <span class="endpoint-path">/api/v2/teams/:id/schedule</span>
                     </div>
                     <p class="endpoint-description">Get game schedule for a team.</p>
 
@@ -843,7 +843,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/games</span>
+                        <span class="endpoint-path">/api/v2/games</span>
                     </div>
                     <p class="endpoint-description">List games with flexible filtering options.</p>
 
@@ -885,14 +885,14 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/games?season=2025&week=1', 'response-games-list')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/games?season=2025&week=1', 'response-games-list')">Try It Now</button>
                     <div id="response-games-list" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/games/:id</span>
+                        <span class="endpoint-path">/api/v2/games/:id</span>
                     </div>
                     <p class="endpoint-description">Get detailed information for a specific game.</p>
                 </div>
@@ -900,7 +900,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/games/:id/stats</span>
+                        <span class="endpoint-path">/api/v2/games/:id/stats</span>
                     </div>
                     <p class="endpoint-description">Get team statistics for a specific game.</p>
                 </div>
@@ -908,7 +908,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/games/:id/scoring-plays</span>
+                        <span class="endpoint-path">/api/v2/games/:id/scoring-plays</span>
                     </div>
                     <p class="endpoint-description">Get scoring plays timeline for a game.</p>
                 </div>
@@ -916,7 +916,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/games/:id/play-by-play</span>
+                        <span class="endpoint-path">/api/v2/games/:id/play-by-play</span>
                     </div>
                     <p class="endpoint-description">Get complete play-by-play data for a game.</p>
                 </div>
@@ -929,7 +929,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/stats/leaders</span>
+                        <span class="endpoint-path">/api/v2/stats/leaders</span>
                     </div>
                     <p class="endpoint-description">Get statistical leaders for various categories.</p>
 
@@ -961,14 +961,14 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/stats/leaders?category=passing_yards&season=2025&limit=10', 'response-stats-leaders')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/stats/leaders?category=passing_yards&season=2025&limit=10', 'response-stats-leaders')">Try It Now</button>
                     <div id="response-stats-leaders" class="response-box"></div>
                 </div>
 
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/stats/game/:gameID</span>
+                        <span class="endpoint-path">/api/v2/stats/game/:gameID</span>
                     </div>
                     <p class="endpoint-description">Get player statistics for a specific game.</p>
                 </div>
@@ -981,7 +981,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/standings</span>
+                        <span class="endpoint-path">/api/v2/standings</span>
                     </div>
                     <p class="endpoint-description">Get current league standings.</p>
 
@@ -1008,7 +1008,7 @@
                         </tbody>
                     </table>
 
-                    <button class="try-it-button" onclick="tryEndpoint('/api/v1/standings?season=2025', 'response-standings')">Try It Now</button>
+                    <button class="try-it-button" onclick="tryEndpoint('/api/v2/standings?season=2025', 'response-standings')">Try It Now</button>
                     <div id="response-standings" class="response-box"></div>
                 </div>
             </section>
@@ -1020,7 +1020,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/defense/rankings</span>
+                        <span class="endpoint-path">/api/v2/defense/rankings</span>
                     </div>
                     <p class="endpoint-description">Get defensive rankings by various metrics.</p>
 
@@ -1056,7 +1056,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/weather/current</span>
+                        <span class="endpoint-path">/api/v2/weather/current</span>
                     </div>
                     <p class="endpoint-description">Get current weather conditions for NFL stadiums.</p>
 
@@ -1087,7 +1087,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/weather/forecast</span>
+                        <span class="endpoint-path">/api/v2/weather/forecast</span>
                     </div>
                     <p class="endpoint-description">Get weather forecast for upcoming games.</p>
                 </div>
@@ -1095,7 +1095,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/weather/historical</span>
+                        <span class="endpoint-path">/api/v2/weather/historical</span>
                     </div>
                     <p class="endpoint-description">Get historical weather data for past games.</p>
                 </div>
@@ -1112,7 +1112,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/ai/predict/game/:id</span>
+                        <span class="endpoint-path">/api/v2/ai/predict/game/:id</span>
                     </div>
                     <p class="endpoint-description">Get AI-powered prediction for a specific game outcome.</p>
 
@@ -1128,7 +1128,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/ai/predict/player/:id</span>
+                        <span class="endpoint-path">/api/v2/ai/predict/player/:id</span>
                     </div>
                     <p class="endpoint-description">Get AI-powered performance prediction for a player.</p>
                 </div>
@@ -1136,7 +1136,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/ai/insights/player/:id</span>
+                        <span class="endpoint-path">/api/v2/ai/insights/player/:id</span>
                     </div>
                     <p class="endpoint-description">Get comprehensive AI analysis of a player's performance.</p>
                 </div>
@@ -1144,7 +1144,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge post">POST</span>
-                        <span class="endpoint-path">/api/v1/ai/query</span>
+                        <span class="endpoint-path">/api/v2/ai/query</span>
                     </div>
                     <p class="endpoint-description">Make natural language queries about NFL data.</p>
 
@@ -1169,7 +1169,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/yahoo/user</span>
+                        <span class="endpoint-path">/api/v2/yahoo/user</span>
                     </div>
                     <p class="endpoint-description">Get authenticated Yahoo user information.</p>
 
@@ -1196,7 +1196,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/yahoo/leagues</span>
+                        <span class="endpoint-path">/api/v2/yahoo/leagues</span>
                     </div>
                     <p class="endpoint-description">Get all fantasy leagues for the authenticated user.</p>
 
@@ -1235,7 +1235,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/yahoo/league/:leagueKey</span>
+                        <span class="endpoint-path">/api/v2/yahoo/league/:leagueKey</span>
                     </div>
                     <p class="endpoint-description">Get detailed information about a specific league.</p>
 
@@ -1261,7 +1261,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/yahoo/team/:teamKey</span>
+                        <span class="endpoint-path">/api/v2/yahoo/team/:teamKey</span>
                     </div>
                     <p class="endpoint-description">Get roster information for a specific team.</p>
 
@@ -1287,7 +1287,7 @@
                 <div class="endpoint-card">
                     <div class="endpoint-header">
                         <span class="method-badge get">GET</span>
-                        <span class="endpoint-path">/api/v1/yahoo/raw</span>
+                        <span class="endpoint-path">/api/v2/yahoo/raw</span>
                     </div>
                     <p class="endpoint-description">Make a raw Yahoo Fantasy API call with a custom endpoint.</p>
 
@@ -1311,7 +1311,7 @@
 
                     <h4>Example Request</h4>
                     <div class="code-block">
-                        <pre><code class="language-bash">curl "https://nfl.wearemachina.com/api/v1/yahoo/raw?url=users;use_login=1/games"</code></pre>
+                        <pre><code class="language-bash">curl "https://nfl.wearemachina.com/api/v2/yahoo/raw?url=users;use_login=1/games"</code></pre>
                     </div>
                 </div>
 
@@ -1475,7 +1475,7 @@
 
                 <h3>Example</h3>
                 <div class="code-block">
-                    <pre><code class="language-bash">GET /api/v1/players?limit=25&offset=50</code></pre>
+                    <pre><code class="language-bash">GET /api/v2/players?limit=25&offset=50</code></pre>
                 </div>
 
                 <h3>Response</h3>
