@@ -23,8 +23,12 @@ Grid Iron Mind is a high-performance NFL data API providing real-time and histor
 
 ```
 cmd/
-  server/           # Main API server entrypoint
-  sync2025/         # 2025 season data sync CLI tool
+  server/              # Main API server entrypoint
+  sync2025/            # 2025 season data sync CLI tool
+  import_historical/   # Historical data import (2010-2024)
+  diagnose-players/    # Player data diagnostics
+  yahoo_auth/          # Yahoo OAuth initial setup
+  yahoo_oauth_helper/  # Yahoo OAuth token refresh helper
 internal/
   cache/            # Redis caching layer with TTL management
   config/           # Configuration loading
@@ -32,11 +36,15 @@ internal/
   espn/             # ESPN API client
   nflverse/         # NFLverse data client
   ingestion/        # Data ingestion service
-  handlers/         # HTTP request handlers (players, teams, games, stats, AI, admin)
+  handlers/         # HTTP request handlers (players, teams, games, stats, AI, admin, yahoo)
   middleware/       # CORS, auth, rate limiting, error handling
   models/           # Data models (Player, Team, Game, Stats, Injury)
-  ai/               # Claude API integration
+  scheduler/        # Automated sync scheduler with game detection
+  services/         # Shared service utilities
+  styleagent/       # UI style agent
+  utils/            # Season detection and utilities
   weather/          # Weather API client
+  yahoo/            # Yahoo Fantasy API client and ingestion
 pkg/
   response/         # JSON response formatting utilities
   validation/       # Input validation
@@ -86,6 +94,9 @@ psql $DATABASE_URL -f schema.sql
 
 # Check connection
 psql $DATABASE_URL -c "SELECT COUNT(*) FROM players;"
+
+# Check database status
+make db-status
 ```
 
 ### Data Sync (2025 Season)
@@ -125,6 +136,51 @@ The sync tool (`cmd/sync2025/main.go`) supports five modes:
 - **live**: Continuous updates during game days
 - **stats**: Player statistics only
 - **injuries**: Injury reports only
+
+### Historical Data Import (2010-2024)
+
+```bash
+# Build historical import tool
+make build-importer
+
+# Import single year
+make import-year YEAR=2024
+
+# Import year range
+make import-range START=2010 END=2014
+
+# Import all 15 years (60-90 min)
+make import-full
+
+# Validate imported data
+make import-validate
+
+# Show import statistics
+make import-stats
+```
+
+**Import Tool** (`cmd/import_historical/main.go`):
+- Imports 15 years of historical NFL data (2010-2024)
+- Sources: NFLverse CSV releases
+- Data: Games, player stats, team stats, schedules
+- Progress tracking with detailed logging
+- Validation and statistics commands
+
+### Diagnostics
+
+```bash
+# Check for missing players (SQL-based)
+make diagnose-players
+
+# Check for missing players (Go binary)
+make diagnose-players-go
+
+# Check Heroku production database
+make diagnose-heroku
+
+# Test API connections
+make test-apis
+```
 
 ### Deployment
 
@@ -400,6 +456,64 @@ Standalone CLI for automated data sync:
 - Live sync: Continuous loop during game days
 - Designed for cron scheduling (see scripts/crontab-2025.txt)
 
+### Automated Scheduler (internal/scheduler/scheduler.go)
+
+Intelligent sync scheduler that automatically adapts to game schedule:
+
+**Sync Modes:**
+- **Offseason Mode:** Daily syncs (rosters, standings)
+- **Preseason Mode:** Every 6 hours (games, rosters, injuries)
+- **Regular Season Mode:** Every 2 hours (all data)
+- **Game Day Mode:** Every 5 minutes during live games (scores, stats, injuries)
+- **Postseason Mode:** Every 15 minutes (playoffs critical)
+
+**Features:**
+- Game detection via GameDetector (internal/scheduler/game_detector.go)
+- Automatic mode switching based on season state
+- Cache invalidation after syncs
+- Health monitoring and error tracking
+- Graceful shutdown support
+
+**Configuration:**
+- Enable/disable via SCHEDULER_ENABLED env var
+- Configurable intervals per mode
+- Manual control via admin endpoints
+
+**Admin Endpoints:**
+- `/api/v1/admin/scheduler/status` - Get scheduler status
+- `/api/v1/admin/scheduler/start` - Start scheduler
+- `/api/v1/admin/scheduler/stop` - Stop scheduler
+- `/api/v1/admin/scheduler/trigger` - Force immediate sync
+
+### Yahoo Fantasy API Client (internal/yahoo/client.go)
+
+**Status:** Foundation built, requires OAuth2 setup to activate
+
+Fantasy-specific data not available in ESPN:
+- Player rankings (weekly, by position)
+- Fantasy point projections with stats breakdown
+- Ownership percentages (roster %, start %)
+- Matchup difficulty ratings
+- Waiver wire trends (adds/drops, FAAB bids)
+- Fantasy news and injury impact
+
+**OAuth2 Setup Required:**
+- Yahoo Developer App credentials (YAHOO_CLIENT_ID, YAHOO_CLIENT_SECRET)
+- One-time manual auth to obtain refresh token
+- Helper tools: `cmd/yahoo_auth/main.go`, `cmd/yahoo_oauth_helper/main.go`
+- See YAHOO_INTEGRATION_GUIDE.md for complete setup
+
+**API Endpoints:**
+- `/api/v1/fantasy/rankings` - Player rankings
+- `/api/v1/fantasy/projections/:id` - Player projections
+- `/api/v1/fantasy/projections/top` - Top projected players
+- `/api/v1/fantasy/ownership` - Ownership data
+
+**Database:**
+- Tables: yahoo_player_rankings, yahoo_player_projections, yahoo_ownership_data
+- Migration 011 adds Yahoo Fantasy schema
+- OAuth token storage (encrypted)
+
 ## AI Integration
 
 ### Multi-Provider AI Service with Automatic Fallback
@@ -530,6 +644,15 @@ func applyAIMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 - `DB_MAX_CONNS` - Max database connections (default 25)
 - `DB_MIN_CONNS` - Min database connections (default 5)
 - `ENVIRONMENT` - production, staging, or development
+
+**Yahoo Fantasy (optional):**
+- `YAHOO_CLIENT_ID` - Yahoo Developer App client ID
+- `YAHOO_CLIENT_SECRET` - Yahoo Developer App client secret
+- `YAHOO_REDIRECT_URL` - OAuth2 redirect URL
+- `YAHOO_REFRESH_TOKEN` - Long-lived refresh token (obtained via yahoo_auth tool)
+
+**Scheduler (optional):**
+- `SCHEDULER_ENABLED` - Enable/disable automated scheduler (default: false)
 
 **Development mode triggers:**
 - No API_KEY set → Authentication bypassed
